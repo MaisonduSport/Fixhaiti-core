@@ -2,123 +2,164 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FixHaiti | Modernisation Infrastructures</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FixHaiti | Infrastructure Intelligence</title>
     
+    <link rel="manifest" href="data:application/manifest+json,{'name':'FixHaiti','short_name':'FixHaiti','start_url':'.','display':'standalone','background_color':'#0A0A0A','theme_color':'#007AFF','icons':[{'src':'https://via.placeholder.com/192/007AFF/ffffff?text=FH','sizes':'192x192','type':'image/png'}]}">
+
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        :root { --black: #0A0A0A; --gray: #1A1A1A; --blue: #007AFF; --red: #FF3B30; --green: #34C759; }
-        body { font-family: -apple-system, sans-serif; background-color: var(--black); color: white; margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        :root { --b: #000; --w: #fff; --blue: #007AFF; --red: #FF3B30; --gray: #1C1C1E; }
+        body { font-family: -apple-system, system-ui, sans-serif; background: var(--b); color: var(--w); margin: 0; display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
         
-        header { background: black; padding: 15px; text-align: center; border-bottom: 1px solid #333; }
-        h1 { margin: 0; font-size: 1.2rem; letter-spacing: 2px; color: var(--blue); }
+        header { background: #000; padding: 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; z-index: 1001; }
+        .logo { font-weight: 900; letter-spacing: 2px; color: var(--blue); }
+        .badge { background: #333; padding: 4px 8px; border-radius: 4px; font-size: 10px; color: #aaa; }
 
-        #map { flex-grow: 1; width: 100%; z-index: 1; }
+        #map { flex-grow: 1; z-index: 1; }
 
-        .action-panel { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 100; display: flex; gap: 10px; }
-        button { background: var(--blue); color: white; border: none; padding: 12px 20px; border-radius: 30px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        .btn-report { background: var(--red); }
+        /* Floating UI */
+        .stats-overlay { position: absolute; top: 80px; left: 20px; z-index: 1000; pointer-events: none; }
+        .stat-card { background: rgba(28,28,30,0.9); padding: 12px; border-radius: 10px; margin-bottom: 8px; border-left: 3px solid var(--blue); min-width: 120px; }
+        .stat-card small { color: #888; font-size: 10px; text-transform: uppercase; }
+        .stat-card div { font-size: 18px; font-weight: bold; }
 
-        /* Report Modal */
-        #modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; padding: 20px; box-sizing: border-box; overflow-y: auto; }
-        .modal-content { max-width: 500px; margin: auto; background: var(--gray); padding: 20px; border-radius: 15px; border: 1px solid #444; }
-        label { display: block; margin: 15px 0 5px; font-size: 0.9rem; color: #aaa; }
-        input, select, textarea { width: 100%; padding: 10px; background: #222; border: 1px solid #444; color: white; border-radius: 5px; box-sizing: border-box; }
+        .btn-report { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 1000; background: var(--blue); color: white; border: none; padding: 16px 32px; border-radius: 50px; font-weight: bold; font-size: 16px; box-shadow: 0 10px 30px rgba(0,122,255,0.4); cursor: pointer; transition: 0.2s; }
+        .btn-report:active { transform: translateX(-50%) scale(0.95); }
+
+        /* Fullscreen Modal */
+        .modal { display: none; position: fixed; inset: 0; background: var(--b); z-index: 2000; padding: 25px; flex-direction: column; overflow-y: auto; }
+        .modal h2 { margin-top: 0; color: var(--blue); }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-size: 12px; color: #888; text-transform: uppercase; }
+        select, input, textarea { width: 100%; background: var(--gray); border: 1px solid #333; color: white; padding: 14px; border-radius: 10px; box-sizing: border-box; font-size: 16px; }
         
-        .estimate-box { margin-top: 20px; padding: 15px; background: #000; border-left: 4px solid var(--blue); }
-        .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        .stat { background: #222; padding: 10px; border-radius: 8px; text-align: center; }
-        .stat span { display: block; font-size: 1.2rem; font-weight: bold; }
+        .estimate-panel { background: #0A0A0A; padding: 20px; border-radius: 12px; border: 1px solid var(--blue); margin-top: 10px; }
+        .cost-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px; }
+        .total-price { font-size: 22px; font-weight: bold; color: var(--blue); margin-top: 10px; border-top: 1px solid #333; padding-top: 10px; }
+
+        .btn-submit { background: var(--blue); color: white; border: none; width: 100%; padding: 18px; border-radius: 12px; font-weight: bold; font-size: 18px; margin-top: 20px; }
+        .btn-close { background: transparent; color: #555; border: none; width: 100%; padding: 10px; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>FIXHAITI <span style="color:white; font-weight:normal;">| PROTOTYPE</span></h1>
+    <div class="logo">FIXHAITI</div>
+    <div class="badge">BETA v1.02</div>
 </header>
+
+<div class="stats-overlay">
+    <div class="stat-card">
+        <small>Signalements</small>
+        <div id="count-total">0</div>
+    </div>
+    <div class="stat-card" style="border-color: var(--red);">
+        <small>Urgent (24h)</small>
+        <div id="count-urgent">0</div>
+    </div>
+</div>
 
 <div id="map"></div>
 
-<div class="summary-grid" style="position: absolute; top: 70px; right: 20px; z-index: 100; width: 200px;">
-    <div class="stat"><span style="color:var(--red);">1,240</span>Signalés</div>
-    <div class="stat"><span style="color:var(--green);">12</span>Réparés</div>
-</div>
+<button class="btn-report" onclick="openModal()">SIGNALER PROBLÈME</button>
 
-<div class="action-panel">
-    <button onclick="toggleModal()">SIGNALER UN PROBLÈME</button>
-    <button style="background: #333;" onclick="alert('Exportation PDF pour MTPTC générée...')">EXPORTER RAPPORT</button>
-</div>
-
-<div id="modal">
-    <div class="modal-content">
-        <h2>Nouveau Signalement</h2>
-        <label>Catégorie</label>
-        <select id="cat" onchange="calculateEstimate()">
-            <option value="45">Nid-de-poule (Route)</option>
-            <option value="120">Caniveau bouché</option>
-            <option value="500">Fuite DINEPA (Grosse)</option>
-            <option value="2500">Pont Endommagé</option>
+<div id="modal" class="modal">
+    <h2>Nouveau Rapport</h2>
+    
+    <div class="form-group">
+        <label>Type d'infrastructure</label>
+        <select id="issue-type" onchange="updateEstimate()">
+            <option value="55" data-label="Nid-de-poule">Route (Nid-de-poule)</option>
+            <option value="120" data-label="Drainage">Caniveau Bouché</option>
+            <option value="350" data-label="Électricité">Poteau EDH Endommagé</option>
+            <option value="800" data-label="Pont">Structure Pont</option>
         </select>
+    </div>
 
-        <label>Impact (Nombre de personnes affectées)</label>
-        <input type="number" id="impact" value="100" oninput="calculateEstimate()">
-
-        <div class="estimate-box">
-            <strong>ESTIMATION AUTOMATIQUE (Bordereau)</strong>
-            <p id="est-text">Coût estimé: $4,500 USD</p>
-            <small style="color: #888;">Basé sur les prix du marché à Port-au-Prince.</small>
-        </div>
-
-        <label>Photo</label>
-        <input type="file" accept="image/*">
-
-        <div style="display: flex; gap: 10px; margin-top: 20px;">
-            <button class="btn-report" style="flex:1" onclick="submitReport()">ENVOYER</button>
-            <button style="background:#555" onclick="toggleModal()">ANNULER</button>
+    <div class="form-group">
+        <label>Importance du trafic</label>
+        <input type="range" id="traffic" min="1" max="10" value="5" oninput="updateEstimate()">
+        <div style="display: flex; justify-content: space-between; font-size: 10px; color: #555;">
+            <span>FAIBLE</span><span>CRITIQUE</span>
         </div>
     </div>
+
+    <div class="estimate-panel">
+        <div class="cost-row"><span>Matériaux:</span><span id="est-mat">$0</span></div>
+        <div class="cost-row"><span>Main d'œuvre:</span><span id="est-lab">$0</span></div>
+        <div class="total-price" id="est-total">$0 USD</div>
+    </div>
+
+    <button class="btn-submit" onclick="submitData()">TRANSMETTRE AU RÉSEAU</button>
+    <button class="btn-close" onclick="closeModal()">RETOUR À LA CARTE</button>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    // 1. Initialize Map centered on Port-au-Prince
-    const map = L.map('map', {zoomControl: false}).setView([18.5392, -72.3350], 13);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap &copy; CARTO'
-    }).addTo(map);
+    // 1. Storage Logic
+    let db = JSON.parse(localStorage.getItem('fixhaiti_data')) || [];
+    
+    // 2. Initialize Map
+    const map = L.map('map', { zoomControl: false }).setView([18.5392, -72.3350], 13);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 
-    // 2. Add Dummy Data (Pins)
-    const issues = [
-        {pos: [18.541, -72.330], desc: "Nid-de-poule Géant", status: "red"},
-        {pos: [18.535, -72.340], desc: "Caniveau Inondé", status: "orange"},
-        {pos: [18.545, -72.320], desc: "Réparation Terminée", status: "green"}
-    ];
-
-    issues.forEach(i => {
-        L.circleMarker(i.pos, {
-            radius: 8,
-            fillColor: i.status === "red" ? "#FF3B30" : i.status === "green" ? "#34C759" : "#FF9500",
-            color: "#fff", weight: 1, fillOpacity: 0.8
-        }).addTo(map).bindPopup(i.desc);
-    });
-
-    // 3. Logic Functions
-    function toggleModal() {
-        const m = document.getElementById('modal');
-        m.style.display = m.style.display === 'block' ? 'none' : 'block';
+    function updateStats() {
+        document.getElementById('count-total').innerText = db.length;
+        document.getElementById('count-urgent').innerText = db.filter(i => i.traffic > 7).length;
     }
 
-    function calculateEstimate() {
-        const unitCost = document.getElementById('cat').value;
-        const impact = document.getElementById('impact').value;
-        const total = unitCost * (impact / 10);
-        document.getElementById('est-text').innerText = "Coût estimé: $" + total.toLocaleString() + " USD";
+    function renderPins() {
+        db.forEach(item => {
+            L.circleMarker([item.lat, item.lng], {
+                radius: 10,
+                fillColor: item.traffic > 7 ? '#FF3B30' : '#007AFF',
+                color: '#fff', weight: 2, fillOpacity: 0.9
+            }).addTo(map).bindPopup(`<b>${item.type}</b><br>Est: ${item.cost}`);
+        });
     }
 
-    function submitReport() {
-        alert("Rapport enregistré ! Coordonnées GPS capturées. Ajout à la carte publique...");
-        toggleModal();
+    // 3. UI Logic
+    function openModal() { document.getElementById('modal').style.display = 'flex'; updateEstimate(); }
+    function closeModal() { document.getElementById('modal').style.display = 'none'; }
+
+    function updateEstimate() {
+        const base = parseInt(document.getElementById('issue-type').value);
+        const traffic = parseInt(document.getElementById('traffic').value);
+        
+        const mat = base * (traffic * 2.5);
+        const lab = mat * 0.4;
+        const total = mat + lab;
+
+        document.getElementById('est-mat').innerText = `$${mat.toLocaleString()}`;
+        document.getElementById('est-lab').innerText = `$${lab.toLocaleString()}`;
+        document.getElementById('est-total').innerText = `$${total.toLocaleString()} USD`;
     }
+
+    function submitData() {
+        navigator.geolocation.getCurrentPosition((pos) => {
+            const newReport = {
+                id: Date.now(),
+                type: document.getElementById('issue-type').selectedOptions[0].getAttribute('data-label'),
+                traffic: document.getElementById('traffic').value,
+                cost: document.getElementById('est-total').innerText,
+                lat: pos.coords.latitude,
+                lng: pos.coords.longitude
+            };
+            
+            db.push(newReport);
+            localStorage.setItem('fixhaiti_data', JSON.stringify(db));
+            
+            alert("Rapport envoyé. Votre position a été enregistrée.");
+            location.reload(); // Refresh to show new pin
+        }, () => {
+            alert("Veuillez activer le GPS pour signaler un problème.");
+        });
+    }
+
+    // Run on Load
+    updateStats();
+    renderPins();
 </script>
 
 </body>
