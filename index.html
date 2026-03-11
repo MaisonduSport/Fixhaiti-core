@@ -2,206 +2,67 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FixHaiti | Ensemble pour l'Avenir</title>
-
-    <div style="padding: 10px 20px; background: #eef2f6; display: flex; justify-content: space-between; font-size: 0.75rem;">
-    <span style="color: #666;">FILE D'ATTENTE D'EXPERTISE:</span>
-    <span style="font-weight: 800; color: var(--primary);">8 RAPPORTS EN COURS</span>
-</div>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FixHaiti | Pro</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #007AFF;
-            --bg: #f5f7fa;
-            --card: rgba(255, 255, 255, 0.8);
-            --text: #1a1c1e;
-            --accent: #34C759;
-        }
-
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: var(--bg);
-            color: var(--text);
-            margin: 0; padding: 0;
-            overflow: hidden; height: 100vh;
-        }
-
-        /* --- THE BEAUTIFUL HEADER --- */
-        header {
-            padding: 20px;
-            display: flex; justify-content: space-between; align-items: center;
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(20px);
-            position: fixed; top: 0; width: 100%; z-index: 2000;
-            box-sizing: border-box;
-        }
-        .logo { font-weight: 800; font-size: 1.2rem; color: var(--primary); letter-spacing: -0.5px; }
-
-        /* --- THE MAP AREA --- */
-        #map { height: 100vh; width: 100%; z-index: 1; }
-
-        /* --- THE CALL TO ACTION --- */
-        .main-button {
-            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
-            background: var(--primary); color: white;
-            padding: 18px 35px; border-radius: 50px;
-            font-weight: 700; font-size: 1rem;
-            border: none; box-shadow: 0 15px 35px rgba(0, 122, 255, 0.3);
-            z-index: 1000; cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .main-button:hover { transform: translateX(-50%) translateY(-5px); box-shadow: 0 20px 40px rgba(0, 122, 255, 0.4); }
-
-        /* --- THE CLEAN REPORT MODAL --- */
-        .modal {
-            display: none; position: fixed; inset: 0;
-            background: rgba(255,255,255,0.7); backdrop-filter: blur(15px);
-            z-index: 3000; padding: 20px; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .modal-content {
-            background: white; width: 100%; max-width: 450px;
-            padding: 30px; border-radius: 30px;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.1);
-            text-align: center;
-        }
+        :root { --primary: #007AFF; --bg: #f5f7fa; }
+        body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
+        #map { height: 100vh; width: 100%; }
         
-        h2 { margin-top: 0; font-weight: 800; color: #111; }
-        p { color: #666; font-size: 0.9rem; line-height: 1.5; }
-
-        .option-card {
-            background: #f0f3f7; padding: 20px; border-radius: 20px;
-            margin: 15px 0; border: 2px solid transparent; cursor: pointer;
-            transition: 0.2s; text-align: left; display: flex; align-items: center; gap: 15px;
+        /* High-End UI Elements */
+        .report-panel {
+            position: absolute; bottom: 20px; left: 20px; right: 20px;
+            background: white; padding: 25px; border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15); z-index: 1000;
+            display: none;
         }
-        .option-card:hover { border-color: var(--primary); background: #fff; }
-        .icon-circle { width: 45px; height: 45px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
-
-        .step-form { display: none; width: 100%; }
-        select, textarea {
-            width: 100%; background: #f0f3f7; border: none; padding: 15px;
-            border-radius: 15px; font-family: inherit; font-size: 1rem; margin-top: 10px;
-        }
-        .upload-btn {
-            margin-top: 15px; display: block; width: 100%; padding: 15px;
-            background: #eef2f6; border: 2px dashed #cbd5e0;
-            border-radius: 15px; color: #4a5568; cursor: pointer;
-        }
-
-        /* --- SUCCESS STATE --- */
-        .success-circle { width: 80px; height: 80px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 20px; }
-
+        .btn { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; width: 100%; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-<header>
-    <div class="logo">FIXHAITI</div>
-    <div style="font-weight: 600; font-size: 0.8rem; background: #fff; padding: 5px 12px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">324 Citoyens Actifs</div>
-</header>
-
 <div id="map"></div>
 
-<button class="main-button" onclick="openStep('intro')">Améliorer mon quartier</button>
-
-<div id="modal-intro" class="modal">
-    <div class="modal-content">
-        <h2>Comment aider ?</h2>
-        <p>Signalez un problème d'infrastructure pour que nous puissions le cataloguer et trouver une solution.</p>
-        
-        <div class="option-card" onclick="startGPS()">
-            <div class="icon-circle">📍</div>
-            <div>
-                <strong>Ma position actuelle</strong><br><small>Utiliser le GPS de mon téléphone</small>
-            </div>
-        </div>
-
-        <div class="option-card" onclick="openStep('map-select')">
-            <div class="icon-circle">🗺️</div>
-            <div>
-                <strong>Choisir sur la carte</strong><br><small>Pointer l'endroit manuellement</small>
-            </div>
-        </div>
-        <button style="background:none; border:none; color:#aaa; margin-top:10px;" onclick="closeAll()">Annuler</button>
-    </div>
-</div>
-
-<div id="modal-form" class="modal">
-    <div class="modal-content" style="text-align: left;">
-        <h2>Détails du problème</h2>
-        <p>Ces informations nous aideront à évaluer la priorité de la réparation.</p>
-        
-        <label style="font-weight: 600; font-size: 0.8rem;">TYPE DE PROBLÈME</label>
-        <select id="issue-type">
-            <option>Route / Nid-de-poule</option>
-            <option>Drainage / Caniveau</option>
-            <option>Eau / Fuite DINEPA</option>
-            <option>Électricité / Poteau</option>
-        </select>
-
-        <label style="font-weight: 600; font-size: 0.8rem; display: block; margin-top: 20px;">PHOTO OU VIDÉO</label>
-        <input type="file" id="media" accept="image/*,video/*" capture="environment" style="display:none">
-        <div class="upload-btn" onclick="document.getElementById('media').click()">Ajouter un média</div>
-
-        <button class="main-button" style="position:static; transform:none; width:100%; margin-top:25px;" onclick="submitFinal()">Envoyer le rapport</button>
-        <center><button style="background:none; border:none; color:#aaa; margin-top:15px;" onclick="openStep('intro')">Retour</button></center>
-    </div>
-</div>
-
-<div id="modal-success" class="modal">
-    <div class="modal-content">
-        <div class="success-circle">✓</div>
-        <h2>Merci, Citoyen !</h2>
-        <p>Votre rapport a été envoyé à notre équipe pour validation. Une fois vérifié, il apparaîtra sur la carte avec une priorité basée sur le nombre de signalements.</p>
-        <button class="main-button" style="position:static; transform:none; width:100%;" onclick="location.reload()">Retour à l'accueil</button>
-    </div>
+<div id="report-panel" class="report-panel">
+    <h3 id="location-title">Confirmer l'emplacement</h3>
+    <p id="address-confirm">Êtes-vous situé sur cette rue ?</p>
+    <select id="issue-type" style="width:100%; padding:10px; margin-bottom:10px;">
+        <option>Route / Nid-de-poule</option>
+        <option>Déchets / Assainissement</option>
+        <option>Eau / Fuite DINEPA</option>
+    </select>
+    <input type="file" id="media" accept="image/*" style="display:none">
+    <button class="btn" onclick="document.getElementById('media').click()">📸 Ajouter une photo (Optionnel)</button>
+    <button class="btn" style="background:#34C759" onclick="confirmReport()">Oui, Signaler ici</button>
+    <button class="btn" style="background:#ff3b30" onclick="closePanel()">Annuler</button>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    // Initialize Map with a soft, clean style
-    const map = L.map('map', {zoomControl: false}).setView([18.5392, -72.3350], 14);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap'
-    }).addTo(map);
+    const map = L.map('map').setView([18.5392, -72.3350], 14);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png').addTo(map);
 
-    // Simulated "Verified" Data from your team
-    const verifiedPoints = [
-        {pos: [18.541, -72.332], desc: "Nid-de-poule Prioritaire", reports: 12, cost: "$1,200"},
-        {pos: [18.535, -72.345], desc: "Caniveau Bouché", reports: 5, cost: "$450"}
-    ];
+    let tempMarker;
 
-    verifiedPoints.forEach(p => {
-        const marker = L.circleMarker(p.pos, {
-            radius: 8 + (p.reports / 2), // Grows with reports
-            fillColor: "#007AFF", color: "#fff", weight: 2, fillOpacity: 0.8
-        }).addTo(map);
-        
-        marker.bindPopup(`<strong>${p.desc}</strong><br>Signalé ${p.reports} fois<br>Estimation: ${p.cost}`);
+    // Click map to report
+    map.on('click', function(e) {
+        if(tempMarker) map.removeLayer(tempMarker);
+        tempMarker = L.marker(e.latlng).addTo(map);
+        document.getElementById('report-panel').style.display = 'block';
+        document.getElementById('address-confirm').innerText = `Coordonnées: ${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`;
     });
 
-    function openStep(step) {
-        closeAll();
-        document.getElementById('modal-' + step).style.display = 'flex';
+    function confirmReport() {
+        // Logic to save to database would go here
+        alert("Rapport enregistré avec succès.");
+        closePanel();
     }
 
-    function closeAll() {
-        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
-    }
-
-    function startGPS() {
-        navigator.geolocation.getCurrentPosition(() => {
-            openStep('form');
-        }, () => {
-            alert("Veuillez autoriser le GPS ou choisir manuellement.");
-        });
-    }
-
-    function submitFinal() {
-        openStep('success');
+    function closePanel() {
+        document.getElementById('report-panel').style.display = 'none';
+        if(tempMarker) map.removeLayer(tempMarker);
     }
 </script>
-
 </body>
 </html>
