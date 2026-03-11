@@ -3,341 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FixHaiti | Infrastructure Intelligence Platform</title>
-
+    <title>FixHaiti | Ensemble pour l'Avenir</title>
+    
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
-
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #050505;
-            --accent: #007AFF;
-            --card: rgba(255, 255, 255, 0.03);
-            --border: rgba(255, 255, 255, 0.08);
-            --text: #E0E0E0;
-            --red: #FF3B30;
-            --green: #34C759;
-            --orange: #FF9500;
+            --primary: #007AFF;
+            --bg: #f5f7fa;
+            --card: rgba(255, 255, 255, 0.8);
+            --text: #1a1c1e;
+            --accent: #34C759;
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body, html { 
-            margin: 0; padding: 0; height: 100%; 
-            background: var(--bg); color: var(--text); 
-            font-family: 'Inter', sans-serif; overflow: hidden;
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0; padding: 0;
+            overflow: hidden; height: 100vh;
         }
 
-        /* --- LAYOUT UTILITIES --- */
-        .page {
-            position: absolute; inset: 0;
-            display: none; padding: 20px;
-            flex-direction: column;
-            overflow-y: auto;
-        }
-        .active-page { display: flex; }
-
-        /* --- GLASSMORPHISM & BENTO --- */
-        .bento-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 20px;
-        }
-        .glass-panel {
-            background: var(--card);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-            border-radius: 12px;
+        /* --- THE BEAUTIFUL HEADER --- */
+        header {
             padding: 20px;
-            position: relative;
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px);
+            position: fixed; top: 0; width: 100%; z-index: 2000;
+            box-sizing: border-box;
         }
-        .span-2 { grid-column: span 2; }
+        .logo { font-weight: 800; font-size: 1.2rem; color: var(--primary); letter-spacing: -0.5px; }
 
-        /* --- TYPOGRAPHY --- */
-        h1, h2, h3 { margin: 0; text-transform: uppercase; letter-spacing: 2px; }
-        .data-label { font-size: 10px; color: #666; font-weight: 700; text-transform: uppercase; margin-bottom: 5px; }
-        .val-huge { font-size: 2.5rem; font-weight: 900; color: var(--accent); line-height: 1; }
-        .val-med { font-size: 1.5rem; font-weight: 700; }
+        /* --- THE MAP AREA --- */
+        #map { height: 100vh; width: 100%; z-index: 1; }
 
-        /* --- COMPONENTS --- */
-        #main-map { height: 300px; border-radius: 12px; margin-top: 15px; border: 1px solid var(--border); }
-        .btn-action {
-            background: var(--accent);
-            color: white; border: none;
-            padding: 20px; border-radius: 8px;
-            font-weight: 900; text-transform: uppercase;
-            letter-spacing: 1px; cursor: pointer;
-            box-shadow: 0 8px 24px rgba(0, 122, 255, 0.3);
-            transition: 0.2s;
+        /* --- THE CALL TO ACTION --- */
+        .main-button {
+            position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%);
+            background: var(--primary); color: white;
+            padding: 18px 35px; border-radius: 50px;
+            font-weight: 700; font-size: 1rem;
+            border: none; box-shadow: 0 15px 35px rgba(0, 122, 255, 0.3);
+            z-index: 1000; cursor: pointer; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .btn-action:active { transform: scale(0.98); opacity: 0.9; }
+        .main-button:hover { transform: translateX(-50%) translateY(-5px); box-shadow: 0 20px 40px rgba(0, 122, 255, 0.4); }
 
-        /* --- PHASE 2/3 SPECIFICS --- */
-        .telemetry-choice {
-            display: flex; flex-direction: column; gap: 15px; margin-top: 40px;
+        /* --- THE CLEAN REPORT MODAL --- */
+        .modal {
+            display: none; position: fixed; inset: 0;
+            background: rgba(255,255,255,0.7); backdrop-filter: blur(15px);
+            z-index: 3000; padding: 20px; flex-direction: column; align-items: center; justify-content: center;
         }
-        #manual-map-container { position: relative; flex-grow: 1; min-height: 400px; margin: 15px 0; }
-        .crosshair {
-            position: absolute; top: 50%; left: 50%;
-            transform: translate(-50%, -100%); z-index: 1000;
-            pointer-events: none; width: 40px;
+        .modal-content {
+            background: white; width: 100%; max-width: 450px;
+            padding: 30px; border-radius: 30px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.1);
+            text-align: center;
         }
-        .audit-form label { display: block; margin-top: 20px; font-size: 11px; color: #888; text-transform: uppercase; }
-        select, textarea, input[type="range"] {
-            width: 100%; background: #111; border: 1px solid var(--border);
-            color: white; padding: 15px; border-radius: 8px; margin-top: 8px;
+        
+        h2 { margin-top: 0; font-weight: 800; color: #111; }
+        p { color: #666; font-size: 0.9rem; line-height: 1.5; }
+
+        .option-card {
+            background: #f0f3f7; padding: 20px; border-radius: 20px;
+            margin: 15px 0; border: 2px solid transparent; cursor: pointer;
+            transition: 0.2s; text-align: left; display: flex; align-items: center; gap: 15px;
         }
-        .cost-display {
-            background: rgba(0, 122, 255, 0.1); border: 1px solid var(--accent);
-            padding: 20px; border-radius: 8px; margin-top: 25px; text-align: center;
+        .option-card:hover { border-color: var(--primary); background: #fff; }
+        .icon-circle { width: 45px; height: 45px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+
+        .step-form { display: none; width: 100%; }
+        select, textarea {
+            width: 100%; background: #f0f3f7; border: none; padding: 15px;
+            border-radius: 15px; font-family: inherit; font-size: 1rem; margin-top: 10px;
         }
-        .media-preview {
-            width: 100%; height: 150px; border: 2px dashed #333;
-            border-radius: 8px; margin-top: 10px; display: flex;
-            align-items: center; justify-content: center; font-size: 12px; color: #444;
+        .upload-btn {
+            margin-top: 15px; display: block; width: 100%; padding: 15px;
+            background: #eef2f6; border: 2px dashed #cbd5e0;
+            border-radius: 15px; color: #4a5568; cursor: pointer;
         }
 
-        /* Chart constraints */
-        #chartWrapper { height: 200px; width: 100%; }
+        /* --- SUCCESS STATE --- */
+        .success-circle { width: 80px; height: 80px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin: 0 auto 20px; }
+
     </style>
 </head>
 <body>
 
-<div id="p1" class="page active-page animate__animated animate__fadeIn">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h1 style="font-size: 1.2rem; color: var(--accent);">FixHaiti // Ledger</h1>
-        <div style="font-size: 10px; border: 1px solid #333; padding: 4px 8px; border-radius: 4px;">SECURE TERMINAL 2026</div>
-    </div>
+<header>
+    <div class="logo">FIXHAITI</div>
+    <div style="font-weight: 600; font-size: 0.8rem; background: #fff; padding: 5px 12px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">324 Citoyens Actifs</div>
+</header>
 
-    <div class="bento-grid">
-        <div class="glass-panel span-2" style="text-align: center;">
-            <div class="data-label">National Infrastructure Health</div>
-            <div class="val-huge" style="color: var(--green);" id="health-index">63%</div>
-            <div style="height: 4px; background: #111; margin-top: 15px; border-radius: 2px;">
-                <div id="health-bar" style="height: 100%; width: 63%; background: var(--green); border-radius: 2px;"></div>
+<div id="map"></div>
+
+<button class="main-button" onclick="openStep('intro')">Améliorer mon quartier</button>
+
+<div id="modal-intro" class="modal">
+    <div class="modal-content">
+        <h2>Comment aider ?</h2>
+        <p>Signalez un problème d'infrastructure pour que nous puissions le cataloguer et trouver une solution.</p>
+        
+        <div class="option-card" onclick="startGPS()">
+            <div class="icon-circle">📍</div>
+            <div>
+                <strong>Ma position actuelle</strong><br><small>Utiliser le GPS de mon téléphone</small>
             </div>
         </div>
 
-        <div class="glass-panel">
-            <div class="data-label">Active Audits</div>
-            <div class="val-med" id="count-audits">0</div>
-        </div>
-        <div class="glass-panel">
-            <div class="data-label">Gov Response</div>
-            <div class="val-med" style="color: var(--orange);">27%</div>
-        </div>
-
-        <div class="glass-panel span-2">
-            <div class="data-label">National Distribution</div>
-            <div id="chartWrapper">
-                <canvas id="distributionChart"></canvas>
+        <div class="option-card" onclick="openStep('map-select')">
+            <div class="icon-circle">🗺️</div>
+            <div>
+                <strong>Choisir sur la carte</strong><br><small>Pointer l'endroit manuellement</small>
             </div>
         </div>
-
-        <div class="glass-panel span-2">
-            <div class="data-label">Live Infrastructure Map</div>
-            <div id="main-map"></div>
-        </div>
+        <button style="background:none; border:none; color:#aaa; margin-top:10px;" onclick="closeAll()">Annuler</button>
     </div>
-
-    <button class="btn-action" style="margin-top: 30px;" onclick="nav('p2')">Initiate Infrastructure Audit</button>
 </div>
 
-<div id="p2" class="page animate__animated animate__fadeIn">
-    <h2>Telemetry Capture</h2>
-    <div class="data-label">Select Location Acquisition Mode</div>
+<div id="modal-form" class="modal">
+    <div class="modal-content" style="text-align: left;">
+        <h2>Détails du problème</h2>
+        <p>Ces informations nous aideront à évaluer la priorité de la réparation.</p>
+        
+        <label style="font-weight: 600; font-size: 0.8rem;">TYPE DE PROBLÈME</label>
+        <select id="issue-type">
+            <option>Route / Nid-de-poule</option>
+            <option>Drainage / Caniveau</option>
+            <option>Eau / Fuite DINEPA</option>
+            <option>Électricité / Poteau</option>
+        </select>
 
-    <div class="telemetry-choice">
-        <div class="glass-panel" onclick="acquireGPS()">
-            <div class="val-med">Active GPS</div>
-            <div style="font-size: 12px; color: #666;">High-precision satellite triangulation</div>
-        </div>
-        <div class="glass-panel" onclick="nav('p2-manual')">
-            <div class="val-med">Spatial Mapping</div>
-            <div style="font-size: 12px; color: #666;">Manual coordinate override</div>
-        </div>
+        <label style="font-weight: 600; font-size: 0.8rem; display: block; margin-top: 20px;">PHOTO OU VIDÉO</label>
+        <input type="file" id="media" accept="image/*,video/*" capture="environment" style="display:none">
+        <div class="upload-btn" onclick="document.getElementById('media').click()">Ajouter un média</div>
+
+        <button class="main-button" style="position:static; transform:none; width:100%; margin-top:25px;" onclick="submitFinal()">Envoyer le rapport</button>
+        <center><button style="background:none; border:none; color:#aaa; margin-top:15px;" onclick="openStep('intro')">Retour</button></center>
     </div>
-    <button class="btn-action" style="background: transparent; border: 1px solid #333; margin-top: auto;" onclick="nav('p1')">Abort Mission</button>
 </div>
 
-<div id="p2-manual" class="page animate__animated animate__fadeIn">
-    <h2>Spatial Mapping</h2>
-    <div class="data-label">Align crosshair with infrastructure failure</div>
-    <div id="manual-map-container">
-        <div id="map-manual" style="height: 100%; border-radius: 12px;"></div>
-        <img src="https://upload.wikimedia.org/wikipedia/commons/e/ed/Map_pin_icon.svg" class="crosshair">
+<div id="modal-success" class="modal">
+    <div class="modal-content">
+        <div class="success-circle">✓</div>
+        <h2>Merci, Citoyen !</h2>
+        <p>Votre rapport a été envoyé à notre équipe pour validation. Une fois vérifié, il apparaîtra sur la carte avec une priorité basée sur le nombre de signalements.</p>
+        <button class="main-button" style="position:static; transform:none; width:100%;" onclick="location.reload()">Retour à l'accueil</button>
     </div>
-    <button class="btn-action" onclick="lockManualCoords()">Lock Coordinates</button>
-</div>
-
-<div id="p3" class="page animate__animated animate__fadeIn audit-form">
-    <h2>Infrastructure Triage</h2>
-    
-    <label>Infrastructure Category</label>
-    <select id="f-cat" onchange="updateBordereau()">
-        <option value="2000">Road / Pavement</option>
-        <option value="3000">Water / DINEPA</option>
-        <option value="4000">Power / EDH</option>
-        <option value="1500">Drainage</option>
-        <option value="8000">Bridge / Structural</option>
-    </select>
-
-    <label>Impact Severity (1-10)</label>
-    <input type="range" id="f-sev" min="1" max="10" step="1" value="5" oninput="updateBordereau()">
-    <div style="display: flex; justify-content: space-between; font-size: 10px; color: #444;">
-        <span>MINOR</span><span>CRITICAL</span>
-    </div>
-
-    <label>Evidence Capture</label>
-    <input type="file" id="f-media" accept="image/*,video/*" capture="environment" onchange="previewMedia()">
-    <div class="media-preview" id="m-prev">Waiting for media uplink...</div>
-
-    <label>Technical Notes</label>
-    <textarea id="f-notes" rows="4" placeholder="Describe damage geometry and public safety hazards..."></textarea>
-
-    <div class="cost-display">
-        <div class="data-label">Estimated Repair Cost (Bordereau)</div>
-        <div class="val-med" id="f-cost" style="color: var(--accent);">$0.00</div>
-    </div>
-
-    <button class="btn-action" style="margin-top: 30px;" onclick="submitAudit()">Commit to Ledger</button>
-</div>
-
-<div id="p4" class="page animate__animated animate__zoomIn" style="text-align: center; justify-content: center;">
-    <div style="font-size: 60px; color: var(--green);">✓</div>
-    <h2>Audit Logged</h2>
-    <div class="glass-panel" style="margin-top: 20px;">
-        <div class="data-label">Verification Status</div>
-        <div class="val-med">PENDING MTPTC REVIEW</div>
-        <p style="font-size: 11px; color: #555; margin-top: 15px;">
-            Ministère des Travaux Publics, Transports et Communications<br>
-            Reference: <span id="ref-id"></span>
-        </p>
-    </div>
-    <button class="btn-action" style="margin-top: 40px; width: 100%;" onclick="location.reload()">Return to Command</button>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    // --- APP STATE & STORAGE ---
-    let reports = JSON.parse(localStorage.getItem('fh_reports')) || [];
-    let currentCoords = { lat: 18.5392, lng: -72.3350 };
-    let mainMap, manualMap, distChart;
+    // Initialize Map with a soft, clean style
+    const map = L.map('map', {zoomControl: false}).setView([18.5392, -72.3350], 14);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap'
+    }).addTo(map);
 
-    // --- NAVIGATION ENGINE ---
-    function nav(id) {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
-        document.getElementById(id).classList.add('active-page');
-        if(id === 'p1') initDashboard();
-        if(id === 'p2-manual') initManualMap();
+    // Simulated "Verified" Data from your team
+    const verifiedPoints = [
+        {pos: [18.541, -72.332], desc: "Nid-de-poule Prioritaire", reports: 12, cost: "$1,200"},
+        {pos: [18.535, -72.345], desc: "Caniveau Bouché", reports: 5, cost: "$450"}
+    ];
+
+    verifiedPoints.forEach(p => {
+        const marker = L.circleMarker(p.pos, {
+            radius: 8 + (p.reports / 2), // Grows with reports
+            fillColor: "#007AFF", color: "#fff", weight: 2, fillOpacity: 0.8
+        }).addTo(map);
+        
+        marker.bindPopup(`<strong>${p.desc}</strong><br>Signalé ${p.reports} fois<br>Estimation: ${p.cost}`);
+    });
+
+    function openStep(step) {
+        closeAll();
+        document.getElementById('modal-' + step).style.display = 'flex';
     }
 
-    // --- PHASE 1: DASHBOARD LOGIC ---
-    function initDashboard() {
-        if (!mainMap) {
-            mainMap = L.map('main-map', { zoomControl: false }).setView([18.5392, -72.3350], 12);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(mainMap);
-        }
-        
-        // Refresh Counters
-        document.getElementById('count-audits').innerText = reports.length;
-        
-        // Update Health Index based on reports (Simulation)
-        let health = Math.max(15, 63 - (reports.length * 2));
-        document.getElementById('health-index').innerText = health + "%";
-        document.getElementById('health-bar').style.width = health + "%";
-
-        // Map Pins
-        reports.forEach(r => {
-            let color = r.severity > 7 ? '#FF3B30' : (r.severity > 4 ? '#FF9500' : '#007AFF');
-            L.circleMarker([r.lat, r.lng], { color: color, radius: 8, fillOpacity: 0.8 }).addTo(mainMap);
-        });
-
-        initChart();
+    function closeAll() {
+        document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
     }
 
-    function initChart() {
-        const ctx = document.getElementById('distributionChart').getContext('2d');
-        const dataMap = { 'Road': 0, 'Water': 0, 'Power': 0, 'Drainage': 0, 'Bridge': 0 };
-        reports.forEach(r => { if(dataMap[r.cat] !== undefined) dataMap[r.cat]++ });
-
-        if(distChart) distChart.destroy();
-        distChart = new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: Object.keys(dataMap),
-                datasets: [{
-                    data: Object.values(dataMap).map(v => v + 5), // Added base values for visual padding
-                    backgroundColor: ['#007AFF', '#34C759', '#FF9500', '#FF3B30', '#8E44AD'],
-                    borderWidth: 0
-                }]
-            },
-            options: { cutout: '80%', plugins: { legend: { display: false } }, maintainAspectRatio: false }
+    function startGPS() {
+        navigator.geolocation.getCurrentPosition(() => {
+            openStep('form');
+        }, () => {
+            alert("Veuillez autoriser le GPS ou choisir manuellement.");
         });
     }
 
-    // --- PHASE 2: TELEMETRY LOGIC ---
-    function acquireGPS() {
-        navigator.geolocation.getCurrentPosition(p => {
-            currentCoords = { lat: p.coords.latitude, lng: p.coords.longitude };
-            nav('p3');
-        }, () => alert("GPS Restricted. Use Manual Mode."));
+    function submitFinal() {
+        openStep('success');
     }
-
-    function initManualMap() {
-        if (!manualMap) {
-            manualMap = L.map('map-manual', { zoomControl: false }).setView([18.5392, -72.3350], 15);
-            L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(manualMap);
-        }
-    }
-
-    function lockManualCoords() {
-        const center = manualMap.getCenter();
-        currentCoords = { lat: center.lat, lng: center.lng };
-        nav('p3');
-    }
-
-    // --- PHASE 3: AUDIT FORM LOGIC ---
-    function updateBordereau() {
-        const base = document.getElementById('f-cat').value;
-        const sev = document.getElementById('f-sev').value;
-        const total = base * sev;
-        document.getElementById('f-cost').innerText = "$" + total.toLocaleString() + ".00";
-    }
-
-    function previewMedia() {
-        const file = document.getElementById('f-media').files[0];
-        document.getElementById('m-prev').innerText = "DATA CAPTURE READY: " + file.name;
-        document.getElementById('m-prev').style.borderColor = "var(--accent)";
-    }
-
-    function submitAudit() {
-        const catLabel = document.getElementById('f-cat').options[document.getElementById('f-cat').selectedIndex].text.split(' ')[0];
-        const newReport = {
-            id: 'FH-' + Math.random().toString(36).substr(2, 9).toUpperCase(),
-            lat: currentCoords.lat,
-            lng: currentCoords.lng,
-            cat: catLabel,
-            severity: document.getElementById('f-sev').value,
-            notes: document.getElementById('f-notes').value,
-            cost: document.getElementById('f-cost').innerText,
-            timestamp: new Date().toISOString()
-        };
-
-        reports.push(newReport);
-        localStorage.setItem('fh_reports', JSON.stringify(reports));
-        
-        document.getElementById('ref-id').innerText = newReport.id;
-        nav('p4');
-    }
-
-    // --- INITIALIZE ---
-    window.onload = () => {
-        initDashboard();
-        updateBordereau();
-    };
 </script>
 
 </body>
