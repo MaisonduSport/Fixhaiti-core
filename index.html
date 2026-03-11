@@ -3,153 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FixHaiti Pro | Command & Report</title>
+    <title>FixHaiti | Infrastructure Intelligence System</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-        :root { --b: #000; --w: #fff; --accent: #007AFF; --card: #121212; --red: #FF3B30; }
-        body, html { margin: 0; padding: 0; height: 100%; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--b); color: var(--w); overflow: hidden; }
+        :root { --bg: #050505; --accent: #007AFF; --panel: #111; --border: #222; --text: #E0E0E0; }
+        body, html { margin: 0; padding: 0; height: 100%; font-family: 'Inter', -apple-system, sans-serif; background: var(--bg); color: var(--text); overflow: hidden; }
 
-        /* --- STAGE 1: DASHBOARD --- */
-        #stage-dashboard { display: flex; flex-direction: column; height: 100%; padding: 20px; box-sizing: border-box; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .logo { font-weight: 900; letter-spacing: 2px; color: var(--accent); }
+        /* --- STAGE 1: COMMAND CENTER --- */
+        #stage-dashboard { display: grid; grid-template-rows: auto 1fr auto; height: 100vh; padding: 25px; box-sizing: border-box; }
+        .nav-top { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
+        .logo { font-weight: 900; letter-spacing: 3px; color: var(--accent); font-size: 1.2rem; }
         
-        .bento-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; flex-grow: 1; }
-        .card { background: var(--card); border-radius: 20px; padding: 20px; border: 1px solid #222; position: relative; }
-        .card-big { grid-column: span 2; height: 150px; display: flex; flex-direction: column; justify-content: center; }
+        .bento-grid { display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(2, 1fr); gap: 20px; margin: 20px 0; }
+        .bento-item { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; justify-content: center; }
+        .bento-full { grid-column: span 2; }
+        .val-large { font-size: 3rem; font-weight: 900; line-height: 1; margin: 10px 0; }
+
+        .cta-bar { background: var(--accent); color: white; border: none; padding: 22px; border-radius: 12px; font-weight: 800; font-size: 1.1rem; cursor: pointer; transition: 0.2s; box-shadow: 0 10px 40px rgba(0,122,255,0.3); }
+
+        /* --- STAGE 2: LOCATION PRECISION --- */
+        .stage-overlay { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 5000; padding: 30px; box-sizing: border-box; flex-direction: column; }
+        .btn-choice { background: var(--panel); border: 1px solid var(--border); padding: 25px; border-radius: 15px; margin-bottom: 20px; text-align: left; cursor: pointer; }
+        .btn-choice:hover { border-color: var(--accent); }
+
+        /* --- STAGE 3: PRECISION MAP --- */
+        #stage-map { padding: 0; }
+        #map-canvas { height: 100%; width: 100%; }
+        .crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -100%); z-index: 6000; pointer-events: none; width: 40px; }
+        .map-controls { position: absolute; bottom: 30px; width: 100%; display: flex; justify-content: center; z-index: 6001; }
+
+        /* --- STAGE 4: MEDIA TRIAGE --- */
+        #stage-triage { overflow-y: auto; }
+        .input-group { margin-bottom: 25px; }
+        .input-group label { display: block; font-size: 0.7rem; color: #666; letter-spacing: 1px; margin-bottom: 8px; }
+        select, textarea, input { width: 100%; background: #000; border: 1px solid var(--border); padding: 18px; color: white; border-radius: 8px; font-size: 1rem; box-sizing: border-box; }
+        .dropzone { border: 2px dashed var(--border); height: 120px; display: flex; align-items: center; justify-content: center; border-radius: 8px; cursor: pointer; color: #555; }
         
-        .btn-report-start { background: var(--accent); color: white; border: none; padding: 20px; border-radius: 15px; font-weight: bold; font-size: 18px; width: 100%; margin-top: 20px; cursor: pointer; }
-
-        /* --- STAGE 2: LOCATION CHOICE --- */
-        #stage-location { display: none; padding: 40px 20px; text-align: center; }
-        .loc-option { background: var(--card); padding: 30px; border-radius: 20px; margin-bottom: 20px; border: 2px solid #333; cursor: pointer; transition: 0.2s; }
-        .loc-option:active { border-color: var(--accent); background: #1a1a1a; }
-
-        /* --- STAGE 3: MAP PICKER --- */
-        #stage-map { display: none; height: 100%; position: relative; }
-        #map { height: 100%; width: 100%; }
-        .map-overlay { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); z-index: 1000; background: rgba(0,0,0,0.8); padding: 10px 20px; border-radius: 30px; font-size: 12px; border: 1px solid var(--accent); }
-        .btn-confirm-loc { position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%); z-index: 1000; background: var(--accent); color: white; border: none; padding: 15px 40px; border-radius: 30px; font-weight: bold; }
-
-        /* --- STAGE 4: FINAL FORM --- */
-        #stage-form { display: none; padding: 25px; overflow-y: auto; height: 100%; box-sizing: border-box; }
-        label { display: block; color: #888; font-size: 11px; text-transform: uppercase; margin-top: 20px; }
-        select, textarea, input { width: 100%; background: var(--card); border: 1px solid #333; color: white; padding: 15px; border-radius: 12px; margin-top: 8px; font-size: 16px; box-sizing: border-box; }
-        .media-preview { height: 150px; background: #222; border-radius: 12px; margin-top: 10px; display: flex; align-items: center; justify-content: center; border: 2px dashed #444; }
-
-        .active-stage { display: block !important; }
+        .active { display: flex !important; }
     </style>
 </head>
 <body>
 
-<div id="stage-dashboard" class="active-stage">
-    <div class="header">
-        <div class="logo">FIXHAITI</div>
-        <div style="font-size: 12px; color: #555;">ID: SEB-2026</div>
+<div id="stage-dashboard" class="active">
+    <div class="nav-top">
+        <div class="logo">FIXHAITI // OS</div>
+        <div style="font-size: 0.7rem; color: #444;">TERMINAL: P-AU-P // 2026</div>
     </div>
     <div class="bento-grid">
-        <div class="card card-big">
-            <small>STATUT RÉSEAU</small>
-            <div style="font-size: 24px; font-weight: bold; color: #34C759;">ALERTE NATIONALE</div>
-            <div style="font-size: 12px; color: #888;">14 signalements actifs à P-au-P</div>
+        <div class="bento-item bento-full">
+            <small>INFRASTRUCTURE HEALTH INDEX</small>
+            <div class="val-large" style="color: var(--red);">32%</div>
+            <div style="font-size: 0.8rem; color: #666;">CRITICAL DEGRADATION DETECTED</div>
         </div>
-        <div class="card">
-            <small>MON SCORE</small>
-            <div style="font-size: 20px;">850 pts</div>
+        <div class="bento-item">
+            <small>ACTIVE REPORTS</small>
+            <div class="val-large">1,402</div>
         </div>
-        <div class="card">
-            <small>RÉSOLUS</small>
-            <div style="font-size: 20px; color: var(--accent);">12</div>
+        <div class="bento-item">
+            <small>REPAIRS IN PROGRESS</small>
+            <div class="val-large" style="color: var(--accent);">18</div>
         </div>
     </div>
-    <button class="btn-report-start" onclick="goTo('location')">SIGNALER UN PROBLÈME</button>
+    <button class="cta-bar" onclick="show('location')">INITIATE INFRASTRUCTURE AUDIT</button>
 </div>
 
-<div id="stage-location">
-    <h2 style="color: var(--accent);">Où est le problème ?</h2>
-    <div class="loc-option" onclick="useCurrentLocation()">
-        <div style="font-size: 40px;">📍</div>
-        <strong>MA POSITION ACTUELLE</strong>
-        <p style="font-size: 12px; color: #666;">Utiliser le GPS de mon téléphone</p>
+<div id="stage-location" class="stage-overlay">
+    <h1 style="margin-top:0;">LOCATION PROTOCOL</h1>
+    <div class="btn-choice" onclick="getGPS()">
+        <strong style="color:var(--accent);">GPS TELEMETRY</strong><br>
+        <small>Capture live coordinates from current position.</small>
     </div>
-    <div class="loc-option" onclick="goTo('map')">
-        <div style="font-size: 40px;">🗺️</div>
-        <strong>CHOISIR SUR LA CARTE</strong>
-        <p style="font-size: 12px; color: #666;">Pointer manuellement l'endroit</p>
+    <div class="btn-choice" onclick="show('map')">
+        <strong style="color:var(--accent);">MANUAL SPATIAL MAPPING</strong><br>
+        <small>Identify coordinates via visual map verification.</small>
     </div>
-    <button class="btn-close" onclick="goTo('dashboard')" style="background:transparent; color:#888; border:none;">ANNULER</button>
+    <button onclick="show('dashboard')" style="background:none; border:none; color:#444; margin-top:auto;">ABORT MISSION</button>
 </div>
 
-<div id="stage-map">
-    <div class="map-overlay">DÉPLACEZ LA CARTE SOUS LE MARQUEUR</div>
-    <div id="map"></div>
-    <div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -100%); z-index:1000; pointer-events:none; font-size:40px;">📍</div>
-    <button class="btn-confirm-loc" onclick="confirmManualLocation()">CONFIRMER CE LIEU</button>
+<div id="stage-map" class="stage-overlay">
+    <div id="map-canvas"></div>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/e/ed/Map_pin_icon.svg" class="crosshair">
+    <div class="map-controls">
+        <button class="cta-bar" style="padding: 15px 50px;" onclick="confirmMapLoc()">CONFIRM COORDINATES</button>
+    </div>
 </div>
 
-<div id="stage-form">
-    <h2 style="color: var(--accent); margin:0;">DÉTAILS DU RAPPORT</h2>
-    
-    <label>Type d'infrastructure</label>
-    <select id="issue-type">
-        <option>Pavement / Route (Nid-de-poule)</option>
-        <option>Drainage / Caniveau bouché</option>
-        <option>Électricité / Poteau tombé</option>
-        <option>Eau / Fuite DINEPA</option>
-    </select>
-
-    <label>Description du problème</label>
-    <textarea id="desc" rows="3" placeholder="Expliquez brièvement..."></textarea>
-
-    <label>Média (Photo ou Vidéo)</label>
-    <input type="file" id="media-input" accept="image/*,video/*" capture="environment" onchange="previewMedia()">
-    <div class="media-preview" id="preview-area">Aucun média sélectionné</div>
-
-    <button class="btn-report-start" onclick="finalize()">ENVOYER LE RAPPORT</button>
-    <button class="btn-close" onclick="goTo('dashboard')" style="background:transparent; color:#888; border:none; width:100%; margin-top:10px;">ANNULER</button>
+<div id="stage-triage" class="stage-overlay">
+    <h2>DATA CAPTURE</h2>
+    <div class="input-group">
+        <label>INFRASTRUCTURE CATEGORY</label>
+        <select id="infra-type">
+            <option>PAVEMENT / ROADWAY (NID-DE-POULE)</option>
+            <option>HYDRAULIC / DRAINAGE OBSTRUCTION</option>
+            <option>POWER GRID / EDH FAILURE</option>
+            <option>BRIDGE / STRUCTURAL INTEGRITY</option>
+        </select>
+    </div>
+    <div class="input-group">
+        <label>MEDIA ATTACHMENT (PHOTO/VIDEO)</label>
+        <input type="file" id="media" accept="image/*,video/*" capture="environment" onchange="updateDropzone()">
+        <div class="dropzone" id="dz">WAITING FOR RICH MEDIA...</div>
+    </div>
+    <div class="input-group">
+        <label>FIELD NOTES</label>
+        <textarea id="notes" rows="4" placeholder="Quantify the damage (e.g. 3m x 2m area)..."></textarea>
+    </div>
+    <button class="cta-bar" onclick="finalize()">PUBLISH TO PUBLIC LEDGER</button>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    let reportData = { lat: 18.5392, lng: -72.3350 };
-    let map;
+    let reportCoords = { lat: 18.5392, lng: -72.3350 };
+    let Lmap;
 
-    function goTo(stage) {
-        document.querySelectorAll('body > div').forEach(div => div.classList.remove('active-stage'));
-        document.getElementById('stage-' + stage).classList.add('active-stage');
-        if(stage === 'map') initMap();
+    function show(id) {
+        document.querySelectorAll('body > div').forEach(d => d.classList.remove('active'));
+        document.getElementById('stage-' + id).classList.add('active');
+        if(id === 'map') initLMap();
     }
 
-    function initMap() {
-        if (map) return;
-        map = L.map('map', {zoomControl: false}).setView([18.5392, -72.3350], 15);
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+    function initLMap() {
+        if (Lmap) return;
+        Lmap = L.map('map-canvas', {zoomControl: false}).setView([18.5392, -72.3350], 16);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(Lmap);
     }
 
-    function useCurrentLocation() {
-        navigator.geolocation.getCurrentPosition(pos => {
-            reportData.lat = pos.coords.latitude;
-            reportData.lng = pos.coords.longitude;
-            goTo('form');
-        }, err => alert("Erreur GPS. Veuillez choisir manuellement."));
+    function getGPS() {
+        navigator.geolocation.getCurrentPosition(p => {
+            reportCoords.lat = p.coords.latitude;
+            reportCoords.lng = p.coords.longitude;
+            show('triage');
+        }, () => alert("GPS SIGNALS BLOCKED. USE MANUAL MAPPING."));
     }
 
-    function confirmManualLocation() {
-        const center = map.getCenter();
-        reportData.lat = center.lat;
-        reportData.lng = center.lng;
-        goTo('form');
+    function confirmMapLoc() {
+        const center = Lmap.getCenter();
+        reportCoords.lat = center.lat;
+        reportCoords.lng = center.lng;
+        show('triage');
     }
 
-    function previewMedia() {
-        const file = document.getElementById('media-input').files[0];
-        document.getElementById('preview-area').innerText = file.name + " prêt !";
-        document.getElementById('preview-area').style.borderColor = "#007AFF";
+    function updateDropzone() {
+        const file = document.getElementById('media').files[0];
+        document.getElementById('dz').innerText = "DATA DETECTED: " + file.name;
+        document.getElementById('dz').style.borderColor = "#007AFF";
     }
 
     function finalize() {
-        alert("RAPPORT AIRTIGHT: Envoyé au MTPTC.\nCoordonnées: " + reportData.lat.toFixed(4) + ", " + reportData.lng.toFixed(4) + "\nMédia: " + document.getElementById('issue-type').value);
+        alert("AUDIT FINALIZED.\nGPS: " + reportCoords.lat.toFixed(6) + " / " + reportCoords.lng.toFixed(6) + "\nSTATUS: SENT TO MTPTC LEDGER.");
         location.reload();
     }
 </script>
