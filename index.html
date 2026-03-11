@@ -1,141 +1,537 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
 <title>FixHaiti — Infrastructure Intelligence</title>
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
 <style>
-/* YOUR ORIGINAL CSS RETAINED */
-*{ margin:0; padding:0; box-sizing:border-box; font-family:Arial, Helvetica, sans-serif; }
-body{ background:#0a0f1a; color:white; overflow-x:hidden; }
-nav{ position:fixed; top:0; width:100%; display:flex; justify-content:space-between; align-items:center; padding:20px 60px; background:rgba(0,0,0,0.6); backdrop-filter:blur(10px); z-index:100; }
-.logo{ font-size:26px; font-weight:bold; letter-spacing:2px; color:#00d9ff; }
-nav a{ color:white; margin-left:25px; text-decoration:none; font-size:14px; transition:0.3s; }
-nav a:hover{ color:#00d9ff; }
-.hero{ height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; position:relative; overflow:hidden; }
-.hero h1{ font-size:70px; letter-spacing:4px; margin-bottom:20px; }
-.hero p{ font-size:20px; opacity:0.8; margin-bottom:40px; }
-.btn{ padding:15px 30px; border:none; margin:10px; font-size:15px; cursor:pointer; background:#00d9ff; color:black; border-radius:5px; transition:0.3s; }
-.btn:hover{ transform:scale(1.08); box-shadow:0 0 20px #00d9ff; }
-.node{ position:absolute; width:6px; height:6px; background:#00d9ff; border-radius:50%; animation:float 10s infinite linear; }
-@keyframes float{ 0%{transform:translateY(0)} 50%{transform:translateY(-100px)} 100%{transform:translateY(0)} }
-.stats{ display:flex; justify-content:space-around; padding:100px 40px; background:#0f1626; }
-.card{ text-align:center; }
-.card h2{ font-size:45px; color:#00d9ff; }
-.card p{ opacity:0.7; }
-.map-section{ padding:100px 40px; text-align:center; }
-/* RESTORED MAP STYLE */
-.map{ width:90%; height:400px; margin:auto; background:linear-gradient(45deg,#0f1626,#0a0f1a); border:1px solid #00d9ff; position:relative; }
-.form-section{ padding:100px 40px; text-align:center; background:#0f1626; }
-form{ max-width:500px; margin:auto; display:flex; flex-direction:column; }
-input, textarea, select{ margin:10px 0; padding:12px; border:none; background:#0a0f1a; color:white; border:1px solid #00d9ff33; }
-button{ margin-top:15px; padding:14px; background:#00d9ff; border:none; cursor:pointer; font-weight:bold; }
-.about{ padding:100px 20%; text-align:center; }
-footer{ padding:60px; text-align:center; background:#000; }
+
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
+
+body{
+background:#0a0f1a;
+color:white;
+overflow-x:hidden;
+}
+
+/* NAV */
+
+nav{
+position:fixed;
+top:0;
+width:100%;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:20px 60px;
+background:rgba(0,0,0,0.6);
+backdrop-filter:blur(10px);
+z-index:100;
+}
+
+.logo{
+font-size:26px;
+font-weight:bold;
+letter-spacing:2px;
+color:#00d9ff;
+}
+
+nav a{
+color:white;
+margin-left:25px;
+text-decoration:none;
+transition:0.3s;
+}
+
+nav a:hover{
+color:#00d9ff;
+}
+
+/* HERO */
+
+.hero{
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+position:relative;
+}
+
+.hero h1{
+font-size:70px;
+letter-spacing:3px;
+}
+
+.hero p{
+opacity:.8;
+margin:20px 0;
+}
+
+.btn{
+padding:14px 30px;
+background:#00d9ff;
+border:none;
+color:black;
+margin:10px;
+cursor:pointer;
+}
+
+/* FLOATING NODES */
+
+.node{
+position:absolute;
+width:6px;
+height:6px;
+background:#00d9ff;
+border-radius:50%;
+animation:float 8s infinite;
+}
+
+@keyframes float{
+0%{transform:translateY(0)}
+50%{transform:translateY(-80px)}
+100%{transform:translateY(0)}
+}
+
+/* STATS */
+
+.stats{
+display:flex;
+justify-content:space-around;
+padding:100px 40px;
+background:#0f1626;
+}
+
+.card h2{
+color:#00d9ff;
+font-size:40px;
+}
+
+.map-section{
+padding:100px 40px;
+text-align:center;
+}
+
+.map{
+width:90%;
+height:500px;
+margin:auto;
+border:1px solid #00d9ff;
+}
+
+/* REPORT */
+
+.form-section{
+padding:100px 40px;
+text-align:center;
+background:#0f1626;
+}
+
+form{
+max-width:500px;
+margin:auto;
+display:flex;
+flex-direction:column;
+}
+
+input,textarea,select{
+margin:10px 0;
+padding:12px;
+background:#0a0f1a;
+border:1px solid #00d9ff33;
+color:white;
+}
+
+/* DANGER LIST */
+
+.danger-section{
+padding:80px 40px;
+background:#0a0f1a;
+}
+
+.danger-list{
+max-width:800px;
+margin:auto;
+}
+
+.danger-item{
+padding:12px;
+border-bottom:1px solid #222;
+display:flex;
+justify-content:space-between;
+}
+
+/* ABOUT */
+
+.about{
+padding:100px 20%;
+text-align:center;
+}
+
+footer{
+padding:60px;
+background:black;
+text-align:center;
+}
+
 </style>
+
 </head>
+
 <body>
 
 <nav>
-    <div class="logo">FIXHAITI</div>
-    <div>
-        <a href="#">Home</a>
-        <a href="#map">Infrastructure Map</a>
-        <a href="#report">Report Issue</a>
-        <a href="#about">About</a>
-    </div>
+
+<div class="logo">FIXHAITI</div>
+
+<div>
+<a href="#">Home</a>
+<a href="#map">Map</a>
+<a href="#report">Report</a>
+<a href="#about">About</a>
+</div>
+
 </nav>
 
 <section class="hero">
-    <div>
-        <h1>FixHaiti</h1>
-        <p>Infrastructure Intelligence for a Better Haiti</p>
-        <button class="btn" onclick="scrollToMap()">View Infrastructure Map</button>
-        <button class="btn" onclick="scrollToReport()">Report Issue</button>
-    </div>
+
+<div>
+
+<h1>FixHaiti</h1>
+
+<p>Infrastructure Intelligence for a Better Haiti</p>
+
+<button class="btn" onclick="scrollToMap()">View Map</button>
+
+<button class="btn" onclick="scrollToReport()">Report Issue</button>
+
+</div>
+
 </section>
 
 <script>
+
 for(let i=0;i<50;i++){
-    let node=document.createElement("div");
-    node.className="node";
-    node.style.left=Math.random()*100+"%";
-    node.style.top=Math.random()*100+"%";
-    node.style.animationDuration=(5+Math.random()*10)+"s";
-    document.querySelector(".hero").appendChild(node);
+
+let node=document.createElement("div")
+
+node.className="node"
+
+node.style.left=Math.random()*100+"%"
+
+node.style.top=Math.random()*100+"%"
+
+document.querySelector(".hero").appendChild(node)
+
 }
+
 </script>
 
 <section class="stats">
-    <div class="card"><h2 id="r1">0</h2><p>Reports Submitted</p></div>
-    <div class="card"><h2 id="r2">0</h2><p>Active Infrastructure Issues</p></div>
-    <div class="card"><h2 id="r3">0</h2><p>Flooding Risk Areas</p></div>
-    <div class="card"><h2 id="r4">0</h2><p>Road Damage Reports</p></div>
+
+<div class="card"><h2 id="r1">0</h2><p>Reports Submitted</p></div>
+
+<div class="card"><h2 id="r2">0</h2><p>Active Issues</p></div>
+
+<div class="card"><h2 id="r3">0</h2><p>Flood Risk</p></div>
+
+<div class="card"><h2 id="r4">0</h2><p>Road Damage</p></div>
+
 </section>
 
 <section id="map" class="map-section">
-    <h2 style="margin-bottom:30px">Live Infrastructure Map</h2>
-    <div class="map" id="mapBox"></div>
+
+<h2>National Infrastructure Map</h2>
+
+<div id="mapBox" class="map"></div>
+
 </section>
 
 <section id="report" class="form-section">
-    <h2>Report Infrastructure Issue</h2>
-    <form id="reportForm">
-        <select id="issueType" required>
-            <option value="">Select Issue Type</option>
-            <option>Pothole</option>
-            <option>Flooding</option>
-            <option>Broken Road</option>
-            <option>No Traffic Light</option>
-        </select>
-        <input type="text" id="loc" placeholder="Click map to set location" readonly required>
-        <textarea id="desc" placeholder="Describe the issue"></textarea>
-        <input type="file" id="photo">
-        <button type="submit">Submit Report</button>
-    </form>
+
+<h2>Report Infrastructure Issue</h2>
+
+<form id="reportForm">
+
+<select id="issueType" required>
+
+<option value="">Select Issue</option>
+
+<option>Pothole</option>
+
+<option>Flooding</option>
+
+<option>Broken Road</option>
+
+<option>No Traffic Light</option>
+
+</select>
+
+<input id="loc" placeholder="Click map to set location" readonly required>
+
+<textarea id="desc" placeholder="Describe issue"></textarea>
+
+<button type="submit">Submit Report</button>
+
+</form>
+
 </section>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-    const map = L.map('mapBox').setView([18.5392, -72.3350], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+<section class="danger-section">
 
-    let pinCoords = null;
-    map.on('click', (e) => {
-        pinCoords = e.latlng;
-        document.getElementById('loc').value = "Lat: " + pinCoords.lat.toFixed(4) + ", Lng: " + pinCoords.lng.toFixed(4);
-    });
+<h2 style="text-align:center;margin-bottom:30px">Top Dangerous Roads</h2>
 
-    document.getElementById("reportForm").addEventListener("submit", function(e){
-        e.preventDefault();
-        if(!pinCoords) { alert("Please click the map to pin the location."); return; }
-        let marker = L.marker([pinCoords.lat, pinCoords.lng]).addTo(map);
-        marker.bindPopup("<b>" + document.getElementById("issueType").value + "</b>");
-        alert("Report submitted successfully");
-        this.reset();
-        pinCoords = null;
-    });
+<div id="dangerList" class="danger-list"></div>
 
-    // Original Stats Animation
-    function animate(id,target){
-        let n=0;
-        let interval=setInterval(()=>{ n+=1; document.getElementById(id).innerText=n; if(n>=target) clearInterval(interval); },20);
-    }
-    animate("r1",284); animate("r2",193); animate("r3",54); animate("r4",167);
-
-    function scrollToMap(){ document.getElementById("map").scrollIntoView({behavior:"smooth"}); }
-    function scrollToReport(){ document.getElementById("report").scrollIntoView({behavior:"smooth"}); }
-</script>
+</section>
 
 <section id="about" class="about">
-    <h2>Why FixHaiti Matters</h2>
-    <p>Across Haiti, broken roads, flooding streets, and damaged infrastructure create daily dangers that often go undocumented...</p>
+
+<h2>Why FixHaiti Matters</h2>
+
+<p>
+
+Infrastructure failures across Haiti create daily danger for citizens.
+
+FixHaiti transforms public reporting into real infrastructure intelligence.
+
+</p>
+
 </section>
 
 <footer>
-    <h2>FIXHAITI</h2>
-    <p>Infrastructure Intelligence Platform</p>
+
+<h2>FIXHAITI</h2>
+
+<p>Infrastructure Intelligence Platform</p>
+
 </footer>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+
+<script>
+
+/* MAP */
+
+const map=L.map('mapBox').setView([18.5392,-72.3350],13)
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map)
+
+let markersLayer=L.layerGroup().addTo(map)
+
+let heatPoints=[]
+
+let reports=JSON.parse(localStorage.getItem("fixhaiti_reports"))||[]
+
+let pinCoords=null
+
+const icons={
+
+"Pothole":"https://maps.google.com/mapfiles/ms/icons/red-dot.png",
+
+"Flooding":"https://maps.google.com/mapfiles/ms/icons/orange-dot.png",
+
+"Broken Road":"https://maps.google.com/mapfiles/ms/icons/yellow-dot.png",
+
+"No Traffic Light":"https://maps.google.com/mapfiles/ms/icons/blue-dot.png"
+
+}
+
+/* DANGER SCORE */
+
+function dangerScore(type){
+
+if(type=="Flooding") return 9
+
+if(type=="Broken Road") return 8
+
+if(type=="Pothole") return 6
+
+return 5
+
+}
+
+/* LOAD SAVED REPORTS */
+
+reports.forEach(r=>{
+
+let marker=L.marker([r.lat,r.lng],{
+
+icon:new L.Icon({iconUrl:icons[r.type],iconSize:[32,32]})
+
+}).addTo(markersLayer)
+
+marker.bindPopup(
+
+"<b>"+r.type+"</b><br>"+
+
+r.desc+"<br>"+
+
+"Danger Score: "+r.score+"<br>"+
+
+"<small>"+r.date+"</small>"
+
+)
+
+heatPoints.push([r.lat,r.lng,0.6])
+
+})
+
+let heatLayer=L.heatLayer(heatPoints,{radius:30})
+
+let overlays={"Reports":markersLayer,"Heatmap":heatLayer}
+
+L.control.layers({},overlays).addTo(map)
+
+/* MAP CLICK */
+
+map.on('click',e=>{
+
+pinCoords=e.latlng
+
+document.getElementById("loc").value=
+
+pinCoords.lat.toFixed(4)+","+pinCoords.lng.toFixed(4)
+
+})
+
+/* SUBMIT REPORT */
+
+document.getElementById("reportForm").addEventListener("submit",function(e){
+
+e.preventDefault()
+
+if(!pinCoords){alert("Click map first");return}
+
+let type=document.getElementById("issueType").value
+
+let desc=document.getElementById("desc").value
+
+let score=dangerScore(type)
+
+let report={
+
+lat:pinCoords.lat,
+
+lng:pinCoords.lng,
+
+type:type,
+
+desc:desc,
+
+score:score,
+
+date:new Date().toLocaleString()
+
+}
+
+reports.push(report)
+
+localStorage.setItem("fixhaiti_reports",JSON.stringify(reports))
+
+let marker=L.marker([report.lat,report.lng],{
+
+icon:new L.Icon({iconUrl:icons[type],iconSize:[32,32]})
+
+}).addTo(markersLayer)
+
+marker.bindPopup(
+
+"<b>"+type+"</b><br>"+
+
+desc+"<br>"+
+
+"Danger Score: "+score+"<br>"+
+
+"<small>"+report.date+"</small>"
+
+)
+
+heatLayer.addLatLng([report.lat,report.lng])
+
+updateDangerList()
+
+this.reset()
+
+pinCoords=null
+
+})
+
+/* DANGER LIST */
+
+function updateDangerList(){
+
+let sorted=[...reports].sort((a,b)=>b.score-a.score)
+
+let list=document.getElementById("dangerList")
+
+list.innerHTML=""
+
+sorted.slice(0,10).forEach(r=>{
+
+let div=document.createElement("div")
+
+div.className="danger-item"
+
+div.innerHTML=
+
+"<span>"+r.type+"</span><span>Score "+r.score+"</span>"
+
+list.appendChild(div)
+
+})
+
+}
+
+updateDangerList()
+
+/* STATS */
+
+function animate(id,target){
+
+let n=0
+
+let int=setInterval(()=>{
+
+n++
+
+document.getElementById(id).innerText=n
+
+if(n>=target) clearInterval(int)
+
+},20)
+
+}
+
+animate("r1",reports.length)
+
+animate("r2",reports.length)
+
+animate("r3",12)
+
+animate("r4",25)
+
+/* NAVIGATION */
+
+function scrollToMap(){
+
+document.getElementById("map").scrollIntoView({behavior:"smooth"})
+
+}
+
+function scrollToReport(){
+
+document.getElementById("report").scrollIntoView({behavior:"smooth"})
+
+}
+
+</script>
 
 </body>
 </html>
