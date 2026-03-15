@@ -8,198 +8,203 @@
 <style>
 
 *{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial, Helvetica, sans-serif;
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial, Helvetica, sans-serif;
 }
 
 body{
-background:#0a0f1a;
-color:white;
-overflow-x:hidden;
+  background:#0a0f1a;
+  color:white;
+  overflow-x:hidden;
 }
 
 nav{
-position:fixed;
-top:0;
-width:100%;
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:20px 60px;
-background:rgba(0,0,0,0.7);
-backdrop-filter:blur(10px);
-z-index:100;
+  position:fixed;
+  top:0;
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:20px 60px;
+  background:rgba(0,0,0,0.7);
+  backdrop-filter:blur(10px);
+  z-index:100;
 }
 
 .logo{
-font-size:26px;
-font-weight:bold;
-letter-spacing:2px;
-color:#00d9ff;
+  font-size:26px;
+  font-weight:bold;
+  letter-spacing:2px;
+  color:#00d9ff;
 }
 
 nav a{
-color:white;
-margin-left:25px;
-text-decoration:none;
-font-size:14px;
-transition:0.3s;
+  color:white;
+  margin-left:25px;
+  text-decoration:none;
+  font-size:14px;
+  transition:0.3s;
 }
 
 nav a:hover{
-color:#00d9ff;
+  color:#00d9ff;
 }
 
 .hero{
-height:100vh;
-display:flex;
-align-items:center;
-justify-content:center;
-text-align:center;
-position:relative;
-overflow:hidden;
+  height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
 }
 
 .hero h1{
-font-size:70px;
-letter-spacing:4px;
-margin-bottom:20px;
+  font-size:70px;
+  letter-spacing:4px;
+  margin-bottom:20px;
 }
 
 .hero p{
-font-size:20px;
-opacity:0.8;
-margin-bottom:40px;
+  font-size:20px;
+  opacity:0.8;
+  margin-bottom:40px;
 }
 
 .btn{
-padding:15px 30px;
-border:none;
-margin:10px;
-font-size:15px;
-cursor:pointer;
-background:#00d9ff;
-color:black;
-border-radius:5px;
-transition:0.3s;
+  padding:15px 30px;
+  border:none;
+  margin:10px;
+  font-size:15px;
+  cursor:pointer;
+  background:#00d9ff;
+  color:black;
+  border-radius:5px;
+  transition:0.3s;
 }
 
 .btn:hover{
-transform:scale(1.08);
-box-shadow:0 0 20px #00d9ff;
+  transform:scale(1.08);
+  box-shadow:0 0 20px #00d9ff;
 }
 
 .node{
-position:absolute;
-width:6px;
-height:6px;
-background:#00d9ff;
-border-radius:50%;
-animation:float 10s infinite linear;
+  position:absolute;
+  width:6px;
+  height:6px;
+  background:#00d9ff;
+  border-radius:50%;
+  animation:float 10s infinite linear;
 }
 
 @keyframes float{
-0%{transform:translateY(0)}
-50%{transform:translateY(-100px)}
-100%{transform:translateY(0)}
+  0%{transform:translateY(0)}
+  50%{transform:translateY(-100px)}
+  100%{transform:translateY(0)}
 }
 
 .stats{
-display:flex;
-justify-content:space-around;
-padding:100px 40px;
-background:#0f1626;
+  display:flex;
+  justify-content:space-around;
+  padding:100px 40px;
+  background:#0f1626;
 }
 
 .card{
-text-align:center;
+  text-align:center;
 }
 
 .card h2{
-font-size:45px;
-color:#00d9ff;
+  font-size:45px;
+  color:#00d9ff;
 }
 
 .card p{
-opacity:0.7;
+  opacity:0.7;
 }
 
 .map-section{
-padding:100px 40px;
-text-align:center;
+  padding:100px 40px;
+  text-align:center;
 }
 
 #mapBox{
-width:90%;
-height:500px;
-margin:auto;
-border:2px solid #00d9ff;
-border-radius:10px;
-overflow:hidden;
+  width:90%;
+  height:500px;
+  margin:auto;
+  border:2px solid #00d9ff;
+  border-radius:10px;
+  overflow:hidden;
 }
 
 .form-section{
-padding:100px 40px;
-text-align:center;
-background:#0f1626;
+  padding:100px 40px;
+  text-align:center;
+  background:#0f1626;
 }
 
 form{
-max-width:500px;
-margin:auto;
-display:flex;
-flex-direction:column;
+  max-width:500px;
+  margin:auto;
+  display:flex;
+  flex-direction:column;
 }
 
 input, textarea, select{
-margin:10px 0;
-padding:12px;
-border:none;
-background:#0a0f1a;
-color:white;
-border:1px solid #00d9ff33;
+  margin:10px 0;
+  padding:12px;
+  border:none;
+  background:#0a0f1a;
+  color:white;
+  border:1px solid #00d9ff33;
 }
 
 button{
-margin-top:15px;
-padding:14px;
-background:#00d9ff;
-border:none;
-cursor:pointer;
-font-weight:bold;
+  margin-top:15px;
+  padding:14px;
+  background:#00d9ff;
+  border:none;
+  cursor:pointer;
+  font-weight:bold;
 }
 
 .about{
-padding:100px 20%;
-text-align:center;
+  padding:100px 20%;
+  text-align:center;
 }
 
 footer{
-padding:60px;
-text-align:center;
-background:#000;
+  padding:60px;
+  text-align:center;
+  background:#000;
 }
 
 /* CUSTOM FIXHAITI PINS */
 
 .fix-pin{
-width:18px;
-height:18px;
-border-radius:50%;
-position:relative;
+  width:18px;
+  height:18px;
+  border-radius:50%;
+  position:relative;
+  transition: transform 0.3s;
 }
 
 .fix-pin::after{
-content:"";
-position:absolute;
-width:30px;
-height:30px;
-top:-6px;
-left:-6px;
-border-radius:50%;
-animation:pulse 2s infinite;
+  content:"";
+  position:absolute;
+  width:30px;
+  height:30px;
+  top:-6px;
+  left:-6px;
+  border-radius:50%;
+  animation:pulse 2s infinite;
+}
+
+.fix-pin:hover{
+  transform: scale(1.5);
 }
 
 .red{background:#ff3b3b;}
@@ -215,13 +220,14 @@ animation:pulse 2s infinite;
 .yellow::after{border:2px solid #ffd000;}
 
 @keyframes pulse{
-0%{transform:scale(.5);opacity:1}
-100%{transform:scale(2);opacity:0}
+  0%{transform:scale(.5);opacity:1}
+  100%{transform:scale(2);opacity:0}
 }
 
 .leaflet-popup-content{
-color:black;
-font-size:14px;
+  color:black;
+  font-size:14px;
+  transition: all 0.3s ease;
 }
 
 </style>
@@ -230,166 +236,146 @@ font-size:14px;
 <body>
 
 <nav>
-<div class="logo">FIXHAITI</div>
-<div>
-<a href="#">Home</a>
-<a href="#map">Infrastructure Map</a>
-<a href="#report">Report Issue</a>
-<a href="#about">About</a>
-</div>
+  <div class="logo">FIXHAITI</div>
+  <div>
+    <a href="#">Home</a>
+    <a href="#map">Infrastructure Map</a>
+    <a href="#report">Report Issue</a>
+    <a href="#about">About</a>
+  </div>
 </nav>
 
 <section class="hero">
+  <div>
+    <h1>FixHaiti</h1>
+    <p>Infrastructure Intelligence for a Better Haiti</p>
 
-<div>
-<h1>FixHaiti</h1>
-<p>Infrastructure Intelligence for a Better Haiti</p>
-
-<button class="btn" onclick="scrollToMap()">View Infrastructure Map</button>
-<button class="btn" onclick="scrollToReport()">Report Issue</button>
-
-</div>
-
+    <button class="btn" onclick="scrollToMap()">View Infrastructure Map</button>
+    <button class="btn" onclick="scrollToReport()">Report Issue</button>
+  </div>
 </section>
 
 <script>
 for(let i=0;i<50;i++){
-let node=document.createElement("div")
-node.className="node"
-node.style.left=Math.random()*100+"%"
-node.style.top=Math.random()*100+"%"
-node.style.animationDuration=(5+Math.random()*10)+"s"
-document.querySelector(".hero").appendChild(node)
+  let node=document.createElement("div")
+  node.className="node"
+  node.style.left=Math.random()*100+"%"
+  node.style.top=Math.random()*100+"%"
+  node.style.animationDuration=(5+Math.random()*10)+"s"
+  document.querySelector(".hero").appendChild(node)
 }
 </script>
 
 <section class="stats">
-
-<div class="card"><h2 id="r1">0</h2><p>Reports Submitted</p></div>
-<div class="card"><h2 id="r2">0</h2><p>Active Issues</p></div>
-<div class="card"><h2 id="r3">0</h2><p>Flood Risk Zones</p></div>
-<div class="card"><h2 id="r4">0</h2><p>Road Damage Reports</p></div>
-
+  <div class="card"><h2 id="r1">0</h2><p>Reports Submitted</p></div>
+  <div class="card"><h2 id="r2">0</h2><p>Active Issues</p></div>
+  <div class="card"><h2 id="r3">0</h2><p>Flood Risk Zones</p></div>
+  <div class="card"><h2 id="r4">0</h2><p>Road Damage Reports</p></div>
 </section>
 
 <section id="map" class="map-section">
-
-<h2 style="margin-bottom:30px">Live Infrastructure Map</h2>
-
-<div id="mapBox"></div>
-
+  <h2 style="margin-bottom:30px">Live Infrastructure Map</h2>
+  <div id="mapBox"></div>
 </section>
 
 <section id="report" class="form-section">
+  <h2>Report Infrastructure Issue</h2>
+  <form id="reportForm">
+    <select id="issueType" required>
+      <option value="">Select Issue Type</option>
+      <option>Pothole</option>
+      <option>Flooding</option>
+      <option>Broken Road</option>
+      <option>No Traffic Light</option>
+    </select>
 
-<h2>Report Infrastructure Issue</h2>
-
-<form id="reportForm">
-
-<select id="issueType" required>
-<option value="">Select Issue Type</option>
-<option>Pothole</option>
-<option>Flooding</option>
-<option>Broken Road</option>
-<option>No Traffic Light</option>
-</select>
-
-<input type="text" id="loc" placeholder="Click map to set location" readonly required>
-
-<textarea id="desc" placeholder="Describe the issue"></textarea>
-
-<input type="file">
-
-<button type="submit">Submit Report</button>
-
-</form>
-
+    <input type="text" id="loc" placeholder="Click map to set location" readonly required>
+    <textarea id="desc" placeholder="Describe the issue"></textarea>
+    <input type="file">
+    <button type="submit">Submit Report</button>
+  </form>
 </section>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <script>
-
 const map = L.map('mapBox').setView([18.5392,-72.3350],13)
-
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map)
 
-let pinCoords=null
-
-map.on('click',(e)=>{
-
-pinCoords=e.latlng
-
-document.getElementById('loc').value=
-"Lat "+pinCoords.lat.toFixed(4)+" , Lng "+pinCoords.lng.toFixed(4)
-
+let pinCoords = null
+map.on('click', (e) => {
+  pinCoords = e.latlng
+  document.getElementById('loc').value =
+    "Lat "+pinCoords.lat.toFixed(4)+" , Lng "+pinCoords.lng.toFixed(4)
 })
 
 function getColor(type){
+  if(type==="Broken Road") return "red"
+  if(type==="Pothole") return "orange"
+  if(type==="Flooding") return "blue"
+  if(type==="No Traffic Light") return "yellow"
+}
 
-if(type==="Broken Road") return "red"
-if(type==="Pothole") return "orange"
-if(type==="Flooding") return "blue"
-if(type==="No Traffic Light") return "yellow"
-
+function getCostEstimate(type){
+  if(type==="Broken Road") return "$2,000 - $5,000"
+  if(type==="Pothole") return "$50 - $300"
+  if(type==="Flooding") return "$500 - $2,000"
+  if(type==="No Traffic Light") return "$1,500 - $3,000"
+  return "N/A"
 }
 
 function createMarker(lat,lng,type,desc){
+  let color = getColor(type)
+  let cost = getCostEstimate(type)
 
-let color=getColor(type)
+  let icon = L.divIcon({
+    className:'',
+    html:`<div class="fix-pin ${color}"></div>`,
+    iconSize:[20,20]
+  })
 
-let icon=L.divIcon({
-className:'',
-html:`<div class="fix-pin ${color}"></div>`,
-iconSize:[20,20]
-})
+  let marker = L.marker([lat,lng], {icon}).addTo(map)
 
-let marker=L.marker([lat,lng],{icon}).addTo(map)
+  marker.bindPopup(`
+    <b>${type}</b><br>
+    ${desc || "No description"}<br>
+    Status: Reported<br>
+    Estimated Repair Cost: <b>${cost}</b>
+  `)
 
-marker.bindPopup(`
-<b>${type}</b><br>
-${desc || "No description"}<br>
-Status: Reported
-`)
-
+  marker.bindTooltip(`Estimated Cost: ${cost}`, {permanent:false, direction:"top"})
 }
 
-document.getElementById("reportForm").addEventListener("submit",function(e){
+document.getElementById("reportForm").addEventListener("submit", function(e){
+  e.preventDefault()
+  if(!pinCoords){
+    alert("Click map to set location")
+    return
+  }
 
-e.preventDefault()
+  let type = document.getElementById("issueType").value
+  let desc = document.getElementById("desc").value
 
-if(!pinCoords){
-alert("Click map to set location")
-return
-}
-
-let type=document.getElementById("issueType").value
-let desc=document.getElementById("desc").value
-
-createMarker(pinCoords.lat,pinCoords.lng,type,desc)
-
-alert("Report Submitted")
-
-this.reset()
-
+  createMarker(pinCoords.lat, pinCoords.lng, type, desc)
+  alert("Report Submitted")
+  this.reset()
 })
 
 /* SAMPLE DATA */
-
 createMarker(18.543,-72.336,"Broken Road","Major potholes causing accidents")
 createMarker(18.535,-72.333,"Flooding","Street floods every rainfall")
 createMarker(18.548,-72.34,"No Traffic Light","Dangerous intersection")
 createMarker(18.538,-72.329,"Pothole","Vehicle damage reported")
 
 /* STATS */
-
 function animate(id,target){
-let n=0
-let i=setInterval(()=>{
-n++
-document.getElementById(id).innerText=n
-if(n>=target) clearInterval(i)
-},15)
+  let n = 0
+  let step = Math.ceil(target / 100)
+  let i = setInterval(()=>{
+    n += step
+    if(n >= target) n = target
+    document.getElementById(id).innerText = n
+    if(n >= target) clearInterval(i)
+  },15)
 }
 
 animate("r1",284)
@@ -398,32 +384,26 @@ animate("r3",54)
 animate("r4",167)
 
 function scrollToMap(){
-document.getElementById("map").scrollIntoView({behavior:"smooth"})
+  document.getElementById("map").scrollIntoView({behavior:"smooth"})
 }
 
 function scrollToReport(){
-document.getElementById("report").scrollIntoView({behavior:"smooth"})
+  document.getElementById("report").scrollIntoView({behavior:"smooth"})
 }
-
 </script>
 
 <section id="about" class="about">
-
-<h2>Why FixHaiti Matters</h2>
-
-<p>
-Across Haiti, broken roads, flooding streets, and damaged infrastructure create daily dangers.
-FixHaiti creates the first citizen-powered infrastructure intelligence system where problems
-are mapped, documented, and impossible to ignore.
-</p>
-
+  <h2>Why FixHaiti Matters</h2>
+  <p>
+    Across Haiti, broken roads, flooding streets, and damaged infrastructure create daily dangers.
+    FixHaiti creates the first citizen-powered infrastructure intelligence system where problems
+    are mapped, documented, and impossible to ignore.
+  </p>
 </section>
 
 <footer>
-
-<h2>FIXHAITI</h2>
-<p>Infrastructure Intelligence Platform</p>
-
+  <h2>FIXHAITI</h2>
+  <p>Infrastructure Intelligence Platform</p>
 </footer>
 
 </body>
