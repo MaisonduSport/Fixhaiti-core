@@ -7,136 +7,138 @@
 
 <style>
 *{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:Arial, Helvetica, sans-serif;
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial, Helvetica, sans-serif;
 }
 
 body{
-  background:#0a0f1a;
-  color:white;
-  overflow-x:hidden;
+background:#0a0f1a;
+color:white;
+overflow-x:hidden;
 }
 
 nav{
-  position:fixed;
-  top:0;
-  width:100%;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:20px 60px;
-  background:rgba(0,0,0,0.7);
-  backdrop-filter:blur(10px);
-  z-index:100;
+position:fixed;
+top:0;
+width:100%;
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:20px 60px;
+background:rgba(0,0,0,0.7);
+backdrop-filter:blur(10px);
+z-index:100;
 }
 
 .logo{
-  font-size:26px;
-  font-weight:bold;
-  letter-spacing:2px;
-  color:#00d9ff;
+font-size:26px;
+font-weight:bold;
+letter-spacing:2px;
+color:#00d9ff;
 }
 
 nav a{
-  color:white;
-  margin-left:25px;
-  text-decoration:none;
-  font-size:14px;
+color:white;
+margin-left:25px;
+text-decoration:none;
+font-size:14px;
 }
 
 .hero{
-  height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
 }
 
 .hero h1{
-  font-size:70px;
-  margin-bottom:20px;
+font-size:70px;
+margin-bottom:20px;
 }
 
 .hero p{
-  font-size:20px;
-  opacity:0.8;
-  margin-bottom:40px;
+font-size:20px;
+opacity:0.8;
+margin-bottom:40px;
 }
 
 .btn{
-  padding:15px 30px;
-  border:none;
-  background:#00d9ff;
-  color:black;
-  border-radius:5px;
-  cursor:pointer;
+padding:15px 30px;
+border:none;
+background:#00d9ff;
+color:black;
+border-radius:5px;
+cursor:pointer;
 }
 
 .stats{
-  display:flex;
-  justify-content:space-around;
-  padding:100px 40px;
-  background:#0f1626;
+display:flex;
+justify-content:space-around;
+padding:100px 40px;
+background:#0f1626;
 }
 
 .card{
-  text-align:center;
+text-align:center;
 }
 
 .card h2{
-  font-size:45px;
-  color:#00d9ff;
+font-size:45px;
+color:#00d9ff;
 }
 
 .map-section{
-  padding:50px 40px;
-  text-align:center;
-  position:relative;
+padding:50px 40px;
+text-align:center;
+position:relative;
 }
 
 #mapBox{
-  width:90%;
-  height:500px;
-  margin:auto;
-  border:2px solid #00d9ff;
-  border-radius:10px;
+width:90%;
+height:500px;
+margin:auto;
+border:2px solid #00d9ff;
+border-radius:10px;
+position:relative;
+z-index:1;
 }
 
 .form-section{
-  padding:60px 40px;
-  text-align:center;
-  background:#0f1626;
-  border-radius:12px;
-  width:90%;
-  max-width:500px;
-  margin:0 auto 40px auto;
+padding:60px 40px;
+text-align:center;
+background:#0f1626;
+border-radius:12px;
+width:90%;
+max-width:500px;
+margin:0 auto 40px auto;
 }
 
 .form-section input, textarea, select{
-  width:100%;
-  margin:6px 0;
-  padding:12px;
-  border-radius:6px;
-  background:#0a0f1a;
-  color:white;
-  border:1px solid #00d9ff33;
+width:100%;
+margin:6px 0;
+padding:12px;
+border-radius:6px;
+background:#0a0f1a;
+color:white;
+border:1px solid #00d9ff33;
 }
 
 .form-section button{
-  margin-top:12px;
-  width:100%;
-  padding:14px;
-  background:#00d9ff;
-  border:none;
-  cursor:pointer;
+margin-top:12px;
+width:100%;
+padding:14px;
+background:#00d9ff;
+border:none;
+cursor:pointer;
 }
 
 .fix-pin{
-  width:18px;
-  height:18px;
-  border-radius:50%;
+width:18px;
+height:18px;
+border-radius:50%;
 }
 
 .red{background:#ff3b3b;}
@@ -145,28 +147,28 @@ nav a{
 .yellow{background:#ffd000;}
 
 #mapLegend{
-  position:absolute;
-  top:20px;
-  right:20px;
-  background:rgba(0,0,0,0.7);
-  padding:20px;
-  border-radius:10px;
+position:absolute;
+top:30px;
+right:80px;
+background:rgba(0,0,0,0.85);
+padding:15px;
+border-radius:10px;
+color:white;
+z-index:1000;
 }
 
 .legend-pin{
-  width:16px;
-  height:16px;
-  border-radius:50%;
-  display:inline-block;
-  margin-right:10px;
+width:16px;
+height:16px;
+border-radius:50%;
+display:inline-block;
+margin-right:10px;
 }
 
 .legend-pin.red{background:#ff3b3b;}
 .legend-pin.orange{background:#ff8c00;}
 .legend-pin.yellow{background:#ffd000;}
 .legend-pin.blue{background:#009dff;}
-
-/* NEW REPAIR SECTION */
 
 .repairs{
 padding:80px 10%;
@@ -204,7 +206,6 @@ margin:10px 0;
 height:100%;
 background:#00d9ff;
 border-radius:10px;
-width:0%;
 }
 
 .contribute-btn{
@@ -286,22 +287,22 @@ background:#000;
 </section>
 
 <section id="map" class="map-section">
+
 <h2>Live Infrastructure Map</h2>
-<div id="mapBox"></div>
 
 <div id="mapLegend">
-<h3>Severity Legend</h3>
+<h3>Severity</h3>
 <ul>
-<li><span class="legend-pin red"></span> Critical</li>
-<li><span class="legend-pin orange"></span> Dangerous</li>
-<li><span class="legend-pin yellow"></span> Moderate</li>
-<li><span class="legend-pin blue"></span> Minor</li>
+<li><span class="legend-pin red"></span>Critical</li>
+<li><span class="legend-pin orange"></span>Dangerous</li>
+<li><span class="legend-pin yellow"></span>Moderate</li>
+<li><span class="legend-pin blue"></span>Minor</li>
 </ul>
 </div>
 
-</section>
+<div id="mapBox"></div>
 
-<!-- NEW CONTRIBUTION SECTION -->
+</section>
 
 <section class="repairs">
 
@@ -315,7 +316,7 @@ background:#000;
 
 <script>
 
-const map = L.map('mapBox').setView([18.5392,-72.3350],13)
+const map=L.map('mapBox').setView([18.5392,-72.3350],13)
 
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map)
 
@@ -354,8 +355,6 @@ return "N/A"
 
 function addRepairProject(type,desc,lat,lng){
 
-let cost=getCostEstimate(type)
-
 let percent=Math.floor(Math.random()*40)
 
 let card=document.createElement("div")
@@ -364,8 +363,8 @@ card.className="repair-card"
 card.innerHTML=`
 <h3>${type}</h3>
 <p><b>Location:</b> ${lat.toFixed(3)}, ${lng.toFixed(3)}</p>
-<p>${desc || "Infrastructure issue reported by citizens."}</p>
-<p><b>Estimated Repair Cost:</b> ${cost}</p>
+<p>${desc}</p>
+<p><b>Estimated Repair Cost:</b> ${getCostEstimate(type)}</p>
 
 <div class="progress-bar">
 <div class="progress" style="width:${percent}%"></div>
@@ -390,7 +389,7 @@ iconSize:[20,20]
 
 L.marker([lat,lng],{icon}).addTo(map).bindPopup(`
 <b>${type}</b><br>
-${desc || "No description"}<br>
+${desc}<br>
 Estimated Repair Cost: <b>${getCostEstimate(type)}</b>
 `)
 
@@ -398,41 +397,11 @@ addRepairProject(type,desc,lat,lng)
 
 }
 
-document.getElementById("reportForm").onsubmit=function(e){
-
-e.preventDefault()
-
-if(!pinCoords){
-alert("Click map or use location")
-return
-}
-
-let type=document.getElementById("issueType").value
-let desc=document.getElementById("desc").value
-
-createMarker(pinCoords.lat,pinCoords.lng,type,desc)
-
-this.reset()
-
-}
-
 createMarker(18.548,-72.34,"Broken Traffic Light","Dangerous intersection")
-
-function animate(id,target){
-let n=0
-let step=Math.ceil(target/100)
-let i=setInterval(()=>{
-n+=step
-if(n>=target) n=target
-document.getElementById(id).innerText=n
-if(n>=target) clearInterval(i)
-},15)
-}
-
-animate("r1",284)
-animate("r2",193)
-animate("r3",54)
-animate("r4",167)
+createMarker(18.540,-72.320,"Pothole","Large pothole damaging vehicles")
+createMarker(18.555,-72.330,"Broken Road","Road collapse blocking traffic")
+createMarker(18.535,-72.350,"Flooding","Street floods after rainfall")
+createMarker(18.545,-72.315,"Missing Traffic Light","Intersection without signal")
 
 function scrollToMap(){
 document.getElementById("map").scrollIntoView({behavior:"smooth"})
@@ -455,7 +424,6 @@ are mapped, documented, and impossible to ignore.
 <footer>
 
 <h2>FIXHAITI</h2>
-
 <p>Infrastructure Intelligence Platform</p>
 
 </footer>
