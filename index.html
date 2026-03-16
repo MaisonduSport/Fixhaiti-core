@@ -82,27 +82,6 @@ nav a:hover{
   background:#00d9ff;
   color:black;
   border-radius:5px;
-  transition:0.3s;
-}
-
-.btn:hover{
-  transform:scale(1.08);
-  box-shadow:0 0 20px #00d9ff;
-}
-
-.node{
-  position:absolute;
-  width:6px;
-  height:6px;
-  background:#00d9ff;
-  border-radius:50%;
-  animation:float 10s infinite linear;
-}
-
-@keyframes float{
-  0%{transform:translateY(0)}
-  50%{transform:translateY(-100px)}
-  100%{transform:translateY(0)}
 }
 
 .stats{
@@ -119,10 +98,6 @@ nav a:hover{
 .card h2{
   font-size:45px;
   color:#00d9ff;
-}
-
-.card p{
-  opacity:0.7;
 }
 
 .map-section{
@@ -161,12 +136,10 @@ nav a:hover{
   width:100%;
   margin:6px 0;
   padding:12px;
-  border:none;
   border-radius:6px;
   background:#0a0f1a;
   color:white;
   border:1px solid #00d9ff33;
-  font-size:14px;
 }
 
 .form-section button{
@@ -178,62 +151,19 @@ nav a:hover{
   cursor:pointer;
   font-weight:bold;
   border-radius:6px;
-  transition:0.3s;
 }
 
-.form-section button:hover{
-  transform:scale(1.05);
-  box-shadow:0 0 15px #00d9ff;
-}
-
-/* CUSTOM FIXHAITI PINS */
 .fix-pin{
   width:18px;
   height:18px;
   border-radius:50%;
-  position:relative;
-  transition: transform 0.3s;
-}
-
-.fix-pin::after{
-  content:"";
-  position:absolute;
-  width:30px;
-  height:30px;
-  top:-6px;
-  left:-6px;
-  border-radius:50%;
-  animation:pulse 2s infinite;
-}
-
-.fix-pin:hover{
-  transform: scale(1.5);
 }
 
 .red{background:#ff3b3b;}
-.red::after{border:2px solid #ff3b3b;}
-
 .orange{background:#ff8c00;}
-.orange::after{border:2px solid #ff8c00;}
-
 .blue{background:#009dff;}
-.blue::after{border:2px solid #009dff;}
-
 .yellow{background:#ffd000;}
-.yellow::after{border:2px solid #ffd000;}
 
-@keyframes pulse{
-  0%{transform:scale(.5);opacity:1}
-  100%{transform:scale(2);opacity:0}
-}
-
-.leaflet-popup-content{
-  color:black;
-  font-size:14px;
-  transition: all 0.3s ease;
-}
-
-/* Legend */
 #mapLegend {
   position: absolute;
   top:20px;
@@ -244,23 +174,6 @@ nav a:hover{
   color: white;
   z-index: 2000;
   width: 150px;
-}
-
-#mapLegend h3 {
-  margin-bottom: 10px;
-  font-size: 16px;
-  color: #00d9ff;
-}
-
-#mapLegend ul {
-  list-style: none;
-}
-
-#mapLegend li {
-  display: flex;
-  align-items: center;
-  margin: 6px 0;
-  font-size: 14px;
 }
 
 .legend-pin {
@@ -288,179 +201,207 @@ footer{
 }
 </style>
 </head>
+
 <body>
 
 <nav>
-  <div class="logo">FIXHAITI</div>
-  <div>
-    <a href="#">Home</a>
-    <a href="#map">Infrastructure Map</a>
-    <a href="#about">About</a>
-  </div>
+<div class="logo">FIXHAITI</div>
+<div>
+<a href="#">Home</a>
+<a href="#map">Infrastructure Map</a>
+<a href="#about">About</a>
+</div>
 </nav>
 
 <section class="hero">
-  <div>
-    <h1>FixHaiti</h1>
-    <p>Infrastructure Intelligence for a Better Haiti</p>
-    <button class="btn" onclick="scrollToMap()">View Infrastructure Map</button>
-  </div>
+<div>
+<h1>FixHaiti</h1>
+<p>Infrastructure Intelligence for a Better Haiti</p>
+<button class="btn" onclick="scrollToMap()">View Infrastructure Map</button>
+</div>
 </section>
-
-<script>
-for(let i=0;i<50;i++){
-  let node=document.createElement("div")
-  node.className="node"
-  node.style.left=Math.random()*100+"%"
-  node.style.top=Math.random()*100+"%"
-  node.style.animationDuration=(5+Math.random()*10)+"s"
-  document.querySelector(".hero").appendChild(node)
-}
-</script>
 
 <section class="stats">
-  <div class="card"><h2 id="r1">0</h2><p>Reports Submitted</p></div>
-  <div class="card"><h2 id="r2">0</h2><p>Active Issues</p></div>
-  <div class="card"><h2 id="r3">0</h2><p>Flood Risk Zones</p></div>
-  <div class="card"><h2 id="r4">0</h2><p>Road Damage Reports</p></div>
+<div class="card"><h2 id="r1">0</h2><p>Reports Submitted</p></div>
+<div class="card"><h2 id="r2">0</h2><p>Active Issues</p></div>
+<div class="card"><h2 id="r3">0</h2><p>Flood Risk Zones</p></div>
+<div class="card"><h2 id="r4">0</h2><p>Road Damage Reports</p></div>
 </section>
 
-<!-- REPORT FORM ABOVE MAP -->
 <section class="form-section">
-  <h2>Report Infrastructure Issue</h2>
-  <form id="reportForm">
-    <select id="issueType" required>
-      <option value="">Select Issue Type</option>
-      <option>Pothole</option>
-      <option>Flooding</option>
-      <option>Broken Road</option>
-      <option>No Traffic Light</option>
-    </select>
+<h2>Report Infrastructure Issue</h2>
 
-    <input type="text" id="loc" placeholder="Click map to set location" readonly required>
-    <button type="button" id="geoBtn">Use My Location</button>
+<form id="reportForm">
 
-    <textarea id="desc" placeholder="Describe the issue"></textarea>
-    <input type="file">
-    <button type="submit">Submit Report</button>
-  </form>
+<select id="issueType" required>
+<option value="">Select Issue Type</option>
+<option>Pothole</option>
+<option>Flooding</option>
+<option>Broken Road</option>
+<option>Missing Traffic Light</option>
+<option>Broken Traffic Light</option>
+</select>
+
+<input type="text" id="loc" placeholder="Click map to set location" readonly required>
+<button type="button" id="geoBtn">Use My Location</button>
+
+<textarea id="desc" placeholder="Describe the issue"></textarea>
+<input type="file">
+<button type="submit">Submit Report</button>
+
+</form>
 </section>
 
 <section id="map" class="map-section">
-  <h2>Live Infrastructure Map</h2>
-  <div id="mapBox"></div>
+<h2>Live Infrastructure Map</h2>
+<div id="mapBox"></div>
 
-  <!-- Severity Legend -->
-  <div id="mapLegend">
-    <h3>Severity Legend</h3>
-    <ul>
-      <li><span class="legend-pin red"></span> Critical</li>
-      <li><span class="legend-pin orange"></span> Dangerous</li>
-      <li><span class="legend-pin yellow"></span> Moderate</li>
-      <li><span class="legend-pin blue"></span> Minor</li>
-    </ul>
-  </div>
+<div id="mapLegend">
+<h3>Severity Legend</h3>
+<ul>
+<li><span class="legend-pin red"></span> Critical</li>
+<li><span class="legend-pin orange"></span> Dangerous</li>
+<li><span class="legend-pin yellow"></span> Moderate</li>
+<li><span class="legend-pin blue"></span> Minor</li>
+</ul>
+</div>
+
 </section>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
 <script>
+
 const map = L.map('mapBox').setView([18.5392,-72.3350],13)
+
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map)
 
 let pinCoords = null
 
-map.on('click', (e) => {
-  pinCoords = e.latlng
-  document.getElementById('loc').value =
-    "Lat "+pinCoords.lat.toFixed(4)+" , Lng "+pinCoords.lng.toFixed(4)
+map.on('click', (e)=>{
+
+pinCoords = e.latlng
+
+document.getElementById('loc').value =
+"Lat "+pinCoords.lat.toFixed(4)+" , Lng "+pinCoords.lng.toFixed(4)
+
 })
 
-document.getElementById("geoBtn").addEventListener("click", () => {
-  if(navigator.geolocation){
-    navigator.geolocation.getCurrentPosition((position)=>{
-      pinCoords = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-      }
-      document.getElementById('loc').value =
-        "Lat "+pinCoords.lat.toFixed(4)+" , Lng "+pinCoords.lng.toFixed(4)
-      map.setView([pinCoords.lat, pinCoords.lng], 16)
-    }, ()=>{
-      alert("Could not get your location. Please allow location access.")
-    })
-  } else {
-    alert("Geolocation is not supported by your browser.")
-  }
+document.getElementById("geoBtn").addEventListener("click",()=>{
+
+if(navigator.geolocation){
+
+navigator.geolocation.getCurrentPosition((position)=>{
+
+pinCoords = {
+lat: position.coords.latitude,
+lng: position.coords.longitude
+}
+
+document.getElementById('loc').value =
+"Lat "+pinCoords.lat.toFixed(4)+" , Lng "+pinCoords.lng.toFixed(4)
+
+map.setView([pinCoords.lat,pinCoords.lng],16)
+
+})
+
+}
+
 })
 
 function getColor(type){
-  if(type==="Broken Road") return "red"
-  if(type==="Pothole") return "orange"
-  if(type==="Flooding") return "blue"
-  if(type==="No Traffic Light") return "yellow"
+
+if(type==="Broken Road") return "red"
+if(type==="Broken Traffic Light") return "red"
+
+if(type==="Pothole") return "orange"
+if(type==="Missing Traffic Light") return "orange"
+
+if(type==="Flooding") return "blue"
+
+return "yellow"
+
 }
 
 function getCostEstimate(type){
-  if(type==="Broken Road") return "$2,000 - $5,000"
-  if(type==="Pothole") return "$50 - $300"
-  if(type==="Flooding") return "$500 - $2,000"
-  if(type==="No Traffic Light") return "$1,500 - $3,000"
-  return "N/A"
+
+if(type==="Broken Road") return "$2,000 - $5,000"
+
+if(type==="Broken Traffic Light") return "$1,000 - $2,500"
+
+if(type==="Missing Traffic Light") return "$1,500 - $3,500"
+
+if(type==="Pothole") return "$50 - $300"
+
+if(type==="Flooding") return "$500 - $2,000"
+
+return "N/A"
+
 }
 
 function createMarker(lat,lng,type,desc){
-  let color = getColor(type)
-  let cost = getCostEstimate(type)
 
-  let icon = L.divIcon({
-    className:'',
-    html:`<div class="fix-pin ${color}"></div>`,
-    iconSize:[20,20]
-  })
+let color = getColor(type)
 
-  let marker = L.marker([lat,lng], {icon}).addTo(map)
+let cost = getCostEstimate(type)
 
-  marker.bindPopup(`
-    <b>${type}</b><br>
-    ${desc || "No description"}<br>
-    Status: Reported<br>
-    Estimated Repair Cost: <b>${cost}</b>
-  `)
-
-  marker.bindTooltip(`Estimated Cost: ${cost}`, {permanent:false, direction:"top"})
-}
-
-document.getElementById("reportForm").addEventListener("submit", function(e){
-  e.preventDefault()
-  if(!pinCoords){
-    alert("Click map or use location to set location")
-    return
-  }
-
-  let type = document.getElementById("issueType").value
-  let desc = document.getElementById("desc").value
-
-  createMarker(pinCoords.lat, pinCoords.lng, type, desc)
-  alert("Report Submitted")
-  this.reset()
+let icon = L.divIcon({
+className:'',
+html:`<div class="fix-pin ${color}"></div>`,
+iconSize:[20,20]
 })
 
-/* SAMPLE DATA */
-createMarker(18.543,-72.336,"Broken Road","Major potholes causing accidents")
-createMarker(18.535,-72.333,"Flooding","Street floods every rainfall")
-createMarker(18.548,-72.34,"No Traffic Light","Dangerous intersection")
-createMarker(18.538,-72.329,"Pothole","Vehicle damage reported")
+let marker = L.marker([lat,lng],{icon}).addTo(map)
 
-/* STATS */
+marker.bindPopup(`
+<b>${type}</b><br>
+${desc || "No description"}<br>
+Status: Reported<br>
+Estimated Repair Cost: <b>${cost}</b>
+`)
+
+}
+
+document.getElementById("reportForm").addEventListener("submit",function(e){
+
+e.preventDefault()
+
+if(!pinCoords){
+alert("Click map or use location to set location")
+return
+}
+
+let type = document.getElementById("issueType").value
+let desc = document.getElementById("desc").value
+
+createMarker(pinCoords.lat,pinCoords.lng,type,desc)
+
+alert("Report Submitted")
+
+this.reset()
+
+})
+
+createMarker(18.548,-72.34,"Broken Traffic Light","Dangerous intersection")
+
 function animate(id,target){
-  let n = 0
-  let step = Math.ceil(target / 100)
-  let i = setInterval(()=>{
-    n += step
-    if(n >= target) n = target
-    document.getElementById(id).innerText = n
-    if(n >= target) clearInterval(i)
-  },15)
+
+let n=0
+
+let step=Math.ceil(target/100)
+
+let i=setInterval(()=>{
+
+n+=step
+
+if(n>=target) n=target
+
+document.getElementById(id).innerText=n
+
+if(n>=target) clearInterval(i)
+
+},15)
+
 }
 
 animate("r1",284)
@@ -469,22 +410,31 @@ animate("r3",54)
 animate("r4",167)
 
 function scrollToMap(){
-  document.getElementById("map").scrollIntoView({behavior:"smooth"})
+
+document.getElementById("map").scrollIntoView({behavior:"smooth"})
+
 }
+
 </script>
 
 <section id="about" class="about">
-  <h2>Why FixHaiti Matters</h2>
-  <p>
-    Across Haiti, broken roads, flooding streets, and damaged infrastructure create daily dangers.
-    FixHaiti creates the first citizen-powered infrastructure intelligence system where problems
-    are mapped, documented, and impossible to ignore.
-  </p>
+<h2>Why FixHaiti Matters</h2>
+
+<p>
+Across Haiti, broken roads, flooding streets, and damaged infrastructure create daily dangers.
+FixHaiti creates the first citizen-powered infrastructure intelligence system where problems
+are mapped, documented, and impossible to ignore.
+</p>
+
 </section>
 
 <footer>
-  <h2>FIXHAITI</h2>
-  <p>Infrastructure Intelligence Platform</p>
+
+<h2>FIXHAITI</h2>
+
+<p>Infrastructure Intelligence Platform</p>
+
 </footer>
+
 </body>
 </html>
