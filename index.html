@@ -205,6 +205,27 @@ display:inline-block;
 margin-right:10px;
 }
 
+/* ISSUE DETAILS PANEL */
+
+.issue-panel{
+width:90%;
+max-width:900px;
+margin:30px auto;
+padding:25px;
+background:#0a0f1a;
+border:1px solid #00d9ff33;
+border-radius:10px;
+}
+
+.issue-panel h3{
+margin-bottom:15px;
+color:#00d9ff;
+}
+
+.issue-panel p{
+margin:8px 0;
+}
+
 /* REPAIRS */
 
 .repairs{
@@ -280,10 +301,11 @@ background:#000;
 
 <div class="hero-content">
 
-<h1>FixHaiti</h1>
+<h1>Haiti's First Infrastructure Intelligence Platform</h1>
 
 <p>
-Haiti's first intelligent infrastructural reporting platform .
+FixHaiti maps broken roads, flooding streets, and failed infrastructure —
+turning citizen reports into real repair projects.
 </p>
 
 <div class="hero-buttons">
@@ -350,6 +372,17 @@ Haiti's first intelligent infrastructural reporting platform .
 
 <div id="mapBox"></div>
 
+<!-- ISSUE DETAILS PANEL -->
+<div id="issueDetails" class="issue-panel">
+<h3>Infrastructure Issue Details</h3>
+<p><strong>Issue:</strong> <span id="issueTypeView">None</span></p>
+<p><strong>Description:</strong> <span id="issueDescView">Select an issue on the map</span></p>
+<p><strong>Severity:</strong> <span id="issueSeverityView">-</span></p>
+<p><strong>Status:</strong> <span id="issueStatusView">-</span></p>
+<p><strong>Estimated Repair Cost:</strong> <span id="issueCostView">-</span></p>
+<button id="sponsorBtn" class="btn">Sponsor This Repair</button>
+</div>
+
 </section>
 
 <!-- REPAIRS -->
@@ -405,7 +438,9 @@ if(type==="Flooding") return "$500 - $2,000"
 return "N/A"
 }
 
-function createMarker(lat,lng,type,desc){
+/* UPGRADED MARKER FUNCTION TO SHOW PANEL */
+
+function createMarker(lat,lng,type,desc,severity,status){
 
 let icon=L.divIcon({
 className:'',
@@ -413,17 +448,72 @@ html:`<div class="fix-pin ${getColor(type)}"></div>`,
 iconSize:[20,20]
 })
 
-L.marker([lat,lng],{icon}).addTo(map)
+let marker=L.marker([lat,lng],{icon}).addTo(map)
+
+marker.on("click",()=>{
+
+document.getElementById("issueTypeView").innerText=type
+document.getElementById("issueDescView").innerText=desc
+document.getElementById("issueSeverityView").innerText=severity
+document.getElementById("issueStatusView").innerText=status
+document.getElementById("issueCostView").innerText=getCostEstimate(type)
+
+})
 
 }
 
 /* DEMO ISSUES */
 
-createMarker(18.548,-72.34,"Broken Traffic Light")
-createMarker(18.540,-72.320,"Pothole")
-createMarker(18.555,-72.330,"Broken Road")
-createMarker(18.535,-72.350,"Flooding")
-createMarker(18.545,-72.315,"Missing Traffic Light")
+createMarker(
+18.548,
+-72.34,
+"Broken Traffic Light",
+"Traffic signal destroyed. Vehicles crossing without regulation creating accident risk.",
+"Critical",
+"Repair Needed"
+)
+
+createMarker(
+18.540,
+-72.320,
+"Pothole",
+"Large pothole damaging vehicles and blocking drainage.",
+"Dangerous",
+"Pending Verification"
+)
+
+createMarker(
+18.555,
+-72.330,
+"Broken Road",
+"Road surface collapsed causing major traffic disruption.",
+"Critical",
+"Repair Needed"
+)
+
+createMarker(
+18.535,
+-72.350,
+"Flooding",
+"Street flooding during rainfall due to blocked drainage.",
+"Moderate",
+"Investigation"
+)
+
+createMarker(
+18.545,
+-72.315,
+"Missing Traffic Light",
+"Major intersection without traffic control system.",
+"Dangerous",
+"Needs Installation"
+)
+
+/* SPONSOR BUTTON */
+
+document.getElementById("sponsorBtn").onclick=()=>{
+alert("Diaspora sponsorship system coming soon. This repair can be funded directly.")
+}
 
 function scrollToMap(){
 document.getElementById("map").scrollIntoView({behavior:"smooth"})
