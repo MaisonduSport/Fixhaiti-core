@@ -336,7 +336,10 @@ for(let i=0;i<50;i++){
       <option>Broken Road</option>
       <option>No Traffic Light</option>
     </select>
+
     <input type="text" id="loc" placeholder="Click map to set location" readonly required>
+    <button type="button" id="geoBtn">Use My Location</button>
+
     <textarea id="desc" placeholder="Describe the issue"></textarea>
     <input type="file">
     <button type="submit">Submit Report</button>
@@ -365,10 +368,29 @@ const map = L.map('mapBox').setView([18.5392,-72.3350],13)
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map)
 
 let pinCoords = null
+
 map.on('click', (e) => {
   pinCoords = e.latlng
   document.getElementById('loc').value =
     "Lat "+pinCoords.lat.toFixed(4)+" , Lng "+pinCoords.lng.toFixed(4)
+})
+
+document.getElementById("geoBtn").addEventListener("click", () => {
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition((position)=>{
+      pinCoords = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      }
+      document.getElementById('loc').value =
+        "Lat "+pinCoords.lat.toFixed(4)+" , Lng "+pinCoords.lng.toFixed(4)
+      map.setView([pinCoords.lat, pinCoords.lng], 16)
+    }, ()=>{
+      alert("Could not get your location. Please allow location access.")
+    })
+  } else {
+    alert("Geolocation is not supported by your browser.")
+  }
 })
 
 function getColor(type){
@@ -411,7 +433,7 @@ function createMarker(lat,lng,type,desc){
 document.getElementById("reportForm").addEventListener("submit", function(e){
   e.preventDefault()
   if(!pinCoords){
-    alert("Click map to set location")
+    alert("Click map or use location to set location")
     return
   }
 
