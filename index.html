@@ -6,65 +6,76 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:Arial, Helvetica, sans-serif;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
 body{background:#0a0f1a;color:white;overflow-x:hidden;}
 
-/* NAV */
 nav{
-position:fixed;top:0;width:100%;display:flex;justify-content:space-between;align-items:center;padding:20px 60px;background:rgba(0,0,0,0.7);backdrop-filter:blur(10px);z-index:100;
+position:fixed;width:100%;top:0;
+display:flex;justify-content:space-between;
+padding:20px 60px;background:rgba(0,0,0,0.7);
+z-index:100;
 }
-.logo{font-size:26px;font-weight:bold;color:#00d9ff;}
-nav a{color:white;margin-left:25px;text-decoration:none;font-size:14px;}
 
-/* HERO */
-.hero{height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden;}
-.hero-content{position:relative;z-index:2;max-width:700px;}
-.hero h1{font-size:60px;margin-bottom:20px;letter-spacing:2px;}
-.hero p{font-size:20px;opacity:0.85;margin-bottom:40px;line-height:1.5;}
-.hero-buttons{display:flex;justify-content:center;gap:20px;}
-#roadNetwork{position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;}
+.logo{color:#00d9ff;font-size:24px;}
+nav a{color:white;margin-left:20px;text-decoration:none;}
 
-/* BUTTON */
-.btn{padding:15px 30px;border:none;background:#00d9ff;color:black;border-radius:5px;cursor:pointer;}
-.btn:hover{opacity:0.9;}
+.hero{height:100vh;display:flex;justify-content:center;align-items:center;text-align:center;position:relative;}
+canvas{position:absolute;width:100%;height:100%;}
+.hero-content{position:relative;z-index:2;}
 
-/* STATS */
-.stats{display:flex;justify-content:space-around;padding:100px 40px;background:#0f1626;}
-.card{text-align:center;}
-.card h2{font-size:45px;color:#00d9ff;}
+.btn{
+background:#00d9ff;
+padding:12px 25px;
+border:none;
+cursor:pointer;
+margin-top:20px;
+transition:0.3s;
+}
+.btn:hover{box-shadow:0 0 20px #00d9ff;transform:scale(1.05);}
 
-/* FORM POPUP */
-.popup-form{background:rgba(10,15,26,0.95);padding:20px;border-radius:12px;width:300px;color:white;}
-.popup-form input, .popup-form select, .popup-form textarea{width:100%;margin:6px 0;padding:10px;border-radius:6px;background:#0a0f1a;color:white;border:1px solid #00d9ff33;}
-.popup-form button{margin-top:10px;padding:12px;width:100%;background:#00d9ff;border:none;cursor:pointer;border-radius:6px;}
+.stats{display:flex;justify-content:space-around;padding:80px;background:#0f1626;}
 
-/* MAP */
-.map-section{padding:50px 40px;text-align:center;position:relative;}
-#mapBox{width:90%;height:500px;margin:auto;border:2px solid #00d9ff;border-radius:10px;position:relative;z-index:1;}
-.fix-pin{width:18px;height:18px;border-radius:50%;}
-.red{background:#ff3b3b;}
-.orange{background:#ff8c00;}
-.blue{background:#009dff;}
-.yellow{background:#ffd000;}
-#mapLegend{position:absolute;top:30px;right:80px;background:rgba(0,0,0,0.85);padding:15px;border-radius:10px;color:white;z-index:1000;}
-.legend-pin{width:16px;height:16px;border-radius:50%;display:inline-block;margin-right:10px;}
+.map-section{padding:80px;text-align:center;}
+#mapBox{height:500px;border:2px solid #00d9ff;border-radius:10px;}
 
-/* ISSUE DETAILS PANEL */
-.issue-panel{width:90%;max-width:900px;margin:30px auto;padding:25px;background:#0a0f1a;border:1px solid #00d9ff33;border-radius:10px;}
-.issue-panel h3{margin-bottom:15px;color:#00d9ff;}
-.issue-panel p{margin:8px 0;}
+.issue-panel, .dashboard{
+width:90%;margin:30px auto;padding:20px;
+background:#0f1626;border-radius:10px;
+}
 
-/* REPAIRS */
-.repairs{padding:80px 10%;background:#0f1626;}
-.repairs h2{text-align:center;margin-bottom:40px;color:#00d9ff;}
-.repair-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:25px;}
-.repair-card{background:#0a0f1a;border:1px solid #00d9ff33;padding:20px;border-radius:10px;}
-.progress-bar{width:100%;background:#1b2435;height:10px;border-radius:10px;margin:10px 0;}
-.progress{height:100%;background:#00d9ff;border-radius:10px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;}
 
-/* ABOUT */
-.about{padding:100px 20%;text-align:center;}
-footer{padding:60px;text-align:center;background:#000;}
+.box{
+background:#0a0f1a;
+padding:15px;
+border-radius:8px;
+transition:0.3s;
+}
+.box:hover{box-shadow:0 0 15px #00d9ff;transform:translateY(-5px);}
+
+.highlight{
+border:2px solid #00ff88;
+box-shadow:0 0 15px #00ff88;
+}
+
+/* Pulse */
+.pulse{
+width:12px;height:12px;background:red;border-radius:50%;
+position:relative;
+}
+.pulse::after{
+content:"";position:absolute;width:12px;height:12px;border-radius:50%;
+background:red;animation:pulse 1.5s infinite;
+}
+@keyframes pulse{
+0%{transform:scale(1);opacity:0.7;}
+100%{transform:scale(3);opacity:0;}
+}
+
+/* Slider */
+.slider-box{margin-top:20px;}
+input[type=range]{width:100%;}
+
 </style>
 </head>
 
@@ -73,176 +84,220 @@ footer{padding:60px;text-align:center;background:#000;}
 <nav>
 <div class="logo">FIXHAITI</div>
 <div>
-<a href="#">Home</a>
-<a href="#map">Infrastructure Map</a>
-<a href="#about">About</a>
+<a href="#map">Map</a>
+<a href="#dashboard">Dashboard</a>
 </div>
 </nav>
 
-<!-- HERO -->
 <section class="hero">
-<canvas id="roadNetwork"></canvas>
+<canvas id="network"></canvas>
 <div class="hero-content">
-<h1>Haiti's First Infrastructure Intelligence Platform</h1>
-<p>FixHaiti maps broken roads, flooding streets, and failed infrastructure — turning citizen reports into real repair projects.</p>
-<div class="hero-buttons">
-<button class="btn" onclick="scrollToMap()">Explore Infrastructure Map</button>
-</div>
+<h1>Infrastructure Intelligence for Haiti</h1>
+<button class="btn" onclick="scrollToMap()">Explore</button>
 </div>
 </section>
 
-<!-- STATS -->
 <section class="stats">
-<div class="card"><h2 id="r1">0</h2><p>Reports Submitted</p></div>
-<div class="card"><h2 id="r2">0</h2><p>Active Issues</p></div>
-<div class="card"><h2 id="r3">0</h2><p>Flood Risk Zones</p></div>
-<div class="card"><h2 id="r4">0</h2><p>Road Damage Reports</p></div>
+<div><h2 id="r1">0</h2><p>Reports</p></div>
+<div><h2 id="r2">0</h2><p>Active</p></div>
+<div><h2 id="r3">0</h2><p>Flood Zones</p></div>
+<div><h2 id="r4">0</h2><p>Road Damage</p></div>
 </section>
 
-<!-- MAP -->
 <section id="map" class="map-section">
 <h2>Live Infrastructure Map</h2>
-<div id="mapLegend">
-<h3>Severity</h3>
-<ul>
-<li>🔴 Critical</li>
-<li>🟠 Dangerous</li>
-<li>🟡 Moderate</li>
-<li>🔵 Minor</li>
-</ul>
-</div>
+
+<button class="btn" onclick="toggleMap()">Toggle Satellite</button>
+
 <div id="mapBox"></div>
 
-<!-- ISSUE DETAILS PANEL -->
-<div id="issueDetails" class="issue-panel">
-<h3>Infrastructure Issue Details</h3>
-<p><strong>Issue:</strong> <span id="issueTypeView">None</span></p>
-<p><strong>Description:</strong> <span id="issueDescView">Select an issue on the map</span></p>
-<p><strong>Severity:</strong> <span id="issueSeverityView">-</span></p>
-<p><strong>Status:</strong> <span id="issueStatusView">-</span></p>
-<p><strong>Estimated Repair Cost:</strong> <span id="issueCostView">-</span></p>
-<p><strong>Responsible Authority:</strong> <span id="issueAuthorityView">-</span></p>
+<div class="issue-panel">
+<h3>Issue Intelligence</h3>
+<p>ID: <span id="idView">-</span></p>
+<p>Type: <span id="typeView">-</span></p>
+<p>Severity: <span id="sevView">-</span></p>
+<p>Priority Score: <span id="scoreView">-</span></p>
+<p>Status: <span id="statusView">-</span></p>
+<p>Cost: <span id="costView">-</span></p>
+<p>Responsible Authority: <span id="authView">-</span></p>
 <button id="sponsorBtn" class="btn">Sponsor This Repair</button>
+
+<div class="slider-box">
+<p>Repair Progress</p>
+<input type="range" min="0" max="100" value="0" id="repairSlider">
+<p id="progressText">0%</p>
+</div>
+
 </div>
 </section>
 
-<!-- REPAIRS -->
-<section class="repairs">
-<h2>Priority Infrastructure Repairs</h2>
-<div class="repair-list" id="repairList"></div>
+<section id="dashboard" class="dashboard">
+<h2>National Control Dashboard</h2>
+
+<div class="grid">
+<div class="box"><h3>Total Budget</h3><p>$2,000,000</p></div>
+<div class="box"><h3>Allocated</h3><p id="allocated">$0</p></div>
+<div class="box"><h3>Remaining</h3><p id="remaining">$2,000,000</p></div>
+</div>
+
+<h3 style="margin-top:30px;">Priority Decisions</h3>
+<div id="decisionList" class="grid"></div>
+
+<button class="btn" onclick="autoSelect()">AI Auto-Prioritize</button>
+
 </section>
+
+<footer style="text-align:center;padding:40px;background:#000;">FixHaiti System</footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-// HERO NETWORK ANIMATION
-const canvas=document.getElementById("roadNetwork")
+
+/* NETWORK */
+const canvas=document.getElementById("network")
 const ctx=canvas.getContext("2d")
 canvas.width=window.innerWidth
 canvas.height=window.innerHeight
+
 let nodes=[]
-for(let i=0;i<60;i++){nodes.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-0.5)*0.5,vy:(Math.random()-0.5)*0.5})}
-function draw(){ctx.clearRect(0,0,canvas.width,canvas.height)
-for(let i=0;i<nodes.length;i++){
-let n=nodes[i]; n.x+=n.vx; n.y+=n.vy;
-if(n.x<0||n.x>canvas.width) n.vx*=-1
-if(n.y<0||n.y>canvas.height) n.vy*=-1
-ctx.beginPath(); ctx.arc(n.x,n.y,2,0,Math.PI*2); ctx.fillStyle="#00d9ff"; ctx.fill()
-for(let j=i+1;j<nodes.length;j++){
-let n2=nodes[j]; let dx=n.x-n2.x, dy=n.y-n2.y, dist=Math.sqrt(dx*dx+dy*dy)
-if(dist<120){ctx.beginPath();ctx.moveTo(n.x,n.y);ctx.lineTo(n2.x,n2.y);ctx.strokeStyle="rgba(0,217,255,0.2)";ctx.stroke()}
-}}
-requestAnimationFrame(draw)}
-draw()
-
-// MAP
-const map=L.map('mapBox').setView([18.5392,-72.3350],13)
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map)
-
-// FUNCTION HELPERS
-function getColor(type){if(type==="Broken Road") return "red"; if(type==="Broken Traffic Light") return "red"; if(type==="Pothole") return "orange"; if(type==="Missing Traffic Light") return "orange"; if(type==="Flooding") return "blue"; return "yellow";}
-function getCost(type){if(type==="Broken Road") return "$2,000 - $5,000"; if(type==="Broken Traffic Light") return "$1,000 - $2,500"; if(type==="Pothole") return "$50 - $300"; if(type==="Missing Traffic Light") return "$1,500 - $3,500"; if(type==="Flooding") return "$500 - $2,000"; return "N/A";}
-function getAuthority(type){if(type==="Broken Road"||type==="Pothole") return "MTPTC"; if(type==="Flooding") return "SNGRS"; if(type==="Traffic Light"||type==="Missing Traffic Light") return "Local Municipality"; return "Other";}
-
-// STATS
-let totalReports=0, activeIssues=0
-function updateStats(){document.getElementById("r1").innerText=totalReports;document.getElementById("r2").innerText=activeIssues;}
-
-// CREATE MARKER
-function addIssue(lat,lng,type,desc,severity="Critical"){
-totalReports++; activeIssues++; updateStats()
-let marker=L.marker([lat,lng],{icon:L.divIcon({className:'fix-pin '+getColor(type)})}).addTo(map)
-marker.on("click",()=>{
-document.getElementById("issueTypeView").innerText=type
-document.getElementById("issueDescView").innerText=desc
-document.getElementById("issueSeverityView").innerText=severity
-document.getElementById("issueStatusView").innerText="Pending"
-document.getElementById("issueCostView").innerText=getCost(type)
-document.getElementById("issueAuthorityView").innerText=getAuthority(type)
-})
+for(let i=0;i<60;i++){
+nodes.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:Math.random()-0.5,vy:Math.random()-0.5})
 }
 
-// MAP CLICK POPUP REPORT
-map.on('click', e=>{
-let popupContent=document.createElement("div")
-popupContent.className="popup-form"
-popupContent.innerHTML=`
-<label>Issue Type:</label>
-<select id="popupType">
-<option value="">Select Issue</option>
-<option>Pothole</option>
-<option>Broken Road</option>
-<option>Flooding</option>
-<option>Broken Traffic Light</option>
-<option>Missing Traffic Light</option>
-</select>
-<label>Description:</label>
-<textarea id="popupDesc" placeholder="Describe the issue"></textarea>
-<label>Photo (optional):</label>
-<input type="file" id="popupPhoto">
-<button id="submitIssue">Report Issue</button>
+function net(){
+ctx.clearRect(0,0,canvas.width,canvas.height)
+nodes.forEach(n=>{
+n.x+=n.vx;n.y+=n.vy
+ctx.fillRect(n.x,n.y,2,2)
+nodes.forEach(m=>{
+let d=Math.hypot(n.x-m.x,n.y-m.y)
+if(d<100){
+ctx.beginPath();ctx.moveTo(n.x,n.y);ctx.lineTo(m.x,m.y)
+ctx.strokeStyle="rgba(0,217,255,0.1)";ctx.stroke()
+}
+})
+})
+requestAnimationFrame(net)
+}
+net()
+
+/* MAP */
+let normal=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
+let sat=L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png')
+let map=L.map('mapBox',{layers:[normal]}).setView([18.5392,-72.3350],13)
+
+let usingSat=false
+function toggleMap(){
+if(usingSat){map.removeLayer(sat);normal.addTo(map)}
+else{map.removeLayer(normal);sat.addTo(map)}
+usingSat=!usingSat
+}
+
+/* BUDGET */
+let total=2000000, used=0
+
+function animateVal(id,start,end){
+let step=(end-start)/30
+let val=start
+let i=setInterval(()=>{
+val+=step
+if(val>=end){val=end;clearInterval(i)}
+document.getElementById(id).innerText="$"+Math.floor(val).toLocaleString()
+},20)
+}
+
+function allocate(cost,btn){
+if(total-used<cost){alert("Not enough");return}
+let prev=used
+used+=cost
+animateVal("allocated",prev,used)
+animateVal("remaining",total-prev,total-used)
+btn.innerText="Allocated"
+btn.disabled=true
+}
+
+/* ISSUES */
+let decisions=[]
+
+function getAuthority(type){
+if(type==="Broken Road") return "MTPTC"
+if(type==="Traffic Light") return "Municipality"
+if(type==="Flooding") return "DINEPA / Civil Protection"
+return "Unknown"
+}
+
+function createIssue(lat,lng,type,score){
+let cost=type==="Broken Road"?5000:2000
+
+let marker=L.marker([lat,lng]).addTo(map)
+L.marker([lat,lng],{icon:L.divIcon({className:"pulse"})}).addTo(map)
+
+marker.on("click",()=>{
+idView.innerText="FH-"+Math.floor(Math.random()*10000)
+typeView.innerText=type
+sevView.innerText="Critical"
+scoreView.innerText=score
+statusView.innerText="Pending"
+costView.innerText="$"+cost
+authView.innerText=getAuthority(type)
+})
+
+let div=document.createElement("div")
+div.className="box"
+div.dataset.score=score
+
+div.innerHTML=`
+<strong>${type}</strong><br>
+Score: ${score}<br>
+Cost: $${cost}<br>
+Authority: ${getAuthority(type)}<br>
+<button onclick="allocate(${cost}, this)">Allocate</button>
 `
 
-let popup=L.popup()
-.setLatLng(e.latlng)
-.setContent(popupContent)
-.openOn(map)
-
-popupContent.querySelector("#submitIssue").onclick=function(){
-let type=document.getElementById("popupType").value
-let desc=document.getElementById("popupDesc").value
-if(!type||!desc){alert("Please fill all fields");return;}
-addIssue(e.latlng.lat,e.latlng.lng,type,desc)
-map.closePopup()
+decisionList.appendChild(div)
+decisions.push(div)
 }
-})
 
-// DEMO ISSUES
-addIssue(18.548,-72.34,"Broken Traffic Light","Traffic signal destroyed. Vehicles crossing without regulation creating accident risk.")
-addIssue(18.540,-72.320,"Pothole","Large pothole damaging vehicles and blocking drainage.")
-addIssue(18.555,-72.330,"Broken Road","Road surface collapsed causing major traffic disruption.")
-addIssue(18.535,-72.350,"Flooding","Street flooding during rainfall due to blocked drainage.")
-addIssue(18.545,-72.315,"Missing Traffic Light","Major intersection without traffic control system.")
+/* SPONSOR BUTTON */
+document.getElementById("sponsorBtn").onclick = ()=>{
+if(!idView.innerText || idView.innerText === "-"){
+alert("Select an issue to sponsor first.");
+return;
+}
+alert(`Diaspora sponsorship system coming soon!\nYou can fund: ${typeView.innerText} (ID: ${idView.innerText})`);
+}
 
-// SPONSOR BUTTON
-document.getElementById("sponsorBtn").onclick=()=>{alert("Diaspora sponsorship system coming soon. This repair can be funded directly.")}
+/* AI PRIORITY */
+function autoSelect(){
+decisions.sort((a,b)=>b.dataset.score-a.dataset.score)
+decisions.forEach((d,i)=>{if(i<2){d.classList.add("highlight")}})
+}
+
+/* SLIDER */
+repairSlider.oninput=function(){progressText.innerText=this.value+"%"}
+
+/* DEMO */
+createIssue(18.54,-72.33,"Broken Road",95)
+createIssue(18.55,-72.34,"Flooding",80)
+createIssue(18.53,-72.32,"Traffic Light",70)
+
+/* STATS */
+function anim(id,end){
+let i=0
+let t=setInterval(()=>{
+i+=Math.ceil(end/40)
+if(i>=end){i=end;clearInterval(t)}
+document.getElementById(id).innerText=i
+},30)
+}
+anim("r1",1200)
+anim("r2",340)
+anim("r3",76)
+anim("r4",500)
 
 function scrollToMap(){document.getElementById("map").scrollIntoView({behavior:"smooth"})}
+
 </script>
-
-<section id="about" class="about">
-<h2>Why FixHaiti Matters</h2>
-<p>
-Across Haiti, broken roads, flooding streets, and damaged infrastructure create daily dangers.
-FixHaiti creates the first citizen-powered infrastructure intelligence system where problems
-are mapped, documented, and impossible to ignore.
-</p>
-</section>
-
-<footer>
-<h2>FIXHAITI</h2>
-<p>Infrastructure Intelligence Platform</p>
-</footer>
 
 </body>
 </html>
