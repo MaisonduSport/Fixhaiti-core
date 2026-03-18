@@ -20,7 +20,7 @@ z-index:100;
 nav a{color:white;margin-left:20px;text-decoration:none;}
 
 .hero{height:100vh;display:flex;justify-content:center;align-items:center;text-align:center;position:relative;}
-canvas{position:absolute;width:100%;height:100%;}
+canvas{position:absolute;width:100%;height:100%;z-index:0;}
 .hero-content{position:relative;z-index:2;}
 
 .btn{
@@ -36,7 +36,7 @@ transition:0.3s;
 .stats{display:flex;justify-content:space-around;padding:80px;background:#0f1626;}
 
 .map-section{padding:80px;text-align:center;}
-#mapBox{height:500px;border:2px solid #00d9ff;border-radius:10px;}
+#mapBox{height:500px;border:2px solid #00d9ff;border-radius:10px;position:relative;}
 
 .issue-panel, .dashboard{
 width:90%;margin:30px auto;padding:20px;
@@ -76,6 +76,17 @@ background:red;animation:pulse 1.5s infinite;
 .slider-box{margin-top:20px;}
 input[type=range]{width:100%;}
 
+/* REPORT FORM POPUP */
+#reportFormPopup{
+position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+background:#0a0f1a;padding:20px;border:2px solid #00d9ff;border-radius:10px;
+display:none;flex-direction:column;gap:10px;z-index:1000;
+width:300px;
+}
+#reportFormPopup input, #reportFormPopup select, #reportFormPopup textarea{
+width:100%;padding:8px;border-radius:5px;background:#0a0f1a;border:1px solid #00d9ff;color:white;
+}
+#reportFormPopup button{padding:10px;background:#00d9ff;border:none;cursor:pointer;}
 </style>
 </head>
 
@@ -111,6 +122,22 @@ input[type=range]{width:100%;}
 
 <div id="mapBox"></div>
 
+<div id="reportFormPopup">
+<h3>Report Infrastructure Issue</h3>
+<select id="reportType" required>
+<option value="">Select Issue Type</option>
+<option>Pothole</option>
+<option>Flooding</option>
+<option>Broken Road</option>
+<option>Missing Traffic Light</option>
+<option>Broken Traffic Light</option>
+</select>
+<textarea id="reportDesc" placeholder="Description (optional)"></textarea>
+<input type="file" id="reportImg">
+<button id="submitReportBtn">Submit Report</button>
+<button onclick="closeReportForm()">Cancel</button>
+</div>
+
 <div class="issue-panel">
 <h3>Issue Intelligence</h3>
 <p>ID: <span id="idView">-</span></p>
@@ -127,7 +154,6 @@ input[type=range]{width:100%;}
 <input type="range" min="0" max="100" value="0" id="repairSlider">
 <p id="progressText">0%</p>
 </div>
-
 </div>
 </section>
 
@@ -153,125 +179,59 @@ input[type=range]{width:100%;}
 
 <script>
 
-/* NETWORK */
+/* NETWORK ANIMATION */
 const canvas=document.getElementById("network")
 const ctx=canvas.getContext("2d")
 canvas.width=window.innerWidth
 canvas.height=window.innerHeight
-
 let nodes=[]
-for(let i=0;i<60;i++){
-nodes.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:Math.random()-0.5,vy:Math.random()-0.5})
-}
-
-function net(){
-ctx.clearRect(0,0,canvas.width,canvas.height)
-nodes.forEach(n=>{
-n.x+=n.vx;n.y+=n.vy
-ctx.fillRect(n.x,n.y,2,2)
-nodes.forEach(m=>{
-let d=Math.hypot(n.x-m.x,n.y-m.y)
-if(d<100){
-ctx.beginPath();ctx.moveTo(n.x,n.y);ctx.lineTo(m.x,m.y)
-ctx.strokeStyle="rgba(0,217,255,0.1)";ctx.stroke()
-}
-})
-})
-requestAnimationFrame(net)
-}
+for(let i=0;i<60;i++){nodes.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:Math.random()-0.5,vy:Math.random()-0.5})}
+function net(){ctx.clearRect(0,0,canvas.width,canvas.height)
+nodes.forEach(n=>{n.x+=n.vx;n.y+=n.vy;ctx.fillRect(n.x,n.y,2,2)
+nodes.forEach(m=>{let d=Math.hypot(n.x-m.x,n.y-m.y);if(d<100){ctx.beginPath();ctx.moveTo(n.x,n.y);ctx.lineTo(m.x,m.y);ctx.strokeStyle="rgba(0,217,255,0.1)";ctx.stroke()}})})
+requestAnimationFrame(net)}
 net()
 
 /* MAP */
 let normal=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
 let sat=L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png')
 let map=L.map('mapBox',{layers:[normal]}).setView([18.5392,-72.3350],13)
-
 let usingSat=false
-function toggleMap(){
-if(usingSat){map.removeLayer(sat);normal.addTo(map)}
-else{map.removeLayer(normal);sat.addTo(map)}
-usingSat=!usingSat
-}
+function toggleMap(){if(usingSat){map.removeLayer(sat);normal.addTo(map)}else{map.removeLayer(normal);sat.addTo(map)}usingSat=!usingSat}
 
 /* BUDGET */
 let total=2000000, used=0
-
 function animateVal(id,start,end){
 let step=(end-start)/30
 let val=start
-let i=setInterval(()=>{
-val+=step
-if(val>=end){val=end;clearInterval(i)}
-document.getElementById(id).innerText="$"+Math.floor(val).toLocaleString()
-},20)
+let i=setInterval(()=>{val+=step;if(val>=end){val=end;clearInterval(i)}document.getElementById(id).innerText="$"+Math.floor(val).toLocaleString()},20)
 }
-
-function allocate(cost,btn){
-if(total-used<cost){alert("Not enough");return}
-let prev=used
-used+=cost
-animateVal("allocated",prev,used)
-animateVal("remaining",total-prev,total-used)
-btn.innerText="Allocated"
-btn.disabled=true
-}
+function allocate(cost,btn){if(total-used<cost){alert("Not enough");return}let prev=used;used+=cost;animateVal("allocated",prev,used);animateVal("remaining",total-prev,total-used);btn.innerText="Allocated";btn.disabled=true}
 
 /* ISSUES */
 let decisions=[]
-
-function getAuthority(type){
-if(type==="Broken Road") return "MTPTC"
-if(type==="Traffic Light") return "Municipality"
-if(type==="Flooding") return "DINEPA / Civil Protection"
-return "Unknown"
-}
-
-function createIssue(lat,lng,type,score){
+function getAuthority(type){if(type==="Broken Road") return "MTPTC";if(type.includes("Traffic Light")) return "Municipality";if(type==="Flooding") return "DINEPA / Civil Protection";return "Unknown"}
+function createIssue(lat,lng,type,score,desc=""){
 let cost=type==="Broken Road"?5000:2000
-
 let marker=L.marker([lat,lng]).addTo(map)
 L.marker([lat,lng],{icon:L.divIcon({className:"pulse"})}).addTo(map)
-
-marker.on("click",()=>{
-idView.innerText="FH-"+Math.floor(Math.random()*10000)
-typeView.innerText=type
-sevView.innerText="Critical"
-scoreView.innerText=score
-statusView.innerText="Pending"
-costView.innerText="$"+cost
-authView.innerText=getAuthority(type)
-})
-
+marker.on("click",()=>{idView.innerText="FH-"+Math.floor(Math.random()*10000);typeView.innerText=type;sevView.innerText="Critical";scoreView.innerText=score;statusView.innerText="Pending";costView.innerText="$"+cost;authView.innerText=getAuthority(type)})
 let div=document.createElement("div")
 div.className="box"
 div.dataset.score=score
-
-div.innerHTML=`
-<strong>${type}</strong><br>
-Score: ${score}<br>
-Cost: $${cost}<br>
-Authority: ${getAuthority(type)}<br>
-<button onclick="allocate(${cost}, this)">Allocate</button>
-`
-
+div.innerHTML=`<strong>${type}</strong><br>Score: ${score}<br>Cost: $${cost}<br>Authority: ${getAuthority(type)}<br><button onclick="allocate(${cost}, this)">Allocate</button>`
 decisionList.appendChild(div)
 decisions.push(div)
 }
 
 /* SPONSOR BUTTON */
 document.getElementById("sponsorBtn").onclick = ()=>{
-if(!idView.innerText || idView.innerText === "-"){
-alert("Select an issue to sponsor first.");
-return;
-}
+if(!idView.innerText || idView.innerText === "-"){alert("Select an issue to sponsor first.");return;}
 alert(`Diaspora sponsorship system coming soon!\nYou can fund: ${typeView.innerText} (ID: ${idView.innerText})`);
 }
 
 /* AI PRIORITY */
-function autoSelect(){
-decisions.sort((a,b)=>b.dataset.score-a.dataset.score)
-decisions.forEach((d,i)=>{if(i<2){d.classList.add("highlight")}})
-}
+function autoSelect(){decisions.sort((a,b)=>b.dataset.score-a.dataset.score);decisions.forEach((d,i)=>{if(i<2){d.classList.add("highlight")}})}
 
 /* SLIDER */
 repairSlider.oninput=function(){progressText.innerText=this.value+"%"}
@@ -282,21 +242,24 @@ createIssue(18.55,-72.34,"Flooding",80)
 createIssue(18.53,-72.32,"Traffic Light",70)
 
 /* STATS */
-function anim(id,end){
-let i=0
-let t=setInterval(()=>{
-i+=Math.ceil(end/40)
-if(i>=end){i=end;clearInterval(t)}
-document.getElementById(id).innerText=i
-},30)
-}
-anim("r1",1200)
-anim("r2",340)
-anim("r3",76)
-anim("r4",500)
-
+function anim(id,end){let i=0;let t=setInterval(()=>{i+=Math.ceil(end/40);if(i>=end){i=end;clearInterval(t)}document.getElementById(id).innerText=i},30)}
+anim("r1",1200);anim("r2",340);anim("r3",76);anim("r4",500)
 function scrollToMap(){document.getElementById("map").scrollIntoView({behavior:"smooth"})}
 
+/* REPORT FORM FUNCTIONALITY */
+let reportLatLng=null
+map.on('click', (e)=>{reportLatLng=e.latlng;openReportForm()})
+function openReportForm(){document.getElementById('reportFormPopup').style.display='flex'}
+function closeReportForm(){document.getElementById('reportFormPopup').style.display='none'}
+document.getElementById('submitReportBtn').onclick=function(){
+let type=document.getElementById('reportType').value
+let desc=document.getElementById('reportDesc').value
+if(!type){alert("Select an issue type");return}
+createIssue(reportLatLng.lat,reportLatLng.lng,type,Math.floor(Math.random()*100),desc)
+closeReportForm()
+}
+
+/* REPORT IMAGE INPUT - placeholder for future use */
 </script>
 
 </body>
