@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <title>FixHaiti — Infrastructure Intelligence</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}
 body{background:#0a0f1a;color:white;overflow-x:hidden;}
@@ -15,6 +14,7 @@ display:flex;justify-content:space-between;
 padding:20px 60px;background:rgba(0,0,0,0.7);
 z-index:100;
 }
+
 .logo{color:#00d9ff;font-size:24px;}
 nav a{color:white;margin-left:20px;text-decoration:none;}
 
@@ -35,7 +35,7 @@ transition:0.3s;
 .stats{display:flex;justify-content:space-around;padding:80px;background:#0f1626;}
 
 .map-section{padding:80px;text-align:center;}
-#mapBox{height:500px;border:2px solid #00d9ff;border-radius:10px;}
+#mapBox{height:500px;border:2px solid #00d9ff;border-radius:10px;position:relative;}
 
 .issue-panel, .dashboard{
 width:90%;margin:30px auto;padding:20px;
@@ -75,20 +75,14 @@ background:red;animation:pulse 1.5s infinite;
 .slider-box{margin-top:20px;}
 input[type=range]{width:100%;}
 
-/* Pop-up Form */
-#reportFormContainer{
-position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-background:#0f1626;padding:25px;border-radius:10px;z-index:10000;
-display:none;width:300px;
+/* Popup form */
+.leaflet-popup-content input,
+.leaflet-popup-content select,
+.leaflet-popup-content textarea{
+width:100%;margin:5px 0;padding:5px;background:#0a0f1a;color:white;border:1px solid #00d9ff;border-radius:5px;
 }
-#reportFormContainer h3{margin-bottom:15px;color:#00d9ff;}
-#reportFormContainer input, textarea, select{width:100%;margin:5px 0;padding:8px;border-radius:6px;background:#0a0f1a;color:white;border:1px solid #00d9ff33;}
-#reportFormContainer button{margin-top:10px;width:100%;padding:10px;background:#00d9ff;border:none;cursor:pointer;}
-#closeForm{background:red;margin-top:5px;}
-#imagePreview{margin-top:5px;width:100%;height:auto;max-height:100px;}
 </style>
 </head>
-
 <body>
 
 <nav>
@@ -116,10 +110,8 @@ display:none;width:300px;
 
 <section id="map" class="map-section">
 <h2>Live Infrastructure Map</h2>
-
 <button class="btn" onclick="toggleMap()">Toggle Satellite</button>
-<button class="btn" onclick="reportAtMyLocation()">Report at My Location</button>
-
+<button class="btn" onclick="reportAtMyLocation()">Report Issue at My Location</button>
 <div id="mapBox"></div>
 
 <div class="issue-panel">
@@ -131,7 +123,6 @@ display:none;width:300px;
 <p>Status: <span id="statusView">-</span></p>
 <p>Cost: <span id="costView">-</span></p>
 <p>Responsible Authority: <span id="authView">-</span></p>
-<p>Image: <span id="imgView">-</span></p>
 <button id="sponsorBtn" class="btn">Sponsor This Repair</button>
 
 <div class="slider-box">
@@ -139,13 +130,11 @@ display:none;width:300px;
 <input type="range" min="0" max="100" value="0" id="repairSlider">
 <p id="progressText">0%</p>
 </div>
-
 </div>
 </section>
 
 <section id="dashboard" class="dashboard">
 <h2>National Control Dashboard</h2>
-
 <div class="grid">
 <div class="box"><h3>Total Budget</h3><p>$2,000,000</p></div>
 <div class="box"><h3>Allocated</h3><p id="allocated">$0</p></div>
@@ -156,43 +145,21 @@ display:none;width:300px;
 <div id="decisionList" class="grid"></div>
 
 <button class="btn" onclick="autoSelect()">AI Auto-Prioritize</button>
-
 </section>
-
-<!-- Pop-up Report Form -->
-<div id="reportFormContainer">
-<h3>Report Infrastructure Issue</h3>
-<select id="formType" required>
-<option value="">Select Issue Type</option>
-<option>Pothole</option>
-<option>Flooding</option>
-<option>Broken Road</option>
-<option>Missing Traffic Light</option>
-<option>Broken Traffic Light</option>
-</select>
-<textarea id="formDesc" placeholder="Describe the issue"></textarea>
-<input type="file" id="formImage">
-<img id="imagePreview" src="" alt="">
-<button id="submitForm">Submit Report</button>
-<button id="closeForm">Cancel</button>
-</div>
 
 <footer style="text-align:center;padding:40px;background:#000;">FixHaiti System</footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <script>
-/* NETWORK ANIMATION */
+/* NETWORK */
 const canvas=document.getElementById("network")
 const ctx=canvas.getContext("2d")
 canvas.width=window.innerWidth
 canvas.height=window.innerHeight
-
 let nodes=[]
 for(let i=0;i<60;i++){
 nodes.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:Math.random()-0.5,vy:Math.random()-0.5})
 }
-
 function net(){
 ctx.clearRect(0,0,canvas.width,canvas.height)
 nodes.forEach(n=>{
@@ -200,10 +167,7 @@ n.x+=n.vx;n.y+=n.vy
 ctx.fillRect(n.x,n.y,2,2)
 nodes.forEach(m=>{
 let d=Math.hypot(n.x-m.x,n.y-m.y)
-if(d<100){
-ctx.beginPath();ctx.moveTo(n.x,n.y);ctx.lineTo(m.x,m.y)
-ctx.strokeStyle="rgba(0,217,255,0.1)";ctx.stroke()
-}
+if(d<100){ctx.beginPath();ctx.moveTo(n.x,n.y);ctx.lineTo(m.x,m.y);ctx.strokeStyle="rgba(0,217,255,0.1)";ctx.stroke();}
 })
 })
 requestAnimationFrame(net)
@@ -215,19 +179,14 @@ let normal=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png')
 let sat=L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png')
 let map=L.map('mapBox',{layers:[normal]}).setView([18.5392,-72.3350],13)
 let usingSat=false
-function toggleMap(){
-if(usingSat){map.removeLayer(sat);normal.addTo(map)}
-else{map.removeLayer(normal);sat.addTo(map)}
-usingSat=!usingSat
-}
+function toggleMap(){if(usingSat){map.removeLayer(sat);normal.addTo(map)}else{map.removeLayer(normal);sat.addTo(map)}usingSat=!usingSat}
 
 /* BUDGET */
 let total=2000000, used=0
 function animateVal(id,start,end){
 let step=(end-start)/30
 let val=start
-let i=setInterval(()=>{val+=step;if(val>=end){val=end;clearInterval(i)}
-document.getElementById(id).innerText="$"+Math.floor(val).toLocaleString()},20)
+let i=setInterval(()=>{val+=step;if(val>=end){val=end;clearInterval(i)}document.getElementById(id).innerText="$"+Math.floor(val).toLocaleString()},20)
 }
 function allocate(cost,btn){
 if(total-used<cost){alert("Not enough");return}
@@ -243,17 +202,14 @@ btn.disabled=true
 let decisions=[]
 function getAuthority(type){
 if(type==="Broken Road") return "MTPTC"
-if(type==="Traffic Light"||type==="Broken Traffic Light"||type==="Missing Traffic Light") return "Municipality"
+if(type==="Traffic Light") return "Municipality"
 if(type==="Flooding") return "DINEPA / Civil Protection"
-if(type==="Pothole") return "Municipality"
 return "Unknown"
 }
-
-function createIssue(lat,lng,type,score,desc,image){
+function createIssue(lat,lng,type,score){
 let cost=type==="Broken Road"?5000:2000
 let marker=L.marker([lat,lng]).addTo(map)
 L.marker([lat,lng],{icon:L.divIcon({className:"pulse"})}).addTo(map)
-
 marker.on("click",()=>{
 idView.innerText="FH-"+Math.floor(Math.random()*10000)
 typeView.innerText=type
@@ -262,9 +218,7 @@ scoreView.innerText=score
 statusView.innerText="Pending"
 costView.innerText="$"+cost
 authView.innerText=getAuthority(type)
-imgView.innerText=image?image.name:"-"
 })
-
 let div=document.createElement("div")
 div.className="box"
 div.dataset.score=score
@@ -273,79 +227,72 @@ decisionList.appendChild(div)
 decisions.push(div)
 }
 
-/* SPONSOR BUTTON */
-document.getElementById("sponsorBtn").onclick = ()=>{
-if(!idView.innerText || idView.innerText === "-"){alert("Select an issue to sponsor first.");return;}
-alert(`Diaspora sponsorship system coming soon!\nYou can fund: ${typeView.innerText} (ID: ${idView.innerText})`);
+/* POPUP REPORT FORM */
+function showReportPopup(latlng){
+let popupContent=`<b>Report Issue</b><br>
+<select id="popupType" required>
+<option value="">Select Issue Type</option>
+<option>Pothole</option>
+<option>Flooding</option>
+<option>Broken Road</option>
+<option>Missing Traffic Light</option>
+<option>Broken Traffic Light</option>
+</select>
+<textarea id="popupDesc" placeholder="Describe the issue"></textarea>
+<input type="file" id="popupPhoto">
+<br><button onclick="submitReport(${latlng.lat},${latlng.lng})">Report</button>`
+L.popup()
+.setLatLng(latlng)
+.setContent(popupContent)
+.openOn(map)
 }
 
-/* AI PRIORITY */
-function autoSelect(){
-decisions.sort((a,b)=>b.dataset.score-a.dataset.score)
-decisions.forEach((d,i)=>{if(i<2){d.classList.add("highlight")}})
+/* SUBMIT REPORT */
+function submitReport(lat,lng){
+let type=document.getElementById("popupType").value
+let desc=document.getElementById("popupDesc").value
+if(!type||!desc){alert("Select type and enter description");return}
+let cost=type==="Broken Road"?5000:2000
+createIssue(lat,lng,type,Math.floor(Math.random()*100))
+map.closePopup()
 }
 
-/* SLIDER */
-repairSlider.oninput=function(){progressText.innerText=this.value+"%"}
-
-/* STATS */
-function anim(id,end){let i=0;let t=setInterval(()=>{i+=Math.ceil(end/40);if(i>=end){i=end;clearInterval(t)}document.getElementById(id).innerText=i},30)}
-anim("r1",1200)
-anim("r2",340)
-anim("r3",76)
-anim("r4",500)
-function scrollToMap(){document.getElementById("map").scrollIntoView({behavior:"smooth"})}
-
-/* DEMO ISSUES */
-createIssue(18.54,-72.33,"Broken Road",95,"Major road collapse",null)
-createIssue(18.55,-72.34,"Flooding",80,"Street flooded during rainfall",null)
-createIssue(18.53,-72.32,"Traffic Light",70,"Signal damaged at intersection",null)
-
-/* REPORT FORM LOGIC */
-let selectedLatLng=null
-
-function openForm(latlng){
-selectedLatLng=latlng
-document.getElementById("reportFormContainer").style.display="block"
-document.getElementById("formType").value=""
-document.getElementById("formDesc").value=""
-document.getElementById("formImage").value=""
-document.getElementById("imagePreview").src=""
-}
-
-map.on('click', function(e){ openForm(e.latlng) })
-
-document.getElementById("closeForm").onclick = ()=>{ document.getElementById("reportFormContainer").style.display="none" }
-
-document.getElementById("formImage").onchange = function(){
-const file=this.files[0]
-if(file){
-let reader=new FileReader()
-reader.onload=function(e){document.getElementById("imagePreview").src=e.target.result}
-reader.readAsDataURL(file)
-}
-}
-
-document.getElementById("submitForm").onclick = ()=>{
-let type=document.getElementById("formType").value
-let desc=document.getElementById("formDesc").value
-let image=document.getElementById("formImage").files[0]
-
-if(!type){alert("Select an issue type."); return;}
-createIssue(selectedLatLng.lat,selectedLatLng.lng,type,50,desc,image)
-document.getElementById("reportFormContainer").style.display="none"
-}
+/* MAP CLICK */
+map.on("click",(e)=>{showReportPopup(e.latlng)})
 
 /* REPORT AT MY LOCATION */
 function reportAtMyLocation(){
 if(navigator.geolocation){
 navigator.geolocation.getCurrentPosition(pos=>{
 let latlng={lat:pos.coords.latitude,lng:pos.coords.longitude}
-map.setView(latlng,16)
-openForm(latlng)
-}, err=>{alert("Unable to get location.")})
-}else{alert("Geolocation not supported.")}
+showReportPopup(latlng)
+})
+}else{alert("Geolocation not supported")}
 }
+
+/* SPONSOR BUTTON */
+document.getElementById("sponsorBtn").onclick=()=>{
+if(!idView.innerText || idView.innerText === "-"){alert("Select an issue to sponsor first.");return;}
+alert(`Diaspora sponsorship system coming soon!\nYou can fund: ${typeView.innerText} (ID: ${idView.innerText})`)
+}
+
+/* AI PRIORITY */
+function autoSelect(){decisions.sort((a,b)=>b.dataset.score-a.dataset.score);decisions.forEach((d,i)=>{if(i<2)d.classList.add("highlight")})}
+
+/* SLIDER */
+repairSlider.oninput=function(){progressText.innerText=this.value+"%"}
+
+/* DEMO */
+createIssue(18.54,-72.33,"Broken Road",95)
+createIssue(18.55,-72.34,"Flooding",80)
+createIssue(18.53,-72.32,"Traffic Light",70)
+
+/* STATS */
+function anim(id,end){let i=0;let t=setInterval(()=>{i+=Math.ceil(end/40);if(i>=end){i=end;clearInterval(t)}document.getElementById(id).innerText=i},30)}
+anim("r1",1200);anim("r2",340);anim("r3",76);anim("r4",500)
+
+function scrollToMap(){document.getElementById("map").scrollIntoView({behavior:"smooth"})}
 </script>
+
 </body>
 </html>
