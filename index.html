@@ -188,10 +188,10 @@ function reportAtMyLocation(){
             let popupContent=document.createElement("div");
             popupContent.className="popup-form";
             popupContent.innerHTML=`
-                <select id="pt"><option>Sunken Road</option><option>Flooding</option></select>
+                <select id="pt"><option>Sunken Road</option><option>Flooding</option><option>Potholes</option><option>Missing Traffic lights</option><option>Broken traffic light</option></select>
                 <textarea id="pd" placeholder="Description..."></textarea>
                 <input type="file" capture="camera">
-                <span class="verifying-tag">📍 SOVEREIGN COORDS LOCKED: ${latlng.lat.toFixed(4)}</span>
+                <span class="verifying-tag">📍 COORDINATION LOCKED: ${latlng.lat.toFixed(4)}</span>
                 <button class="btn" style="width:100%;" id="sub">Submit Evidence</button>`;
             let p=L.popup().setLatLng(latlng).setContent(popupContent).openOn(map);
             popupContent.querySelector("#sub").onclick=()=>{
