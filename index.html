@@ -76,8 +76,8 @@ footer {padding:60px; text-align:center; background:#000;}
 <section class="hero">
     <canvas id="roadNetwork"></canvas>
     <div class="hero-content">
-        <h1>Haiti's Infrastructure Intelligence Platform</h1>
-        <p>Turning verified ground-truth into national reconstruction priority. Designed for the Haiti.</p>
+        <h1>Sovereign Infrastructure Intelligence</h1>
+        <p>Turning verified ground-truth into national reconstruction priority. Designed for the Republic.</p>
         <button class="btn" onclick="document.getElementById('map').scrollIntoView({behavior:'smooth'})">Explore Map</button>
     </div>
 </section>
@@ -110,7 +110,7 @@ footer {padding:60px; text-align:center; background:#000;}
         <p><strong>Status:</strong> <span id="issueStatusView">-</span></p>
         <p><strong>Estimated Repair Cost:</strong> <span id="issueCostView">-</span></p>
         <p><strong>Responsible Authority:</strong> <span id="issueAuthorityView">-</span></p>
-        <button class="btn" style="margin-top:15px; font-size:12px;">Sponsor Fix</button>
+        <button class="btn" style="margin-top:15px; font-size:12px;">Initiate Reconstruction Fund</button>
     </div>
 </section>
 
@@ -118,10 +118,16 @@ footer {padding:60px; text-align:center; background:#000;}
     <h2>Field Agent Portal</h2>
     <div id="taskList">
         <div class="task-card">
-            <div><h4>Site Audit: Route de Delmas</h4><p style="font-size:11px; opacity:0.5;">ID: FIX-9921</p></div>
+            <div><h4>Site Audit: Route de Delmas (West)</h4><p style="font-size:11px; opacity:0.5;">ID: FIX-9921</p></div>
             <div style="text-align:right;"><span class="tc-badge">40 Trust Credits</span></div>
-       <div><h4>Site Audit: Petion-ville</h4><p style="font-size:11px; opacity:0.5;">ID: FIX-9921</p></div>
-            <div style="text-align:right;"><span class="tc-badge">40 Trust Credits</span></div>
+        </div>
+        <div class="task-card">
+            <div><h4>Verification: RN6 Sunken Road (Nord)</h4><p style="font-size:11px; opacity:0.5;">ID: FIX-1144</p></div>
+            <div style="text-align:right;"><span class="tc-badge">55 Trust Credits</span></div>
+        </div>
+        <div class="task-card">
+            <div><h4>Audit: Port-de-Paix Drainage (Nord-Ouest)</h4><p style="font-size:11px; opacity:0.5;">ID: FIX-2088</p></div>
+            <div style="text-align:right;"><span class="tc-badge">60 Trust Credits</span></div>
         </div>
     </div>
 </section>
@@ -130,7 +136,7 @@ footer {padding:60px; text-align:center; background:#000;}
     <h2>National Control Dashboard</h2>
     <div class="grid" id="decisionList">
         <div class="box" data-severity="Minor"><h3>Pothole (Sector 4)</h3><p>Priority: Minor</p></div>
-        <div class="box" data-severity="Critical"><h3>Sunken Road</h3><p>Priority: Critical</p></div>
+        <div class="box" data-severity="Critical"><h3>RN6 Sunken Road</h3><p>Priority: Critical</p></div>
     </div>
     <button class="btn" onclick="autoPrioritize()" style="margin-top:40px; background:#00ff88;">Trigger AI Priority Protocol</button>
 </section>
@@ -150,13 +156,13 @@ for(let j=i+1;j<nodes.length;j++){let n2=nodes[j], dx=n.x-n2.x, dy=n.y-n2.y, dis
 if(dist<120){ctx.beginPath(); ctx.moveTo(n.x,n.y); ctx.lineTo(n2.x,n2.y); ctx.strokeStyle="rgba(0,217,255,0.1)"; ctx.stroke()}}}
 requestAnimationFrame(draw);} draw();
 
-/* MAP LOGIC */
-const map=L.map('mapBox').setView([18.5392,-72.3350], 13);
+/* MAP LOGIC (ZOOMED OUT TO SHOW NORD & OUEST) */
+const map=L.map('mapBox').setView([19.1000,-72.3350], 8);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 
-/* HELPERS RESTORED */
-function getCost(type){if(type==="Bridge Collapse"||type==="Structural Failure")return "$15,000 - $50,000"; return "$500 - $2,500";}
-function getAuthority(type){if(type.includes("Bridge"))return "MTPTC"; return "Local Municipality";}
+/* HELPERS */
+function getCost(type){if(type.includes("Sunken") || type.includes("Bridge"))return "$25,000 - $75,000"; return "$500 - $2,500";}
+function getAuthority(type){if(type.includes("Road") || type.includes("Bridge"))return "MTPTC"; return "Local Municipality";}
 
 let totalReports=0, activeIssues=0;
 function updateStats(){document.getElementById("r1").innerText=totalReports; document.getElementById("r2").innerText=activeIssues;}
@@ -182,7 +188,7 @@ function reportAtMyLocation(){
             let popupContent=document.createElement("div");
             popupContent.className="popup-form";
             popupContent.innerHTML=`
-                <select id="pt"><option>Structural Failure</option><option>Flooding</option></select>
+                <select id="pt"><option>Sunken Road</option><option>Flooding</option></select>
                 <textarea id="pd" placeholder="Description..."></textarea>
                 <input type="file" capture="camera">
                 <span class="verifying-tag">📍 SOVEREIGN COORDS LOCKED: ${latlng.lat.toFixed(4)}</span>
@@ -209,9 +215,11 @@ function autoPrioritize(){
     });
 }
 
-// RESTORED DEMO DATA
-addIssue(18.548,-72.34,"Bridge Collapse","Structural failure at Canapé Vert. High transit risk.","Critical");
-addIssue(18.540,-72.320,"Severe Pothole","Multiple vehicle damages in Delmas 31.","Dangerous");
+// NORD (NORTH) & OUEST (WEST) DEMO DATA
+addIssue(19.728, -72.155, "Sunken Road", "Severe pavement subsidence on RN6 near Quartier Morin. Impacting heavy transport.", "Critical");
+addIssue(19.752, -72.211, "Drainage Failure", "Major silt blockage in Bassin Rhodo, Cap-Haitien. Urban flood risk high.", "Critical");
+addIssue(18.548, -72.340, "Bridge Scour", "Erosion at bridge piers in West Dept. Structural integrity at risk.", "Dangerous");
+addIssue(19.932, -72.833, "Unfinished Corridor", "Stalled road construction near Port-de-Paix. Massive dust and runoff issues.", "Dangerous");
 </script>
 
 <footer>
