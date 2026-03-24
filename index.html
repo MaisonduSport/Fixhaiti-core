@@ -5,7 +5,7 @@
 <title>FixHaiti — Infrastructure Intelligence</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <style>
-/* --- CORE STYLES --- */
+/* --- CORE STYLES (Restored Original) --- */
 * {margin:0; padding:0; box-sizing:border-box; font-family:Arial, Helvetica, sans-serif;}
 body {background:#0a0f1a; color:white; overflow-x:hidden;}
 nav {
@@ -13,52 +13,52 @@ nav {
     padding:20px 60px; background:rgba(0,0,0,0.7); backdrop-filter:blur(10px); z-index:1000;
 }
 .logo {font-size:26px; font-weight:bold; color:#00d9ff; letter-spacing:1px;}
-nav a {color:white; margin-left:25px; text-decoration:none; font-size:13px; text-transform: uppercase; opacity: 0.8;}
-nav a:hover {opacity: 1; color: #00d9ff;}
+nav a {color:white; margin-left:25px; text-decoration:none; font-size:14px; opacity: 0.8;}
 
 /* --- HERO --- */
 .hero {height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; position:relative; overflow:hidden;}
 .hero-content {position:relative; z-index:2; max-width:700px;}
-.hero h1 {font-size:60px; margin-bottom:20px; letter-spacing:2px; line-height: 1.1;}
-.hero p {font-size:18px; opacity:0.7; margin-bottom:40px; line-height:1.6; color: #a0aec0;}
+.hero h1 {font-size:60px; margin-bottom:20px; letter-spacing:2px;}
 #roadNetwork {position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;}
 
 /* --- BUTTONS --- */
-.btn {padding:15px 30px; border:none; background:#00d9ff; color:black; border-radius:4px; cursor:pointer; font-weight:bold; transition: 0.3s;}
-.btn:hover {background: #00b8d9; transform: translateY(-2px);}
-.btn-outline {background:transparent; border:1px solid #00d9ff; color:#00d9ff; margin-left: 10px;}
+.btn {padding:15px 30px; border:none; background:#00d9ff; color:black; border-radius:5px; cursor:pointer; font-weight:bold; transition: 0.3s;}
+.btn:hover {opacity:0.9; transform: scale(1.05);}
 
 /* --- STATS --- */
-.stats {display:flex; justify-content:space-around; padding:100px 40px; background:#0f1626; border-bottom: 1px solid #1b2435;}
+.stats {display:flex; justify-content:space-around; padding:100px 40px; background:#0f1626;}
 .card {text-align:center;}
-.card h2 {font-size:48px; color:#00d9ff; margin-bottom: 5px;}
-.card p {font-size: 14px; opacity: 0.6; text-transform: uppercase; letter-spacing: 1px;}
+.card h2 {font-size:48px; color:#00d9ff;}
 
-/* --- FIELD AGENT PORTAL (SECURITY UPDATES) --- */
-.agent-section { padding: 100px 10%; background: #0a0f1a; border-top: 1px solid #00d9ff22; }
-.agent-section h2 { color: #00d9ff; margin-bottom: 10px; font-size: 32px; }
-.task-card { background: #111827; border: 1px solid #1f2937; padding: 25px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
-.task-card:hover { border-color: #00d9ff66; background: #161e2e; }
-.tc-badge { background: #00ff8815; color: #00ff88; padding: 6px 14px; border-radius: 20px; font-size: 12px; border: 1px solid #00ff8833; font-weight: bold; letter-spacing: 0.5px; }
+/* --- AGENT PORTAL (New UI) --- */
+.agent-section { padding: 80px 10%; background: #0a0f1a; border-top: 1px solid #00d9ff22; }
+.task-card { background: #111827; border: 1px solid #1f2937; padding: 25px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+.tc-badge { background: #00ff8815; color: #00ff88; padding: 6px 14px; border-radius: 20px; font-size: 12px; border: 1px solid #00ff8833; font-weight: bold; }
 
-/* --- MAP & FORM --- */
-.map-section {padding:80px 40px; text-align:center;}
-#mapBox {width:90%; height:550px; margin:auto; border:1px solid #1f2937; border-radius:12px; z-index:1;}
-.popup-form {background:#0f172a; padding:20px; border-radius:8px; width:280px; color:white; border: 1px solid #00d9ff33;}
-.popup-form input, .popup-form select, .popup-form textarea {
-    width:100%; margin:8px 0; padding:12px; border-radius:4px; background:#020617; color:white; border:1px solid #1e293b; font-size: 13px;
-}
-.verifying-tag { font-size: 11px; color: #00ff88; margin: 10px 0; display: block; font-weight: bold; }
-.fix-pin {width:18px; height:18px; border-radius:50%; border: 2px solid #fff; box-shadow: 0 0 10px rgba(0,0,0,0.5);}
+/* --- MAP & LEGEND --- */
+.map-section {padding:50px 40px; text-align:center; position:relative;}
+#mapBox {width:90%; height:500px; margin:auto; border:2px solid #00d9ff; border-radius:10px; position:relative; z-index:1;}
+#mapLegend {position:absolute; top:30px; right:80px; background:rgba(0,0,0,0.85); padding:15px; border-radius:10px; color:white; z-index:1000; text-align: left; border: 1px solid #00d9ff33;}
+.fix-pin {width:18px; height:18px; border-radius:50%; border: 2px solid #fff;}
 .red {background:#ef4444;} .orange {background:#f59e0b;} .blue {background:#3b82f6;} .yellow {background:#eab308;}
 
-/* --- DASHBOARD & AI LOGIC --- */
+/* --- ISSUE PANEL --- */
+.issue-panel {width:90%; max-width:900px; margin:30px auto; padding:25px; background:#0a0f1a; border:1px solid #00d9ff33; border-radius:10px; text-align: left;}
+.issue-panel h3 {margin-bottom:15px; color:#00d9ff;}
+.issue-panel p {margin:8px 0; font-size: 15px;}
+
+/* --- DASHBOARD --- */
 .dashboard {padding:100px 10%; background:#0f1626;}
 .grid {display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:25px;}
-.box {background:#0a0f1a; padding:30px; border-radius:12px; border: 1px solid #1e293b; transition: 0.6s cubic-bezier(0.16, 1, 0.3, 1);}
-.box h3 { color: #00d9ff; margin-bottom: 10px; font-size: 18px; }
-.box p { font-size: 14px; opacity: 0.7; }
-footer {padding:80px; text-align:center; background:#000; border-top: 1px solid #111;}
+.box {background:#0a0f1a; padding:30px; border-radius:12px; border: 1px solid #1e293b; transition: 0.5s ease;}
+footer {padding:60px; text-align:center; background:#000;}
+
+/* FORM POPUP */
+.popup-form {background:rgba(10,15,26,0.95); padding:20px; border-radius:12px; width:300px; color:white; border: 1px solid #00d9ff;}
+.popup-form input, .popup-form select, .popup-form textarea {
+    width:100%; margin:6px 0; padding:10px; border-radius:6px; background:#0a0f1a; color:white; border:1px solid #00d9ff33;
+}
+.verifying-tag { font-size: 11px; color: #00ff88; margin-top: 10px; display: block; font-weight: bold; }
 </style>
 </head>
 <body>
@@ -76,76 +76,61 @@ footer {padding:80px; text-align:center; background:#000; border-top: 1px solid 
 <section class="hero">
     <canvas id="roadNetwork"></canvas>
     <div class="hero-content">
-        <h1>Haiti's Infrastructure Intelligence Engine</h1>
-        <p>FixHaiti bridges the intelligence gap, turning verified ground-truth data into national reconstruction priority.</p>
-        <div class="hero-buttons">
-            <button class="btn" onclick="document.getElementById('map').scrollIntoView({behavior:'smooth'})">Explore Live Map</button>
-            <button class="btn btn-outline" onclick="document.getElementById('agents').scrollIntoView({behavior:'smooth'})">Field Agent Access</button>
-        </div>
+        <h1>Sovereign Infrastructure Intelligence</h1>
+        <p>Turning verified ground-truth into national reconstruction priority. Designed for the Republic.</p>
+        <button class="btn" onclick="document.getElementById('map').scrollIntoView({behavior:'smooth'})">Explore Map</button>
     </div>
 </section>
 
 <section class="stats">
-    <div class="card"><h2 id="r1">124</h2><p>Total Reports</p></div>
-    <div class="card"><h2 id="r2">88</h2><p>Verified Ground-Truth</p></div>
+    <div class="card"><h2 id="r1">0</h2><p>Reports Submitted</p></div>
+    <div class="card"><h2 id="r2">0</h2><p>Verified Ground-Truth</p></div>
     <div class="card"><h2 id="r4">42</h2><p>Field Agents Active</p></div>
 </section>
 
 <section id="map" class="map-section">
-    <h2 style="margin-bottom: 40px;">Live Intelligence Feed</h2>
+    <h2>Live Intelligence Feed</h2>
+    <div id="mapLegend">
+        <h3 style="font-size: 14px; margin-bottom: 5px;">Severity</h3>
+        <ul style="list-style: none; font-size: 12px;">
+            <li>🔴 Critical</li>
+            <li>🟠 Dangerous</li>
+            <li>🟡 Moderate</li>
+            <li>🔵 Minor</li>
+        </ul>
+    </div>
     <div id="mapBox"></div>
-    <button class="btn" onclick="reportAtMyLocation()" style="margin-top:30px;">Anchor Report at My Location</button>
+    <button class="btn" onclick="reportAtMyLocation()" style="margin-top:20px;">Report at My Location</button>
+
+    <div id="issueDetails" class="issue-panel">
+        <h3>Asset Intelligence Details</h3>
+        <p><strong>Issue:</strong> <span id="issueTypeView">None</span></p>
+        <p><strong>Description:</strong> <span id="issueDescView">Select a pin on the map.</span></p>
+        <p><strong>Severity:</strong> <span id="issueSeverityView">-</span></p>
+        <p><strong>Status:</strong> <span id="issueStatusView">-</span></p>
+        <p><strong>Estimated Repair Cost:</strong> <span id="issueCostView">-</span></p>
+        <p><strong>Responsible Authority:</strong> <span id="issueAuthorityView">-</span></p>
+        <button class="btn" style="margin-top:15px; font-size:12px;">Initiate Reconstruction Fund</button>
+    </div>
 </section>
 
 <section id="agents" class="agent-section">
     <h2>Field Agent Portal</h2>
-    <p style="margin-bottom:40px; opacity:0.6; max-width: 600px;">Secure operational interface for verified ground-truth verification and asset documentation.</p>
-    
     <div id="taskList">
         <div class="task-card">
-            <div>
-                <h4>Asset Verification: Route de Delmas</h4>
-                <p style="font-size:12px; opacity:0.5; margin-top:5px;">Protocol: FIX-9921 | Sector: West</p>
-            </div>
-            <div style="text-align:right;">
-                <span class="tc-badge">40 Trust Credits</span>
-                <button class="btn" style="padding:10px 20px; margin-top:10px; font-size: 12px;" onclick="alert('Securing device... Accessing Field Agent Camera Module.')">Execute Audit</button>
-            </div>
-        </div>
-        <div class="task-card">
-            <div>
-                <h4>Condition Documentation: Port-au-Prince Center</h4>
-                <p style="font-size:12px; opacity:0.5; margin-top:5px;">Protocol: FIX-1042 | Sector: West</p>
-            </div>
-            <div style="text-align:right;">
-                <span class="tc-badge">65 Trust Credits</span>
-                <button class="btn" style="padding:10px 20px; margin-top:10px; font-size: 12px;" onclick="alert('Securing device... Accessing Field Agent Camera Module.')">Execute Audit</button>
-            </div>
+            <div><h4>Site Audit: Route de Delmas</h4><p style="font-size:11px; opacity:0.5;">ID: FIX-9921</p></div>
+            <div style="text-align:right;"><span class="tc-badge">40 Trust Credits</span></div>
         </div>
     </div>
 </section>
 
 <section id="dashboard" class="dashboard">
-    <h2 style="margin-bottom: 10px;">National Control Dashboard</h2>
-    <p style="margin-bottom: 40px; opacity: 0.6;">Strategic oversight and resource allocation engine.</p>
+    <h2>National Control Dashboard</h2>
     <div class="grid" id="decisionList">
-        <div class="box" data-severity="Minor">
-            <h3>Street Lighting (Pétion-Ville)</h3>
-            <p>Status: Functional Check Required</p>
-            <p style="margin-top:10px; font-weight:bold;">Priority: Minor</p>
-        </div>
-        <div class="box" data-severity="Critical">
-            <h3>Bridge Structural Failure (Canapé Vert)</h3>
-            <p>Status: Immediate Danger to Transit</p>
-            <p style="margin-top:10px; font-weight:bold;">Priority: Critical</p>
-        </div>
-        <div class="box" data-severity="Dangerous">
-            <h3>Sewerage Collapse (Cité Soleil)</h3>
-            <p>Status: Health Risk & Flooding</p>
-            <p style="margin-top:10px; font-weight:bold;">Priority: Dangerous</p>
-        </div>
+        <div class="box" data-severity="Minor"><h3>Pothole (Sector 4)</h3><p>Priority: Minor</p></div>
+        <div class="box" data-severity="Critical"><h3>Bridge Structural Failure</h3><p>Priority: Critical</p></div>
     </div>
-    <button class="btn" onclick="autoPrioritize()" style="margin-top:40px; width: 100%; max-width: 400px; background: #00ff88;">Trigger AI Priority Protocol</button>
+    <button class="btn" onclick="autoPrioritize()" style="margin-top:40px; background:#00ff88;">Trigger AI Priority Protocol</button>
 </section>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -164,16 +149,30 @@ if(dist<120){ctx.beginPath(); ctx.moveTo(n.x,n.y); ctx.lineTo(n2.x,n2.y); ctx.st
 requestAnimationFrame(draw);} draw();
 
 /* MAP LOGIC */
-const map=L.map('mapBox', {zoomControl: false}).setView([18.5392,-72.3350], 13);
+const map=L.map('mapBox').setView([18.5392,-72.3350], 13);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 
-function getColor(severity){if(severity==="Critical")return "red"; if(severity==="Dangerous")return "orange"; return "blue";}
+/* HELPERS RESTORED */
+function getCost(type){if(type==="Bridge Collapse"||type==="Structural Failure")return "$15,000 - $50,000"; return "$500 - $2,500";}
+function getAuthority(type){if(type.includes("Bridge"))return "MTPTC"; return "Local Municipality";}
 
-function addIssue(lat,lng,type,severity){
-    L.marker([lat,lng],{icon:L.divIcon({className:'fix-pin '+getColor(severity)})}).addTo(map);
+let totalReports=0, activeIssues=0;
+function updateStats(){document.getElementById("r1").innerText=totalReports; document.getElementById("r2").innerText=activeIssues;}
+
+function addIssue(lat,lng,type,desc,severity="Critical"){
+    totalReports++; activeIssues++; updateStats();
+    let marker=L.marker([lat,lng],{icon:L.divIcon({className:'fix-pin '+ (severity==="Critical"?"red":severity==="Dangerous"?"orange":"blue")})}).addTo(map);
+    
+    marker.on("click",()=>{
+        document.getElementById("issueTypeView").innerText=type;
+        document.getElementById("issueDescView").innerText=desc;
+        document.getElementById("issueSeverityView").innerText=severity;
+        document.getElementById("issueStatusView").innerText="Under Field Agent Review";
+        document.getElementById("issueCostView").innerText=getCost(type);
+        document.getElementById("issueAuthorityView").innerText=getAuthority(type);
+    });
 }
 
-// SECURE REPORTING UI
 function reportAtMyLocation(){
     if(navigator.geolocation){
         navigator.geolocation.getCurrentPosition(pos=>{
@@ -181,48 +180,41 @@ function reportAtMyLocation(){
             let popupContent=document.createElement("div");
             popupContent.className="popup-form";
             popupContent.innerHTML=`
-                <h4 style="color:#00d9ff; margin-bottom:10px;">Anchored Report</h4>
-                <select id="pt"><option>Structural Damage</option><option>Flooding</option></select>
-                <textarea id="pd" placeholder="Observed status..."></textarea>
-                <input type="file" accept="image/*" capture="camera">
-                <span class="verifying-tag">📍 SOVEREIGN COORDS LOCKED: ${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}</span>
-                <button class="btn" style="width:100%; font-size:12px;" onclick="map.closePopup(); alert('Report hashed and transmitted.')">Submit Evidence</button>`;
-            L.popup().setLatLng(latlng).setContent(popupContent).openOn(map);
+                <select id="pt"><option>Structural Failure</option><option>Flooding</option></select>
+                <textarea id="pd" placeholder="Description..."></textarea>
+                <input type="file" capture="camera">
+                <span class="verifying-tag">📍 SOVEREIGN COORDS LOCKED: ${latlng.lat.toFixed(4)}</span>
+                <button class="btn" style="width:100%;" id="sub">Submit Evidence</button>`;
+            let p=L.popup().setLatLng(latlng).setContent(popupContent).openOn(map);
+            popupContent.querySelector("#sub").onclick=()=>{
+                addIssue(latlng.lat,latlng.lng,document.getElementById("pt").value,document.getElementById("pd").value);
+                map.closePopup();
+            };
         });
     }
 }
 
-// AI PRIORITY LOGIC (SHOWS THE URGENT FIX)
 function autoPrioritize(){
     const list = document.getElementById("decisionList");
     const boxes = Array.from(list.getElementsByClassName("box"));
-    const order = { "Critical": 1, "Dangerous": 2, "Minor": 3 };
-    
-    boxes.sort((a, b) => order[a.dataset.severity] - order[b.dataset.severity]);
-
-    boxes.forEach((box, i) => {
+    boxes.sort((a, b) => (a.dataset.severity === "Critical" ? -1 : 1));
+    boxes.forEach(box => {
         list.appendChild(box); 
         if(box.dataset.severity === "Critical") {
             box.style.borderColor = "#ef4444";
-            box.style.boxShadow = "0 0 20px rgba(239, 68, 68, 0.2)";
-            box.style.background = "#1e1b1b";
-        } else {
-            box.style.opacity = "0.4";
-            box.style.transform = "scale(0.95)";
+            box.style.boxShadow = "0 0 15px rgba(239,68,68,0.3)";
         }
     });
-    console.log("AI: Resource deployment optimized for high-risk infrastructure.");
 }
 
-// DEMO DATA
-addIssue(18.548,-72.34,"Bridge","Critical");
-addIssue(18.540,-72.320,"Road","Dangerous");
+// RESTORED DEMO DATA
+addIssue(18.548,-72.34,"Bridge Collapse","Structural failure at Canapé Vert. High transit risk.","Critical");
+addIssue(18.540,-72.320,"Severe Pothole","Multiple vehicle damages in Delmas 31.","Dangerous");
 </script>
 
 <footer>
-    <h2 style="letter-spacing: 2px;">FIXHAITI</h2>
-    <p style="opacity:0.4; font-size: 12px; margin-top:10px;">© 2026 — A Private Company. Data Sovereignty for the Republic.</p>
+    <h2>FIXHAITI</h2>
+    <p>© 2026 — A Private Company. Built for the Republic.</p>
 </footer>
-
 </body>
 </html>
