@@ -8,8 +8,6 @@
 /* --- CORE STYLES --- */
 * {margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif;}
 body {background:#05070a; color:#f8fafc; overflow:hidden;}
-
-/* --- NAVIGATION --- */
 nav {
     position:fixed; top:0; width:100%; display:flex; justify-content:space-between; align-items:center;
     padding:15px 40px; background:rgba(5,7,10,0.8); backdrop-filter:blur(15px); z-index:1000; border-bottom:1px solid #ffffff11;
@@ -17,46 +15,48 @@ nav {
 .logo {font-size:20px; font-weight:900; letter-spacing:3px;}
 .logo span {color:#00d9ff;}
 
-/* --- OPERATIONAL TEAM ROSTER (Locked/Blurred) --- */
+/* --- OPERATIONAL TEAM BAR --- */
 .op-team-bar {
     position: fixed; top: 65px; left: 0; width: 100%; height: 45px; 
     background: #0f172a; border-bottom: 1px solid #1e293b; 
     display: flex; align-items: center; padding: 0 40px; z-index: 999;
     font-size: 11px; color: #64748b; font-weight: 700;
 }
-.team-member {margin-right: 35px; display: flex; align-items: center; white-space: nowrap;}
-.team-member span {color: #fff; margin-left: 8px; font-weight: 400; transition: 0.5s;}
-.locked-name { filter: blur(5px); opacity: 0.4; user-select: none; }
+.team-member {margin-right: 35px; display: flex; align-items: center;}
+.team-member span {color: #fff; margin-left: 8px; font-weight: 400;}
+.locked-name { filter: blur(5px); opacity: 0.4; }
 
-/* --- SIDEBAR & TOOLS --- */
+/* --- SIDEBAR & LAYOUT --- */
 .main-grid {display: grid; grid-template-columns: 1fr 380px; height: 100vh; padding-top: 110px;}
 .sidebar { background: #0a0f1a; border-left: 1px solid #1e293b; padding: 30px; overflow-y: auto; }
-
 .panel-label {font-size: 10px; color: #00d9ff; font-weight: 800; letter-spacing: 2px; margin-bottom: 15px;}
+
+/* --- DOSSIER MEDIA --- */
+#v-image { width: 100%; height: 180px; background: #05070a; border: 1px solid #1e293b; border-radius: 4px; margin-bottom: 20px; object-fit: cover; display: none; }
+
 .data-box {background: #05070a; border: 1px solid #ffffff05; padding: 20px; border-radius: 4px; margin-bottom: 20px;}
+.data-row {display:flex; justify-content:space-between; font-size:13px; margin-bottom:10px;}
+.label {color: #475569; font-weight: 700; text-transform: uppercase; font-size: 10px;}
 
-/* GUARDIAN ACTIONS (Gated) */
-#guardianActions { 
-    display: none; /* Hidden by default */
-    margin-top: 25px; padding-top: 25px; border-top: 1px solid #00d9ff33; 
-}
+/* --- FORM & UI ELEMENTS --- */
+.input-field { width: 100%; background: #05070a; border: 1px solid #1e293b; color: white; padding: 10px; font-size: 12px; border-radius: 4px; margin-bottom: 10px; }
+.btn {padding:12px; border:none; border-radius:4px; cursor:pointer; font-size:10px; font-weight:800; text-transform:uppercase; transition:0.3s; width: 100%; margin-bottom: 8px;}
+.btn-verify {background: #00ff88; color: #05070a;}
+.btn-dismiss {background: transparent; border: 1px solid #ef4444; color: #ef4444;}
+.btn-edit {background: #1e293b; color: #fff;}
 
-/* BUTTONS */
-.btn {padding:12px; border:none; border-radius:4px; cursor:pointer; font-size:10px; font-weight:800; text-transform:uppercase; transition:0.3s;}
-.btn-verify {background: #00ff88; color: #05070a; width: 100%; margin-bottom: 8px;}
-.btn-dismiss {background: transparent; border: 1px solid #ef4444; color: #ef4444; width: 100%;}
-.btn-edit {background: #1e293b; color: #fff; width: 100%; margin-bottom: 8px;}
+/* --- GUARDIAN OVERRIDE TOOLS --- */
+#guardianActions { display: none; margin-top: 25px; padding-top: 25px; border-top: 1px solid #00d9ff33; }
 
-/* LOGIN OVERLAY */
+/* --- AUTH OVERLAY --- */
 #loginOverlay {
     display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
     background:rgba(5,7,10,0.98); z-index:10000; align-items:center; justify-content:center;
 }
 .login-box {background:#0a0f1a; padding:40px; border:1px solid #00d9ff; border-radius:8px; width:320px; text-align:center;}
-.login-box input {width:100%; padding:12px; margin-bottom:15px; background:#05070a; border:1px solid #1e293b; color:white;}
 
 /* PINS */
-.dot {width:12px; height:12px; border-radius:50%; border: 2px solid #fff;}
+.dot {width:16px; height:16px; border-radius:50%; border: 2px solid #fff;}
 .p1 {background:#eab308;} .p2 {background:#3b82f6;} .p3 {background:#00ff88;}
 </style>
 </head>
@@ -64,55 +64,50 @@ nav {
 
 <div id="loginOverlay">
     <div class="login-box">
-        <h2 style="font-size:14px; letter-spacing:2px; margin-bottom:20px;">GUARDIAN KEY REQUIRED</h2>
-        <input type="password" id="authCode" placeholder="Enter Sector Code">
-        <button class="btn" style="background:#00d9ff; color:black; width:100%;" onclick="validateKey()">Unlock Verification Suite</button>
+        <h2 style="font-size:12px; letter-spacing:2px; margin-bottom:20px;">GUARDIAN AUTHENTICATION</h2>
+        <input type="password" id="authCode" class="input-field" placeholder="Enter Sector Code">
+        <button class="btn" style="background:#00d9ff; color:black;" onclick="validateKey()">Unlock Verification Suite</button>
     </div>
 </div>
 
 <nav>
     <div class="logo">FIX<span>HAITI</span></div>
     <div>
-        <button class="btn" style="background:transparent; color:#00d9ff; border:1px solid #00d9ff;" onclick="reportAtMyLocation()">📍 Report Signal</button>
-        <button class="btn" style="background:#1e293b; color:white; margin-left:10px;" onclick="openLogin()">Guardian Portal</button>
+        <button class="btn" style="background:transparent; color:#00d9ff; border:1px solid #00d9ff; width:auto;" onclick="reportAtMyLocation()">📍 Report Signal</button>
+        <button class="btn" style="background:#1e293b; color:white; margin-left:10px; width:auto;" onclick="openLogin()">Guardian Portal</button>
     </div>
 </nav>
 
 <div class="op-team-bar">
-    <div class="team-member">SECTOR GUARDIAN: <span id="t-scout" class="locked-name">---- ----</span></div>
-    <div class="team-member">FIELD ENGINEER: <span id="t-jfe" class="locked-name">---- ----</span></div>
-    <div class="team-member">MTPTC AUTHORITY: <span id="t-mtptc" class="locked-name">---- ----</span></div>
+    <div class="team-member">SECTOR GUARDIAN: <span id="t-scout" class="locked-name">REDACTED</span></div>
+    <div class="team-member">FIELD ENGINEER: <span id="t-jfe" class="locked-name">REDACTED</span></div>
+    <div class="team-member">MTPTC AUTHORITY: <span id="t-mtptc" class="locked-name">REDACTED</span></div>
 </div>
 
 <div class="main-grid">
     <div id="mapBox"></div>
-
     <div class="sidebar">
         <div class="panel-label">TECHNICAL ASSET DOSSIER</div>
         
-        <div class="data-box">
-            <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:10px;">
-                <span class="label">Infrastructure ID</span><span id="v-id">#---</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:10px;">
-                <span class="label">Phase Status</span><span id="v-phase">-</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; font-size:13px;">
-                <span class="label">Budget Estimate</span><span id="v-cost">-</span>
-            </div>
-        </div>
+        <img id="v-image" src="" alt="Field Evidence">
 
+        <div class="data-box">
+            <div class="data-row"><span class="label">Infrastructure ID</span><span id="v-id">#---</span></div>
+            <div class="data-row"><span class="label">Category</span><span id="v-type">-</span></div>
+            <div class="data-row"><span class="label">Phase Status</span><span id="v-phase">-</span></div>
+            <div class="data-row"><span class="label">Magnitude</span><span id="v-cost">-</span></div>
+        </div>
         <div class="data-box" style="background:transparent;">
             <p class="label" style="margin-bottom:10px;">Engineering Observation</p>
-            <p id="v-desc" style="font-size:14px; opacity:0.6; line-height:1.6;">Click a coordinate on the map to load data.</p>
+            <p id="v-desc" style="font-size:14px; opacity:0.6; line-height:1.6;">Select a report pin to begin analysis.</p>
         </div>
 
         <div id="guardianActions">
             <div class="panel-label" style="color:#00ff88;">GUARDIAN OVERRIDE</div>
-            <button class="btn btn-verify" onclick="updatePhase(2)">Verify Signal (Phase 2)</button>
-            <button class="btn btn-verify" style="background:#00d9ff;" onclick="updatePhase(3)">Finalize Dossier (Phase 3)</button>
-            <button class="btn btn-edit">Edit Technical Data</button>
-            <button class="btn btn-dismiss">Dismiss Signal</button>
+            <button class="btn btn-verify" onclick="triggerUpdate(2)">Verify Signal (Phase 2)</button>
+            <button class="btn btn-verify" style="background:#00d9ff;" onclick="triggerUpdate(3)">Finalize Dossier (Phase 3)</button>
+            <button class="btn btn-edit" onclick="triggerEdit()">Edit Technical Specs</button>
+            <button class="btn btn-dismiss" onclick="triggerDismiss()">Dismiss Signal</button>
         </div>
     </div>
 </div>
@@ -120,80 +115,104 @@ nav {
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 let currentAsset = null;
-const map = L.map('mapBox', {zoomControl: false}).setView([18.5, -72.3], 10);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
-
-const initialData = [
-    {id:"FH-402", lat: 18.54, lng: -72.33, phase: 1, scout: "Jean B. (Delmas 75)", jfe: "S. Pierre", mtptc: "Ing. Léger", cost: "$4,200", desc: "Citizen Signal: Major pavement breach after rain."},
-    {id:"FH-109", lat: 18.51, lng: -72.29, phase: 3, scout: "Marie L. (C-V)", jfe: "R. Dural", mtptc: "Ing. Léger", cost: "$12,500", desc: "Verified Phase 3: Structural cracks on bridge pier. Ready for MTPTC review."}
+let database = [
+    {id:"FH-402", lat: 18.54, lng: -72.33, phase: 1, type: "Pavement Failure", scout: "Jean B.", jfe: "S. Pierre", mtptc: "Ing. Léger", cost: "$4,200", desc: "Citizen Signal: Major pavement breach after rain.", img: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?auto=format&fit=crop&w=400&q=80"},
+    {id:"FH-109", lat: 18.51, lng: -72.29, phase: 3, type: "Bridge Structure", scout: "Marie L.", jfe: "R. Dural", mtptc: "Ing. Léger", cost: "$12,500", desc: "Verified Phase 3: Structural cracks on bridge pier.", img: "https://images.unsplash.com/photo-1545459720-aac273a27b3d?auto=format&fit=crop&w=400&q=80"}
 ];
 
-function renderPins() {
+const map = L.map('mapBox', {zoomControl: false}).setView([18.5, -72.3], 11);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+
+function render() {
     map.eachLayer(l => { if(l instanceof L.Marker) map.removeLayer(l) });
-    initialData.forEach(item => {
+    database.forEach(item => {
         let marker = L.marker([item.lat, item.lng], {
-            icon: L.divIcon({className: `dot p${item.phase}`, iconSize:[14,14]})
+            icon: L.divIcon({className: `dot p${item.phase}`, iconSize:[16,16]})
         }).addTo(map);
 
         marker.on('click', () => {
             currentAsset = item;
             document.getElementById("v-id").innerText = item.id;
+            document.getElementById("v-type").innerText = item.type || "General Infrastructure";
             document.getElementById("v-phase").innerText = "PHASE " + item.phase;
             document.getElementById("v-cost").innerText = item.cost;
             document.getElementById("v-desc").innerText = item.desc;
-            
-            // Populate Team Bar
             document.getElementById("t-scout").innerText = item.scout;
             document.getElementById("t-jfe").innerText = item.jfe;
             document.getElementById("t-mtptc").innerText = item.mtptc;
+
+            // Media Display Logic
+            const imgEl = document.getElementById("v-image");
+            if(item.img) { imgEl.src = item.img; imgEl.style.display = "block"; } 
+            else { imgEl.style.display = "none"; }
         });
     });
 }
-renderPins();
+render();
 
-/* AUTHENTICATION GATE */
+/* --- GUARDIAN TOOLS --- */
+function triggerUpdate(p) { if(currentAsset){ currentAsset.phase = p; render(); document.getElementById("v-phase").innerText = "PHASE " + p; } }
+function triggerDismiss() { if(currentAsset && confirm("Permanently remove this infrastructure signal?")){ database = database.filter(i => i.id !== currentAsset.id); render(); currentAsset = null; } }
+function triggerEdit() { if(currentAsset){ currentAsset.desc = prompt("Update Engineering Notes:", currentAsset.desc) || currentAsset.desc; currentAsset.cost = prompt("Update Magnitude Estimate:", currentAsset.cost) || currentAsset.cost; render(); } }
+
+/* --- AUTHENTICATION --- */
 function openLogin() { document.getElementById('loginOverlay').style.display = 'flex'; }
-
 function validateKey() {
-    // Demo Code: 1974 (Haiti's World Cup Year)
     if(document.getElementById('authCode').value === "1974") {
         document.getElementById('loginOverlay').style.display = 'none';
-        
-        // UNLOCK FEATURES
         document.getElementById('guardianActions').style.display = 'block';
-        document.querySelectorAll('.locked-name').forEach(el => {
-            el.classList.remove('locked-name');
-            el.style.filter = "none";
-            el.style.opacity = "1";
-        });
-        alert("Sector Access Granted. Verification Tools Enabled.");
-    } else {
-        alert("Invalid Sector Key. Unauthorized Access Logged.");
-    }
+        document.querySelectorAll('.locked-name').forEach(el => el.classList.remove('locked-name'));
+    } else { alert("Invalid Sector Key."); }
 }
 
-function updatePhase(newPhase) {
-    if(currentAsset) {
-        currentAsset.phase = newPhase;
-        renderPins();
-        document.getElementById("v-phase").innerText = "PHASE " + newPhase;
-    }
-}
-
+/* --- THE NEW INTEGRATED REPORTING TOOL --- */
 function reportAtMyLocation(){
     if(navigator.geolocation){
         navigator.geolocation.getCurrentPosition(pos=>{
             const latlng={lat:pos.coords.latitude,lng:pos.coords.longitude};
             let div=document.createElement("div");
-            div.innerHTML=`<div style="background:#0a0f1a; padding:15px; border:1px solid #00d9ff; border-radius:4px; width:220px;">
+            div.innerHTML=`<div style="background:#0a0f1a; padding:15px; border:1px solid #00d9ff; border-radius:4px; width:260px;">
                 <h4 style="font-size:10px; color:#00d9ff; margin-bottom:10px;">SUBMIT SIGNAL</h4>
-                <textarea id="p-desc" placeholder="Issue description..." style="width:100%; height:60px; background:#05070a; border:1px solid #1e293b; color:white; font-size:12px; padding:5px; margin-bottom:10px;"></textarea>
-                <button class="btn" style="width:100%; background:#00d9ff; color:black;" id="sub">Drop Signal</button>
+                
+                <select id="p-type" class="input-field">
+                    <option value="Road Pothole/Collapse">Road Pothole/Collapse</option>
+                    <option value="Drainage Blockage">Drainage Blockage</option>
+                    <option value="Bridge Instability">Bridge Instability</option>
+                    <option value="Sanitation Issue">Sanitation Issue</option>
+                </select>
+
+                <textarea id="p-desc" class="input-field" placeholder="Describe the technical issue..."></textarea>
+                
+                <label style="font-size:9px; color:#64748b; display:block; margin-bottom:5px;">ATTACH VISUAL EVIDENCE</label>
+                <input type="file" id="p-img" class="input-field" accept="image/*" style="font-size:9px;">
+                
+                <button class="btn" style="background:#00d9ff; color:black; margin:0;" id="sub">Drop Signal</button>
             </div>`;
-            L.popup().setLatLng(latlng).setContent(div).openOn(map);
+            
+            let popup = L.popup().setLatLng(latlng).setContent(div).openOn(map);
+            
             div.querySelector("#sub").onclick=()=>{
-                initialData.push({id:"SIG-"+Math.floor(Math.random()*99), lat:latlng.lat, lng:latlng.lng, phase:1, scout: "Unassigned", jfe: "Unassigned", mtptc: "Unassigned", cost: "Pending", desc: div.querySelector("#p-desc").value});
-                renderPins(); map.closePopup();
+                const fileInput = div.querySelector("#p-img");
+                const reader = new FileReader();
+                
+                const pushToDB = (imgData) => {
+                    database.push({
+                        id:"SIG-"+Math.floor(Math.random()*999), 
+                        lat:latlng.lat, lng:latlng.lng, 
+                        phase:1, 
+                        type: div.querySelector("#p-type").value,
+                        scout: "Unassigned", jfe: "Unassigned", mtptc: "Unassigned", 
+                        cost: "Pending Assessment", 
+                        desc: div.querySelector("#p-desc").value,
+                        img: imgData || "https://images.unsplash.com/photo-1584467735871-b28e40f38443?auto=format&fit=crop&w=400&q=80"
+                    });
+                    render(); map.closePopup();
+                };
+
+                if(fileInput.files[0]) {
+                    reader.onload = (e) => pushToDB(e.target.result);
+                    reader.readAsDataURL(fileInput.files[0]);
+                } else { pushToDB(); }
             };
         });
     }
