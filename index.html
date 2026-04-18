@@ -6,206 +6,214 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
 <style>
-* {margin:0; padding:0; box-sizing:border-box; font-family:Arial, Helvetica, sans-serif;}
-body {background:#0a0f1a; color:white; overflow-x:hidden;}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Arial,Helvetica,sans-serif;}
+body{background:#0a0f1a;color:white;overflow-x:hidden}
 
-nav {
-    position:fixed; top:0; width:100%; display:flex; justify-content:space-between; align-items:center;
-    padding:20px 60px; background:rgba(0,0,0,0.7); backdrop-filter:blur(10px); z-index:1000;
+/* HEADER (RESTORED) */
+nav{
+position:fixed;top:0;width:100%;
+display:flex;justify-content:space-between;
+align-items:center;
+padding:20px 60px;
+background:rgba(0,0,0,0.7);
+backdrop-filter:blur(10px);
+z-index:1000;
+}
+.logo{font-size:26px;font-weight:bold;color:#00d9ff}
+nav a{color:white;margin-left:25px;text-decoration:none;font-size:14px;opacity:0.8}
+
+/* HERO */
+.hero{
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+position:relative;
+overflow:hidden;
+}
+.hero-content{position:relative;z-index:2;max-width:700px}
+.hero h1{font-size:50px;margin-bottom:20px}
+
+#roadNetwork{
+position:absolute;
+top:0;left:0;
+width:100%;height:100%;
+z-index:1;
 }
 
-.logo {font-size:26px; font-weight:bold; color:#00d9ff;}
-nav a {color:white; margin-left:25px; text-decoration:none; font-size:14px; opacity:0.8;}
-
-.hero {
-    height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    text-align:center;
-    position:relative;
-    overflow:hidden;
+/* BUTTON */
+.btn{
+padding:15px 30px;
+border:none;
+background:#00d9ff;
+color:black;
+border-radius:5px;
+cursor:pointer;
+font-weight:bold;
 }
 
-.hero-content {position:relative; z-index:2; max-width:900px; padding:0 20px;}
-.hero h1 {font-size:clamp(28px,5vw,50px); margin-bottom:20px;}
-
-#roadNetwork {
-    position:absolute;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    z-index:1;
+/* STATS */
+.stats{
+display:flex;
+justify-content:space-around;
+padding:80px 40px;
+background:#0f1626;
 }
 
-.btn {
-    padding:15px 30px;
-    border:none;
-    background:#00d9ff;
-    color:black;
-    border-radius:5px;
-    cursor:pointer;
-    font-weight:bold;
+/* MAP LAYOUT (IMPORTANT FIX) */
+.map-section{
+padding:50px 40px;
+text-align:center;
 }
 
-.stats {
-    display:flex;
-    justify-content:space-around;
-    flex-wrap:wrap;
-    gap:20px;
-    padding:80px 20px;
-    background:#0f1626;
+#mapBox{
+width:90%;
+height:500px;
+margin:auto;
+border:2px solid #00d9ff;
+border-radius:10px;
 }
 
-.card h2 {font-size:42px; color:#00d9ff;}
-
-section {
-    padding-left:clamp(15px,5vw,60px);
-    padding-right:clamp(15px,5vw,60px);
+/* FIXED ISSUE PANEL (NO SCROLL REQUIRED) */
+.issue-panel{
+position:sticky;
+top:100px;
+width:90%;
+max-width:900px;
+margin:30px auto;
+padding:25px;
+background:#0a0f1a;
+border:1px solid #00d9ff33;
+border-radius:10px;
+text-align:left;
 }
 
-.map-section {padding:50px 40px; text-align:center;}
-
-#mapBox {
-    width:100%;
-    max-width:1100px;
-    height:clamp(300px,60vh,600px);
-    margin:auto;
-    border:2px solid #00d9ff;
-    border-radius:10px;
+/* DASHBOARD */
+.dashboard{
+padding:80px 10%;
+background:#0f1626;
+}
+.grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:25px;
+}
+.box{
+background:#0a0f1a;
+padding:30px;
+border-radius:12px;
+border:1px solid #1e293b;
 }
 
-.issue-panel {
-    width:90%;
-    max-width:900px;
-    margin:30px auto;
-    padding:25px;
-    background:#0a0f1a;
-    border:1px solid #00d9ff33;
-    border-radius:10px;
-    text-align:left;
+/* FOOTER */
+footer{
+padding:60px;
+text-align:center;
+background:#000;
 }
 
-.dashboard {
-    padding:80px 10%;
-    background:#0f1626;
+/* POPUP FORM (ONLY FOR REPORTING) */
+.popup-form{
+background:#0a0f1a;
+padding:20px;
+border-radius:12px;
+width:320px;
+border:1px solid #00d9ff33;
 }
-
-.grid {
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
-    gap:25px;
+.popup-form input,
+.popup-form select,
+.popup-form textarea{
+width:100%;
+margin:6px 0;
+padding:10px;
+background:#0a0f1a;
+color:white;
+border:1px solid #00d9ff33;
 }
+.status-tag{font-size:11px;color:#00ff88;margin-top:10px}
 
-.box {
-    background:#0a0f1a;
-    padding:30px;
-    border-radius:12px;
-    border:1px solid #1e293b;
-}
-
-footer {
-    padding:60px;
-    text-align:center;
-    background:#000;
-}
-
-.popup-form {
-    background:#0a0f1a;
-    padding:20px;
-    border-radius:12px;
-    width:320px;
-    border:1px solid #00d9ff33;
-}
-
-.popup-form label {
-    font-size:12px;
-    display:block;
-    margin-top:6px;
-    color:#aaa;
-}
-
-.popup-form textarea,
-.popup-form input {
-    width:100%;
-    margin:6px 0;
-    padding:10px;
-    background:#0a0f1a;
-    color:white;
-    border:1px solid #00d9ff33;
-}
-
-.status-tag {font-size:11px; color:#00ff88; margin-top:10px;}
-
-/* MOBILE FIX */
-@media (max-width:768px){
-    nav{flex-direction:column; padding:15px;}
-    .stats{flex-direction:column; align-items:center;}
-    .issue-panel{width:95%;}
+/* MOBILE */
+@media(max-width:768px){
+nav{padding:15px 20px;flex-direction:column}
+.stats{flex-direction:column;gap:20px}
+.issue-panel{position:relative;top:auto}
 }
 </style>
 </head>
 
 <body>
 
+<!-- HEADER RESTORED -->
 <nav>
-    <div class="logo">FIXHAITI</div>
-    <div>
-        <a href="#">Home</a>
-        <a href="#map">Map</a>
-        <a href="#dashboard">Dashboard</a>
-    </div>
+<div class="logo">FIXHAITI</div>
+<div>
+<a href="#">Home</a>
+<a href="#map">Map</a>
+<a href="#dashboard">Dashboard</a>
+</div>
 </nav>
 
+<!-- HERO RESTORED -->
 <section class="hero">
-    <canvas id="roadNetwork"></canvas>
-    <div class="hero-content">
-        <h1>Road Infrastructure Monitoring Platform</h1>
-        <p>Reporting, tracking, and prioritizing infrastructure issues through structured data.</p>
-        <button class="btn" onclick="document.getElementById('map').scrollIntoView({behavior:'smooth'})">Open Map</button>
-    </div>
+<canvas id="roadNetwork"></canvas>
+<div class="hero-content">
+<h1>Road Infrastructure Monitoring Platform</h1>
+<p>Reporting, tracking, and prioritizing infrastructure issues in real time.</p>
+<button class="btn" onclick="document.getElementById('map').scrollIntoView({behavior:'smooth'})">
+Open Map
+</button>
+</div>
 </section>
 
+<!-- STATS -->
 <section class="stats">
-    <div class="card"><h2 id="r1">0</h2><p>Reports</p></div>
-    <div class="card"><h2 id="r2">0</h2><p>Active Issues</p></div>
+<div><h2 id="r1">0</h2><p>Reports</p></div>
+<div><h2 id="r2">0</h2><p>Active Issues</p></div>
 </section>
 
+<!-- MAP -->
 <section id="map" class="map-section">
-    <h2>Infrastructure Map</h2>
-    <div id="mapBox"></div>
-    <button class="btn" onclick="reportAtMyLocation()">Report Issue</button>
 
-    <div class="issue-panel">
-        <h3>Issue Details</h3>
-        <p><strong>Type:</strong> <span id="issueTypeView">None</span></p>
-        <p><strong>Description:</strong> <span id="issueDescView">Select a map pin</span></p>
-        <p><strong>Severity:</strong> <span id="issueSeverityView">-</span></p>
-        <p><strong>Status:</strong> <span id="issueStatusView">-</span></p>
-        <p><strong>Cost:</strong> <span id="issueCostView">-</span></p>
-        <p><strong>Location:</strong> <span id="issueLocationView">-</span></p>
-    </div>
+<h2>Infrastructure Map</h2>
+
+<div id="mapBox"></div>
+
+<button class="btn" onclick="reportAtMyLocation()">Report Issue</button>
+
+<!-- FIXED PANEL (NO SCROLL PROBLEM) -->
+<div class="issue-panel">
+<h3>Issue Details</h3>
+
+<p><b>Type:</b> <span id="type">None</span></p>
+<p><b>Description:</b> <span id="desc">Select an issue</span></p>
+<p><b>Severity:</b> <span id="severity">-</span></p>
+<p><b>Status:</b> <span id="status">-</span></p>
+<p><b>Cost:</b> <span id="cost">-</span></p>
+<p><b>Location:</b> <span id="location">-</span></p>
+
+</div>
 </section>
 
+<!-- DASHBOARD -->
 <section id="dashboard" class="dashboard">
-    <h2>Control Dashboard</h2>
-    <div class="grid">
-        <div class="box"><h3>Pothole</h3><p>Minor</p></div>
-        <div class="box"><h3>Road Collapse</h3><p>Critical</p></div>
-    </div>
+<h2>Control Dashboard</h2>
+<div class="grid">
+<div class="box"><h3>Pothole</h3><p>Minor</p></div>
+<div class="box"><h3>Road Collapse</h3><p>Critical</p></div>
+</div>
 </section>
 
 <footer>
-    <h2>FIXHAITI</h2>
-    <p>Road Infrastructure Monitoring System</p>
+<h2>FIXHAITI</h2>
+<p>Infrastructure Monitoring System</p>
 </footer>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
 
-/* HERO ANIMATION */
+/* HERO ANIMATION (RESTORED) */
 const canvas=document.getElementById("roadNetwork");
 const ctx=canvas.getContext("2d");
 canvas.width=window.innerWidth;
@@ -241,74 +249,70 @@ const map=L.map('mapBox').setView([19,-72.3],8);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 
 /* SYSTEM */
-let totalReports=0;
-let activeIssues=0;
+let total=0;
+let active=0;
 
-function updateStats(){
-document.getElementById("r1").innerText=totalReports;
-document.getElementById("r2").innerText=activeIssues;
+function update(){
+document.getElementById("r1").innerText=total;
+document.getElementById("r2").innerText=active;
 }
 
-function addIssue(lat,lng,type,desc,severity="Critical",locationName="Unknown"){
-totalReports++;activeIssues++;updateStats();
+function setDetails(type,desc,severity,location){
+document.getElementById("type").innerText=type;
+document.getElementById("desc").innerText=desc;
+document.getElementById("severity").innerText=severity;
+document.getElementById("status").innerText="Submitted";
+document.getElementById("cost").innerText="$500 - $25,000";
+document.getElementById("location").innerText=location;
+}
 
-let marker=L.circleMarker([lat,lng],{
+function addIssue(lat,lng,type,desc,severity,location){
+total++;active++;update();
+
+let m=L.circleMarker([lat,lng],{
 radius:8,
-color:severity==="Critical"?"red":severity==="Dangerous"?"orange":"blue"
+color:severity==="Critical"?"red":"orange"
 }).addTo(map);
 
-marker.on("click",()=>{
-document.getElementById("issueTypeView").innerText=type;
-document.getElementById("issueDescView").innerText=desc;
-document.getElementById("issueSeverityView").innerText=severity;
-document.getElementById("issueStatusView").innerText="Submitted";
-document.getElementById("issueCostView").innerText="$500-$25,000";
-document.getElementById("issueLocationView").innerText=locationName;
-});
+m.on("click",()=>setDetails(type,desc,severity,location));
 }
 
-/* REPORT SYSTEM */
+/* REPORT */
 function reportAtMyLocation(){
 navigator.geolocation.getCurrentPosition(async pos=>{
-const lat=pos.coords.latitude;
-const lng=pos.coords.longitude;
+let lat=pos.coords.latitude;
+let lng=pos.coords.longitude;
 
-let locationName="Unknown";
-
+let location="Unknown";
 try{
-let res=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
-let data=await res.json();
-locationName=data.display_name;
+let r=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
+let d=await r.json();
+location=d.display_name;
 }catch(e){}
 
-const popup=`
+let popup=`
 <div class="popup-form">
-<label>Issues</label>
-<label><input type="checkbox" value="Pothole">Pothole</label>
-<label><input type="checkbox" value="Flooding">Flooding</label>
-<label><input type="checkbox" value="Road Damage">Road Damage</label>
-
-<label>Description</label>
-<textarea id="desc"></textarea>
-
-<label>Photo</label>
-<input type="file" id="photo" accept="image/*">
-
-<div class="status-tag">${locationName}</div>
-
-<button id="submitBtn" class="btn" style="width:100%">Submit</button>
-</div>`;
+<select id="t">
+<option>Pothole</option>
+<option>Flooding</option>
+<option>Road Damage</option>
+</select>
+<textarea id="d" placeholder="Description"></textarea>
+<input type="file" id="p" accept="image/*">
+<button class="btn" id="s">Submit</button>
+<div class="status-tag">${location}</div>
+</div>
+`;
 
 let p=L.popup().setLatLng([lat,lng]).setContent(popup).openOn(map);
 
 setTimeout(()=>{
-document.getElementById("submitBtn").onclick=()=>{
-let checked=[...document.querySelectorAll("input[type=checkbox]:checked")].map(x=>x.value);
-let desc=document.getElementById("desc").value;
-let photo=document.getElementById("photo").files[0];
-
-addIssue(lat,lng,checked.join(","),desc+(photo?" +image":""),"Critical",locationName);
-
+document.getElementById("s").onclick=()=>{
+addIssue(lat,lng,
+document.getElementById("t").value,
+document.getElementById("d").value,
+"Critical",
+location);
 map.closePopup();
 };
 },100);
@@ -317,8 +321,8 @@ map.closePopup();
 }
 
 /* DEMO */
-addIssue(19.7,-72.2,"Road Damage","Damaged road","Critical","Cap-Haïtien");
-addIssue(18.5,-72.3,"Flooding","Blocked drainage","Dangerous","Port-au-Prince");
+addIssue(19.7,-72.2,"Road Damage","Potholes cluster","Critical","Cap-Haïtien");
+addIssue(18.5,-72.3,"Flooding","Drainage blocked","Dangerous","Port-au-Prince");
 
 </script>
 
