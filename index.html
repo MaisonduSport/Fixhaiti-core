@@ -17,22 +17,56 @@ nav {
 .logo {font-size:26px; font-weight:bold; color:#00d9ff;}
 nav a {color:white; margin-left:25px; text-decoration:none; font-size:14px; opacity:0.8;}
 
-.hero {height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; position:relative;}
+.hero {
+    height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    position:relative;
+    overflow:hidden;
+}
+
 .hero-content {position:relative; z-index:2; max-width:700px;}
 .hero h1 {font-size:50px; margin-bottom:20px;}
 
-#roadNetwork {position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;}
-
-.btn {
-    padding:15px 30px; border:none; background:#00d9ff; color:black;
-    border-radius:5px; cursor:pointer; font-weight:bold;
+#roadNetwork {
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    z-index:1;
 }
 
-.stats {display:flex; justify-content:space-around; padding:80px 40px; background:#0f1626;}
+.btn {
+    padding:15px 30px;
+    border:none;
+    background:#00d9ff;
+    color:black;
+    border-radius:5px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.stats {
+    display:flex;
+    justify-content:space-around;
+    padding:80px 40px;
+    background:#0f1626;
+}
+
 .card h2 {font-size:42px; color:#00d9ff;}
 
 .map-section {padding:50px 40px; text-align:center;}
-#mapBox {width:90%; height:500px; margin:auto; border:2px solid #00d9ff; border-radius:10px;}
+
+#mapBox {
+    width:90%;
+    height:500px;
+    margin:auto;
+    border:2px solid #00d9ff;
+    border-radius:10px;
+}
 
 .fix-pin {width:16px; height:16px; border-radius:50%; border:2px solid white;}
 .red {background:#ef4444;}
@@ -40,27 +74,57 @@ nav a {color:white; margin-left:25px; text-decoration:none; font-size:14px; opac
 .blue {background:#3b82f6;}
 
 .issue-panel {
-    width:90%; max-width:900px; margin:30px auto; padding:25px;
-    background:#0a0f1a; border:1px solid #00d9ff33; border-radius:10px;
+    width:90%;
+    max-width:900px;
+    margin:30px auto;
+    padding:25px;
+    background:#0a0f1a;
+    border:1px solid #00d9ff33;
+    border-radius:10px;
     text-align:left;
 }
 
-.dashboard {padding:80px 10%; background:#0f1626;}
+.dashboard {
+    padding:80px 10%;
+    background:#0f1626;
+}
 
-.grid {display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:25px;}
+.grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    gap:25px;
+}
 
-.box {background:#0a0f1a; padding:30px; border-radius:12px; border:1px solid #1e293b;}
+.box {
+    background:#0a0f1a;
+    padding:30px;
+    border-radius:12px;
+    border:1px solid #1e293b;
+}
 
-footer {padding:60px; text-align:center; background:#000;}
+footer {
+    padding:60px;
+    text-align:center;
+    background:#000;
+}
 
 .popup-form {
-    background:#0a0f1a; padding:20px; border-radius:12px; width:300px;
+    background:#0a0f1a;
+    padding:20px;
+    border-radius:12px;
+    width:300px;
     border:1px solid #00d9ff33;
 }
 
-.popup-form input, .popup-form select, .popup-form textarea {
-    width:100%; margin:6px 0; padding:10px;
-    background:#0a0f1a; color:white; border:1px solid #00d9ff33;
+.popup-form input,
+.popup-form select,
+.popup-form textarea {
+    width:100%;
+    margin:6px 0;
+    padding:10px;
+    background:#0a0f1a;
+    color:white;
+    border:1px solid #00d9ff33;
 }
 
 .status-tag {font-size:11px; color:#00ff88; margin-top:10px;}
@@ -78,6 +142,7 @@ footer {padding:60px; text-align:center; background:#000;}
     </div>
 </nav>
 
+<!-- ✅ RESTORED HERO ANIMATION -->
 <section class="hero">
     <canvas id="roadNetwork"></canvas>
     <div class="hero-content">
@@ -109,9 +174,9 @@ footer {padding:60px; text-align:center; background:#000;}
 
 <section id="dashboard" class="dashboard">
     <h2>Control Dashboard</h2>
-    <div class="grid" id="decisionList">
-        <div class="box" data-severity="Minor"><h3>Pothole</h3><p>Priority: Minor</p></div>
-        <div class="box" data-severity="Critical"><h3>Road Collapse</h3><p>Priority: Critical</p></div>
+    <div class="grid">
+        <div class="box"><h3>Pothole</h3><p>Priority: Minor</p></div>
+        <div class="box"><h3>Road Collapse</h3><p>Priority: Critical</p></div>
     </div>
 </section>
 
@@ -123,10 +188,69 @@ footer {padding:60px; text-align:center; background:#000;}
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
+/* ===== HERO ANIMATION RESTORED ===== */
+const canvas = document.getElementById("roadNetwork");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let nodes = [];
+
+for (let i = 0; i < 60; i++) {
+    nodes.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: (Math.random() - 0.5) * 0.5
+    });
+}
+
+function draw() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    for (let i = 0; i < nodes.length; i++) {
+        let n = nodes[i];
+
+        n.x += n.vx;
+        n.y += n.vy;
+
+        if (n.x < 0 || n.x > canvas.width) n.vx *= -1;
+        if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
+
+        ctx.beginPath();
+        ctx.arc(n.x, n.y, 2, 0, Math.PI * 2);
+        ctx.fillStyle = "#00d9ff";
+        ctx.fill();
+
+        for (let j = i + 1; j < nodes.length; j++) {
+            let n2 = nodes[j];
+            let dx = n.x - n2.x;
+            let dy = n.y - n2.y;
+            let dist = Math.sqrt(dx*dx + dy*dy);
+
+            if (dist < 120) {
+                ctx.beginPath();
+                ctx.moveTo(n.x, n.y);
+                ctx.lineTo(n2.x, n2.y);
+                ctx.strokeStyle = "rgba(0,217,255,0.1)";
+                ctx.stroke();
+            }
+        }
+    }
+
+    requestAnimationFrame(draw);
+}
+
+draw();
+
+/* ===== MAP ===== */
 const map = L.map('mapBox').setView([19.0, -72.3], 8);
 
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png')
+.addTo(map);
 
+/* ===== SIMPLE ISSUE SYSTEM ===== */
 let totalReports = 0;
 let activeIssues = 0;
 
@@ -154,39 +278,7 @@ function addIssue(lat,lng,type,desc,severity="Critical"){
     });
 }
 
-function reportAtMyLocation(){
-    if(navigator.geolocation){
-        navigator.geolocation.getCurrentPosition(pos=>{
-            const lat = pos.coords.latitude;
-            const lng = pos.coords.longitude;
-
-            let popup = L.popup()
-                .setLatLng([lat,lng])
-                .setContent(`
-                    <div class="popup-form">
-                        <select id="type">
-                            <option>Pothole</option>
-                            <option>Flooding</option>
-                            <option>Road Damage</option>
-                        </select>
-                        <textarea id="desc" placeholder="Description"></textarea>
-                        <button onclick="submitReport(${lat},${lng})" class="btn">Submit</button>
-                        <div class="status-tag">Location locked</div>
-                    </div>
-                `)
-                .openOn(map);
-        });
-    }
-}
-
-function submitReport(lat,lng){
-    let type = document.getElementById("type").value;
-    let desc = document.getElementById("desc").value;
-    addIssue(lat,lng,type,desc);
-    map.closePopup();
-}
-
-// demo data
+/* demo data */
 addIssue(19.7,-72.2,"Road Damage","Damaged road section","Critical");
 addIssue(18.5,-72.3,"Flooding","Blocked drainage system","Dangerous");
 </script>
