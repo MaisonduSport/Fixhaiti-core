@@ -27,8 +27,8 @@ nav a {color:white; margin-left:25px; text-decoration:none; font-size:14px; opac
     overflow:hidden;
 }
 
-.hero-content {position:relative; z-index:2; max-width:700px;}
-.hero h1 {font-size:50px; margin-bottom:20px;}
+.hero-content {position:relative; z-index:2; max-width:900px; padding:0 20px;}
+.hero h1 {font-size:clamp(28px,5vw,50px); margin-bottom:20px;}
 
 #roadNetwork {
     position:absolute;
@@ -52,17 +52,25 @@ nav a {color:white; margin-left:25px; text-decoration:none; font-size:14px; opac
 .stats {
     display:flex;
     justify-content:space-around;
-    padding:80px 40px;
+    flex-wrap:wrap;
+    gap:20px;
+    padding:80px 20px;
     background:#0f1626;
 }
 
 .card h2 {font-size:42px; color:#00d9ff;}
 
+section {
+    padding-left:clamp(15px,5vw,60px);
+    padding-right:clamp(15px,5vw,60px);
+}
+
 .map-section {padding:50px 40px; text-align:center;}
 
 #mapBox {
-    width:90%;
-    height:500px;
+    width:100%;
+    max-width:1100px;
+    height:clamp(300px,60vh,600px);
     margin:auto;
     border:2px solid #00d9ff;
     border-radius:10px;
@@ -86,7 +94,7 @@ nav a {color:white; margin-left:25px; text-decoration:none; font-size:14px; opac
 
 .grid {
     display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
     gap:25px;
 }
 
@@ -119,8 +127,7 @@ footer {
 }
 
 .popup-form textarea,
-.popup-form input,
-.popup-form select {
+.popup-form input {
     width:100%;
     margin:6px 0;
     padding:10px;
@@ -130,6 +137,13 @@ footer {
 }
 
 .status-tag {font-size:11px; color:#00ff88; margin-top:10px;}
+
+/* MOBILE FIX */
+@media (max-width:768px){
+    nav{flex-direction:column; padding:15px;}
+    .stats{flex-direction:column; align-items:center;}
+    .issue-panel{width:95%;}
+}
 </style>
 </head>
 
@@ -144,23 +158,20 @@ footer {
     </div>
 </nav>
 
-<!-- HERO -->
 <section class="hero">
     <canvas id="roadNetwork"></canvas>
     <div class="hero-content">
         <h1>Road Infrastructure Monitoring Platform</h1>
-        <p>A system for reporting, tracking, and prioritizing road infrastructure issues through structured data.</p>
+        <p>Reporting, tracking, and prioritizing infrastructure issues through structured data.</p>
         <button class="btn" onclick="document.getElementById('map').scrollIntoView({behavior:'smooth'})">Open Map</button>
     </div>
 </section>
 
-<!-- STATS -->
 <section class="stats">
     <div class="card"><h2 id="r1">0</h2><p>Reports</p></div>
     <div class="card"><h2 id="r2">0</h2><p>Active Issues</p></div>
 </section>
 
-<!-- MAP -->
 <section id="map" class="map-section">
     <h2>Infrastructure Map</h2>
     <div id="mapBox"></div>
@@ -172,17 +183,16 @@ footer {
         <p><strong>Description:</strong> <span id="issueDescView">Select a map pin</span></p>
         <p><strong>Severity:</strong> <span id="issueSeverityView">-</span></p>
         <p><strong>Status:</strong> <span id="issueStatusView">-</span></p>
-        <p><strong>Estimated Cost:</strong> <span id="issueCostView">-</span></p>
+        <p><strong>Cost:</strong> <span id="issueCostView">-</span></p>
         <p><strong>Location:</strong> <span id="issueLocationView">-</span></p>
     </div>
 </section>
 
-<!-- DASHBOARD -->
 <section id="dashboard" class="dashboard">
     <h2>Control Dashboard</h2>
     <div class="grid">
-        <div class="box"><h3>Pothole</h3><p>Priority: Minor</p></div>
-        <div class="box"><h3>Road Collapse</h3><p>Priority: Critical</p></div>
+        <div class="box"><h3>Pothole</h3><p>Minor</p></div>
+        <div class="box"><h3>Road Collapse</h3><p>Critical</p></div>
     </div>
 </section>
 
@@ -195,152 +205,120 @@ footer {
 
 <script>
 
-/* ===== ANIMATION ===== */
-const canvas = document.getElementById("roadNetwork");
-const ctx = canvas.getContext("2d");
+/* HERO ANIMATION */
+const canvas=document.getElementById("roadNetwork");
+const ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-let nodes = [];
-
-for (let i = 0; i < 60; i++) {
-    nodes.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5
-    });
+let nodes=[];
+for(let i=0;i<60;i++){
+nodes.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+vx:(Math.random()-0.5)*0.5,
+vy:(Math.random()-0.5)*0.5
+});
 }
 
-function draw() {
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-
-    for (let i = 0; i < nodes.length; i++) {
-        let n = nodes[i];
-
-        n.x += n.vx;
-        n.y += n.vy;
-
-        if (n.x < 0 || n.x > canvas.width) n.vx *= -1;
-        if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
-
-        ctx.beginPath();
-        ctx.arc(n.x, n.y, 2, 0, Math.PI * 2);
-        ctx.fillStyle = "#00d9ff";
-        ctx.fill();
-    }
-
-    requestAnimationFrame(draw);
+function draw(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+nodes.forEach(n=>{
+n.x+=n.vx;n.y+=n.vy;
+if(n.x<0||n.x>canvas.width)n.vx*=-1;
+if(n.y<0||n.y>canvas.height)n.vy*=-1;
+ctx.beginPath();
+ctx.arc(n.x,n.y,2,0,Math.PI*2);
+ctx.fillStyle="#00d9ff";
+ctx.fill();
+});
+requestAnimationFrame(draw);
 }
 draw();
 
-/* ===== MAP ===== */
-const map = L.map('mapBox').setView([19.0, -72.3], 8);
+/* MAP */
+const map=L.map('mapBox').setView([19,-72.3],8);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png')
-.addTo(map);
-
-/* ===== SYSTEM ===== */
-let totalReports = 0;
-let activeIssues = 0;
+/* SYSTEM */
+let totalReports=0;
+let activeIssues=0;
 
 function updateStats(){
-    document.getElementById("r1").innerText = totalReports;
-    document.getElementById("r2").innerText = activeIssues;
+document.getElementById("r1").innerText=totalReports;
+document.getElementById("r2").innerText=activeIssues;
 }
 
-function addIssue(lat,lng,type,desc,severity="Critical",locationName="Unknown location"){
-    totalReports++;
-    activeIssues++;
-    updateStats();
+function addIssue(lat,lng,type,desc,severity="Critical",locationName="Unknown"){
+totalReports++;activeIssues++;updateStats();
 
-    let marker = L.circleMarker([lat,lng],{
-        radius:8,
-        color: severity==="Critical"?"red":severity==="Dangerous"?"orange":"blue"
-    }).addTo(map);
+let marker=L.circleMarker([lat,lng],{
+radius:8,
+color:severity==="Critical"?"red":severity==="Dangerous"?"orange":"blue"
+}).addTo(map);
 
-    marker.on("click",()=>{
-        document.getElementById("issueTypeView").innerText = type;
-        document.getElementById("issueDescView").innerText = desc;
-        document.getElementById("issueSeverityView").innerText = severity;
-        document.getElementById("issueStatusView").innerText = "Submitted";
-        document.getElementById("issueCostView").innerText = "$500 - $25,000";
-        document.getElementById("issueLocationView").innerText = locationName;
-    });
+marker.on("click",()=>{
+document.getElementById("issueTypeView").innerText=type;
+document.getElementById("issueDescView").innerText=desc;
+document.getElementById("issueSeverityView").innerText=severity;
+document.getElementById("issueStatusView").innerText="Submitted";
+document.getElementById("issueCostView").innerText="$500-$25,000";
+document.getElementById("issueLocationView").innerText=locationName;
+});
 }
 
-/* ===== REPORT SYSTEM (FIXED) ===== */
+/* REPORT SYSTEM */
 function reportAtMyLocation(){
-    if(navigator.geolocation){
-        navigator.geolocation.getCurrentPosition(async pos=>{
-            const lat = pos.coords.latitude;
-            const lng = pos.coords.longitude;
+navigator.geolocation.getCurrentPosition(async pos=>{
+const lat=pos.coords.latitude;
+const lng=pos.coords.longitude;
 
-            let locationName = "Unknown location";
+let locationName="Unknown";
 
-            try {
-                let res = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
-                let data = await res.json();
-                locationName = data.display_name || locationName;
-            } catch(e){}
+try{
+let res=await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json`);
+let data=await res.json();
+locationName=data.display_name;
+}catch(e){}
 
-            const popupContent = `
-                <div class="popup-form">
+const popup=`
+<div class="popup-form">
+<label>Issues</label>
+<label><input type="checkbox" value="Pothole">Pothole</label>
+<label><input type="checkbox" value="Flooding">Flooding</label>
+<label><input type="checkbox" value="Road Damage">Road Damage</label>
 
-                    <label>Issues</label>
-                    <label><input type="checkbox" value="Pothole"> Pothole</label>
-                    <label><input type="checkbox" value="Flooding"> Flooding</label>
-                    <label><input type="checkbox" value="Road Damage"> Road Damage</label>
-                    <label><input type="checkbox" value="Traffic Light Issue"> Traffic Light Issue</label>
+<label>Description</label>
+<textarea id="desc"></textarea>
 
-                    <label>Description</label>
-                    <textarea id="desc"></textarea>
+<label>Photo</label>
+<input type="file" id="photo" accept="image/*">
 
-                    <label>Photo</label>
-                    <input type="file" id="photo" accept="image/*" capture="environment">
+<div class="status-tag">${locationName}</div>
 
-                    <div class="status-tag">${locationName}</div>
+<button id="submitBtn" class="btn" style="width:100%">Submit</button>
+</div>`;
 
-                    <button id="submitBtn" class="btn" style="width:100%;">Submit</button>
-                </div>
-            `;
+let p=L.popup().setLatLng([lat,lng]).setContent(popup).openOn(map);
 
-            let popup = L.popup()
-                .setLatLng([lat,lng])
-                .setContent(popupContent)
-                .openOn(map);
+setTimeout(()=>{
+document.getElementById("submitBtn").onclick=()=>{
+let checked=[...document.querySelectorAll("input[type=checkbox]:checked")].map(x=>x.value);
+let desc=document.getElementById("desc").value;
+let photo=document.getElementById("photo").files[0];
 
-            setTimeout(()=>{
-                document.getElementById("submitBtn").onclick = function(){
+addIssue(lat,lng,checked.join(","),desc+(photo?" +image":""),"Critical",locationName);
 
-                    let checked = Array.from(
-                        document.querySelectorAll("input[type=checkbox]:checked")
-                    ).map(x => x.value);
+map.closePopup();
+};
+},100);
 
-                    let desc = document.getElementById("desc").value;
-                    let photo = document.getElementById("photo").files[0];
-
-                    addIssue(
-                        lat,
-                        lng,
-                        checked.join(", "),
-                        desc + (photo ? " (photo attached)" : ""),
-                        "Critical",
-                        locationName
-                    );
-
-                    map.closePopup();
-                }
-            },100);
-
-        });
-    }
+});
 }
 
-/* DEMO DATA */
-addIssue(19.7,-72.2,"Road Damage","Damaged road section","Critical","Cap-Haïtien area");
-addIssue(18.5,-72.3,"Flooding","Blocked drainage system","Dangerous","Port-au-Prince area");
+/* DEMO */
+addIssue(19.7,-72.2,"Road Damage","Damaged road","Critical","Cap-Haïtien");
+addIssue(18.5,-72.3,"Flooding","Blocked drainage","Dangerous","Port-au-Prince");
 
 </script>
 
