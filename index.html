@@ -1,231 +1,195 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>FixHaiti — Infrastructure Intelligence</title>
+<title>FixHaiti — Road Infrastructure Monitoring Platform</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
 <style>
-/* --- CORE STYLES (Restored Original) --- */
 * {margin:0; padding:0; box-sizing:border-box; font-family:Arial, Helvetica, sans-serif;}
 body {background:#0a0f1a; color:white; overflow-x:hidden;}
+
 nav {
     position:fixed; top:0; width:100%; display:flex; justify-content:space-between; align-items:center;
     padding:20px 60px; background:rgba(0,0,0,0.7); backdrop-filter:blur(10px); z-index:1000;
 }
-.logo {font-size:26px; font-weight:bold; color:#00d9ff; letter-spacing:1px;}
-nav a {color:white; margin-left:25px; text-decoration:none; font-size:14px; opacity: 0.8;}
 
-/* --- HERO --- */
-.hero {height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; position:relative; overflow:hidden;}
+.logo {font-size:26px; font-weight:bold; color:#00d9ff;}
+nav a {color:white; margin-left:25px; text-decoration:none; font-size:14px; opacity:0.8;}
+
+.hero {height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; position:relative;}
 .hero-content {position:relative; z-index:2; max-width:700px;}
-.hero h1 {font-size:60px; margin-bottom:20px; letter-spacing:2px;}
+.hero h1 {font-size:50px; margin-bottom:20px;}
+
 #roadNetwork {position:absolute; top:0; left:0; width:100%; height:100%; z-index:1;}
 
-/* --- BUTTONS --- */
-.btn {padding:15px 30px; border:none; background:#00d9ff; color:black; border-radius:5px; cursor:pointer; font-weight:bold; transition: 0.3s;}
-.btn:hover {opacity:0.9; transform: scale(1.05);}
+.btn {
+    padding:15px 30px; border:none; background:#00d9ff; color:black;
+    border-radius:5px; cursor:pointer; font-weight:bold;
+}
 
-/* --- STATS --- */
-.stats {display:flex; justify-content:space-around; padding:100px 40px; background:#0f1626;}
-.card {text-align:center;}
-.card h2 {font-size:48px; color:#00d9ff;}
+.stats {display:flex; justify-content:space-around; padding:80px 40px; background:#0f1626;}
+.card h2 {font-size:42px; color:#00d9ff;}
 
-/* --- AGENT PORTAL (New UI) --- */
-.agent-section { padding: 80px 10%; background: #0a0f1a; border-top: 1px solid #00d9ff22; }
-.task-card { background: #111827; border: 1px solid #1f2937; padding: 25px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
-.tc-badge { background: #00ff8815; color: #00ff88; padding: 6px 14px; border-radius: 20px; font-size: 12px; border: 1px solid #00ff8833; font-weight: bold; }
+.map-section {padding:50px 40px; text-align:center;}
+#mapBox {width:90%; height:500px; margin:auto; border:2px solid #00d9ff; border-radius:10px;}
 
-/* --- MAP & LEGEND --- */
-.map-section {padding:50px 40px; text-align:center; position:relative;}
-#mapBox {width:90%; height:500px; margin:auto; border:2px solid #00d9ff; border-radius:10px; position:relative; z-index:1;}
-#mapLegend {position:absolute; top:30px; right:80px; background:rgba(0,0,0,0.85); padding:15px; border-radius:10px; color:white; z-index:1000; text-align: left; border: 1px solid #00d9ff33;}
-.fix-pin {width:18px; height:18px; border-radius:50%; border: 2px solid #fff;}
-.red {background:#ef4444;} .orange {background:#f59e0b;} .blue {background:#3b82f6;} .yellow {background:#eab308;}
+.fix-pin {width:16px; height:16px; border-radius:50%; border:2px solid white;}
+.red {background:#ef4444;}
+.orange {background:#f59e0b;}
+.blue {background:#3b82f6;}
 
-/* --- ISSUE PANEL --- */
-.issue-panel {width:90%; max-width:900px; margin:30px auto; padding:25px; background:#0a0f1a; border:1px solid #00d9ff33; border-radius:10px; text-align: left;}
-.issue-panel h3 {margin-bottom:15px; color:#00d9ff;}
-.issue-panel p {margin:8px 0; font-size: 15px;}
+.issue-panel {
+    width:90%; max-width:900px; margin:30px auto; padding:25px;
+    background:#0a0f1a; border:1px solid #00d9ff33; border-radius:10px;
+    text-align:left;
+}
 
-/* --- DASHBOARD --- */
-.dashboard {padding:100px 10%; background:#0f1626;}
+.dashboard {padding:80px 10%; background:#0f1626;}
+
 .grid {display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:25px;}
-.box {background:#0a0f1a; padding:30px; border-radius:12px; border: 1px solid #1e293b; transition: 0.5s ease;}
+
+.box {background:#0a0f1a; padding:30px; border-radius:12px; border:1px solid #1e293b;}
+
 footer {padding:60px; text-align:center; background:#000;}
 
-/* FORM POPUP */
-.popup-form {background:rgba(10,15,26,0.95); padding:20px; border-radius:12px; width:300px; color:white; border: 1px solid #00d9ff;}
-.popup-form input, .popup-form select, .popup-form textarea {
-    width:100%; margin:6px 0; padding:10px; border-radius:6px; background:#0a0f1a; color:white; border:1px solid #00d9ff33;
+.popup-form {
+    background:#0a0f1a; padding:20px; border-radius:12px; width:300px;
+    border:1px solid #00d9ff33;
 }
-.verifying-tag { font-size: 11px; color: #00ff88; margin-top: 10px; display: block; font-weight: bold; }
+
+.popup-form input, .popup-form select, .popup-form textarea {
+    width:100%; margin:6px 0; padding:10px;
+    background:#0a0f1a; color:white; border:1px solid #00d9ff33;
+}
+
+.status-tag {font-size:11px; color:#00ff88; margin-top:10px;}
 </style>
 </head>
+
 <body>
 
 <nav>
     <div class="logo">FIXHAITI</div>
     <div>
         <a href="#">Home</a>
-        <a href="#map">Intelligence Map</a>
-        <a href="#agents">Field Agent Portal</a>
-        <a href="#dashboard">Control Dashboard</a>
+        <a href="#map">Map</a>
+        <a href="#dashboard">Dashboard</a>
     </div>
 </nav>
 
 <section class="hero">
     <canvas id="roadNetwork"></canvas>
     <div class="hero-content">
-        <h1>Sovereign Infrastructure Intelligence</h1>
-        <p>Turning verified ground-truth into national reconstruction priority. Designed for the Republic.</p>
-        <button class="btn" onclick="document.getElementById('map').scrollIntoView({behavior:'smooth'})">Explore Map</button>
+        <h1>Road Infrastructure Monitoring Platform</h1>
+        <p>A system for reporting, tracking, and prioritizing road infrastructure issues through structured data.</p>
+        <button class="btn" onclick="document.getElementById('map').scrollIntoView({behavior:'smooth'})">Open Map</button>
     </div>
 </section>
 
 <section class="stats">
-    <div class="card"><h2 id="r1">0</h2><p>Reports Submitted</p></div>
-    <div class="card"><h2 id="r2">0</h2><p>Verified Ground-Truth</p></div>
-    <div class="card"><h2 id="r4">42</h2><p>Field Agents Active</p></div>
+    <div class="card"><h2 id="r1">0</h2><p>Reports</p></div>
+    <div class="card"><h2 id="r2">0</h2><p>Active Issues</p></div>
 </section>
 
 <section id="map" class="map-section">
-    <h2>Live Intelligence Feed</h2>
-    <div id="mapLegend">
-        <h3 style="font-size: 14px; margin-bottom: 5px;">Severity</h3>
-        <ul style="list-style: none; font-size: 12px;">
-            <li>🔴 Critical</li>
-            <li>🟠 Dangerous</li>
-            <li>🟡 Moderate</li>
-            <li>🔵 Minor</li>
-        </ul>
-    </div>
+    <h2>Infrastructure Map</h2>
     <div id="mapBox"></div>
-    <button class="btn" onclick="reportAtMyLocation()" style="margin-top:20px;">Report at My Location</button>
+    <button class="btn" onclick="reportAtMyLocation()">Report Issue</button>
 
-    <div id="issueDetails" class="issue-panel">
-        <h3>Asset Intelligence Details</h3>
-        <p><strong>Issue:</strong> <span id="issueTypeView">None</span></p>
-        <p><strong>Description:</strong> <span id="issueDescView">Select a pin on the map.</span></p>
+    <div class="issue-panel">
+        <h3>Issue Details</h3>
+        <p><strong>Type:</strong> <span id="issueTypeView">None</span></p>
+        <p><strong>Description:</strong> <span id="issueDescView">Select a map pin</span></p>
         <p><strong>Severity:</strong> <span id="issueSeverityView">-</span></p>
         <p><strong>Status:</strong> <span id="issueStatusView">-</span></p>
-        <p><strong>Estimated Repair Cost:</strong> <span id="issueCostView">-</span></p>
-        <p><strong>Responsible Authority:</strong> <span id="issueAuthorityView">-</span></p>
-        <button class="btn" style="margin-top:15px; font-size:12px;">Initiate Reconstruction Fund</button>
-    </div>
-</section>
-
-<section id="agents" class="agent-section">
-    <h2>Field Agent Portal</h2>
-    <div id="taskList">
-        <div class="task-card">
-            <div><h4>Site Audit: Route de Delmas (West)</h4><p style="font-size:11px; opacity:0.5;">ID: FIX-9921</p></div>
-            <div style="text-align:right;"><span class="tc-badge">40 Trust Credits</span></div>
-        </div>
-        <div class="task-card">
-            <div><h4>Verification: RN6 Sunken Road (Nord)</h4><p style="font-size:11px; opacity:0.5;">ID: FIX-1144</p></div>
-            <div style="text-align:right;"><span class="tc-badge">55 Trust Credits</span></div>
-        </div>
-        <div class="task-card">
-            <div><h4>Audit: Port-de-Paix Drainage (Nord-Ouest)</h4><p style="font-size:11px; opacity:0.5;">ID: FIX-2088</p></div>
-            <div style="text-align:right;"><span class="tc-badge">60 Trust Credits</span></div>
-        </div>
+        <p><strong>Estimated Cost:</strong> <span id="issueCostView">-</span></p>
     </div>
 </section>
 
 <section id="dashboard" class="dashboard">
-    <h2>National Control Dashboard</h2>
+    <h2>Control Dashboard</h2>
     <div class="grid" id="decisionList">
-        <div class="box" data-severity="Minor"><h3>Pothole (Sector 4)</h3><p>Priority: Minor</p></div>
-        <div class="box" data-severity="Critical"><h3>RN6 Sunken Road</h3><p>Priority: Critical</p></div>
+        <div class="box" data-severity="Minor"><h3>Pothole</h3><p>Priority: Minor</p></div>
+        <div class="box" data-severity="Critical"><h3>Road Collapse</h3><p>Priority: Critical</p></div>
     </div>
-    <button class="btn" onclick="autoPrioritize()" style="margin-top:40px; background:#00ff88;">Trigger AI Priority Protocol</button>
 </section>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-/* HERO ANIMATION */
-const canvas=document.getElementById("roadNetwork"), ctx=canvas.getContext("2d");
-canvas.width=window.innerWidth; canvas.height=window.innerHeight;
-let nodes=[];
-for(let i=0;i<60;i++){nodes.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-0.5)*0.5,vy:(Math.random()-0.5)*0.5})}
-function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);
-for(let i=0;i<nodes.length;i++){let n=nodes[i];n.x+=n.vx;n.y+=n.vy;
-if(n.x<0||n.x>canvas.width)n.vx*=-1;if(n.y<0||n.y>canvas.height)n.vy*=-1;
-ctx.beginPath(); ctx.arc(n.x,n.y,2,0,Math.PI*2); ctx.fillStyle="#00d9ff"; ctx.fill();
-for(let j=i+1;j<nodes.length;j++){let n2=nodes[j], dx=n.x-n2.x, dy=n.y-n2.y, dist=Math.sqrt(dx*dx+dy*dy);
-if(dist<120){ctx.beginPath(); ctx.moveTo(n.x,n.y); ctx.lineTo(n2.x,n2.y); ctx.strokeStyle="rgba(0,217,255,0.1)"; ctx.stroke()}}}
-requestAnimationFrame(draw);} draw();
+<footer>
+    <h2>FIXHAITI</h2>
+    <p>Road Infrastructure Monitoring System</p>
+</footer>
 
-/* MAP LOGIC (ZOOMED OUT TO SHOW NORD & OUEST) */
-const map=L.map('mapBox').setView([19.1000,-72.3350], 8);
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+const map = L.map('mapBox').setView([19.0, -72.3], 8);
+
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 
-/* HELPERS */
-function getCost(type){if(type.includes("Sunken") || type.includes("Bridge"))return "$25,000 - $75,000"; return "$500 - $2,500";}
-function getAuthority(type){if(type.includes("Road") || type.includes("Bridge"))return "MTPTC"; return "Local Municipality";}
+let totalReports = 0;
+let activeIssues = 0;
 
-let totalReports=0, activeIssues=0;
-function updateStats(){document.getElementById("r1").innerText=totalReports; document.getElementById("r2").innerText=activeIssues;}
+function updateStats(){
+    document.getElementById("r1").innerText = totalReports;
+    document.getElementById("r2").innerText = activeIssues;
+}
 
 function addIssue(lat,lng,type,desc,severity="Critical"){
-    totalReports++; activeIssues++; updateStats();
-    let marker=L.marker([lat,lng],{icon:L.divIcon({className:'fix-pin '+ (severity==="Critical"?"red":severity==="Dangerous"?"orange":"blue")})}).addTo(map);
-    
+    totalReports++;
+    activeIssues++;
+    updateStats();
+
+    let marker = L.circleMarker([lat,lng],{
+        radius:8,
+        color: severity==="Critical"?"red":severity==="Dangerous"?"orange":"blue"
+    }).addTo(map);
+
     marker.on("click",()=>{
-        document.getElementById("issueTypeView").innerText=type;
-        document.getElementById("issueDescView").innerText=desc;
-        document.getElementById("issueSeverityView").innerText=severity;
-        document.getElementById("issueStatusView").innerText="Under Field Agent Review";
-        document.getElementById("issueCostView").innerText=getCost(type);
-        document.getElementById("issueAuthorityView").innerText=getAuthority(type);
+        document.getElementById("issueTypeView").innerText = type;
+        document.getElementById("issueDescView").innerText = desc;
+        document.getElementById("issueSeverityView").innerText = severity;
+        document.getElementById("issueStatusView").innerText = "Submitted";
+        document.getElementById("issueCostView").innerText = "$500 - $25,000";
     });
 }
 
 function reportAtMyLocation(){
     if(navigator.geolocation){
         navigator.geolocation.getCurrentPosition(pos=>{
-            const latlng={lat:pos.coords.latitude,lng:pos.coords.longitude};
-            let popupContent=document.createElement("div");
-            popupContent.className="popup-form";
-            popupContent.innerHTML=`
-                <select id="pt"><option>Sunken Road</option><option>Blocked Drains</option><option>Potholes</option><option>Missing Traffic lights</option><option>Broken traffic light</option></select>
-                <textarea id="pd" placeholder="Description..."></textarea>
-                <input type="file" capture="camera">
-                <span class="verifying-tag">📍 COORDINATION LOCKED: ${latlng.lat.toFixed(4)}</span>
-                <button class="btn" style="width:100%;" id="sub">Submit Evidence</button>`;
-            let p=L.popup().setLatLng(latlng).setContent(popupContent).openOn(map);
-            popupContent.querySelector("#sub").onclick=()=>{
-                addIssue(latlng.lat,latlng.lng,document.getElementById("pt").value,document.getElementById("pd").value);
-                map.closePopup();
-            };
+            const lat = pos.coords.latitude;
+            const lng = pos.coords.longitude;
+
+            let popup = L.popup()
+                .setLatLng([lat,lng])
+                .setContent(`
+                    <div class="popup-form">
+                        <select id="type">
+                            <option>Pothole</option>
+                            <option>Flooding</option>
+                            <option>Road Damage</option>
+                        </select>
+                        <textarea id="desc" placeholder="Description"></textarea>
+                        <button onclick="submitReport(${lat},${lng})" class="btn">Submit</button>
+                        <div class="status-tag">Location locked</div>
+                    </div>
+                `)
+                .openOn(map);
         });
     }
 }
 
-function autoPrioritize(){
-    const list = document.getElementById("decisionList");
-    const boxes = Array.from(list.getElementsByClassName("box"));
-    boxes.sort((a, b) => (a.dataset.severity === "Critical" ? -1 : 1));
-    boxes.forEach(box => {
-        list.appendChild(box); 
-        if(box.dataset.severity === "Critical") {
-            box.style.borderColor = "#ef4444";
-            box.style.boxShadow = "0 0 15px rgba(239,68,68,0.3)";
-        }
-    });
+function submitReport(lat,lng){
+    let type = document.getElementById("type").value;
+    let desc = document.getElementById("desc").value;
+    addIssue(lat,lng,type,desc);
+    map.closePopup();
 }
 
-// NORD (NORTH) & OUEST (WEST) DEMO DATA
-addIssue(19.728, -72.155, "Sunken Road", "Severe pavement subsidence on RN6 near Quartier Morin. Impacting heavy transport.", "Critical");
-addIssue(19.752, -72.211, "Drainage Failure", "Major silt blockage in Bassin Rhodo, Cap-Haitien. Urban flood risk high.", "Critical");
-addIssue(18.548, -72.340, "Bridge Scour", "Erosion at bridge piers in West Dept. Structural integrity at risk.", "Dangerous");
-addIssue(19.932, -72.833, "Unfinished Corridor", "Stalled road construction near Port-de-Paix. Massive dust and runoff issues.", "Dangerous");
+// demo data
+addIssue(19.7,-72.2,"Road Damage","Damaged road section","Critical");
+addIssue(18.5,-72.3,"Flooding","Blocked drainage system","Dangerous");
 </script>
 
-<footer>
-    <h2>FIXHAITI</h2>
-    <p>© 2026 — A Private Company. Built for the Republic.</p>
-</footer>
 </body>
 </html>
