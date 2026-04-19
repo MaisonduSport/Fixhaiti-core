@@ -2,344 +2,199 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>FixHaiti — Infrastructure Intelligence Platform </title>
+<title>FixHaiti — Infrastructure Intelligence Platform</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
 <style>
+/* --- CORE DESIGN --- */
 * {margin:0; padding:0; box-sizing:border-box; font-family:Arial, Helvetica, sans-serif;}
 body {background:#0a0f1a; color:white; overflow-x:hidden;}
 
 nav {
-position:fixed; top:0; width:100%;
-display:flex; justify-content:space-between; align-items:center;
-padding:20px 60px;
-background:rgba(0,0,0,0.7);
-backdrop-filter:blur(10px);
-z-index:1000;
+    position:fixed; top:0; width:100%;
+    display:flex; justify-content:space-between; align-items:center;
+    padding:20px 60px; background:rgba(0,0,0,0.85);
+    backdrop-filter:blur(10px); z-index:1000;
 }
 
 .logo {font-size:26px; font-weight:bold; color:#00d9ff; letter-spacing:1px;}
 nav a {color:white; margin-left:25px; text-decoration:none; font-size:14px; opacity:0.8;}
 
-.hero {
-height:100vh;
-display:flex;
-align-items:center;
-justify-content:center;
-text-align:center;
-position:relative;
-overflow:hidden;
+/* --- THE STEALTH BAR (Hidden by default) --- */
+#expertBar {
+    display: none; position: fixed; top: 75px; left: 0; width: 100%; height: 40px; 
+    background: #00d9ff; border-bottom: 1px solid #1e293b; 
+    align-items: center; padding: 0 60px; z-index: 999;
+    font-size: 11px; color: #000; font-weight: 800; text-transform: uppercase;
 }
 
+/* --- AUTH OVERLAY --- */
+#loginOverlay {
+    display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+    background:rgba(5,7,10,0.98); z-index:10000; align-items:center; justify-content:center;
+}
+.login-box {background:#0f1626; padding:40px; border:1px solid #00d9ff; border-radius:10px; width:340px; text-align:center;}
+
+/* --- MAP & PANEL --- */
+.hero { height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; position:relative; overflow:hidden; }
+#roadNetwork { position:absolute; top:0; left:0; width:100%; height:100%; z-index:1; }
 .hero-content {position:relative; z-index:2; max-width:700px;}
-.hero h1 {font-size:60px; margin-bottom:20px; letter-spacing:2px;}
+.hero h1 {font-size:60px; margin-bottom:10px; letter-spacing:2px;}
 
-#roadNetwork {
-position:absolute;
-top:0; left:0;
-width:100%; height:100%;
-z-index:1;
-}
-
-.btn {
-padding:15px 30px;
-border:none;
-background:#00d9ff;
-color:black;
-border-radius:5px;
-cursor:pointer;
-font-weight:bold;
-transition:0.3s;
-}
-
+.btn { padding:15px 30px; border:none; background:#00d9ff; color:black; border-radius:5px; cursor:pointer; font-weight:bold; transition:0.3s; }
 .btn:hover {opacity:0.9; transform:scale(1.05);}
 
-.stats {
-display:flex;
-justify-content:space-around;
-padding:100px 40px;
-background:#0f1626;
-}
+#mapBox { width:90%; height:500px; margin:40px auto; border:1px solid #1e293b; border-radius:10px; z-index:1; }
 
-.card {text-align:center;}
-.card h2 {font-size:48px; color:#00d9ff;}
+.issue-panel { width:90%; max-width:900px; margin:30px auto; padding:25px; background:#0a0f1a; border:1px solid #ffffff11; border-radius:10px; text-align:left; }
+.issue-panel h3 {margin-bottom:15px; color:#00d9ff; font-size:18px;}
 
-.map-section {
-padding:50px 40px;
-text-align:center;
-position:relative;
-}
+/* --- REVEALED GUARDIAN TOOLS --- */
+#guardianTools { display: none; margin-top: 20px; padding-top: 20px; border-top: 1px solid #00d9ff33; }
+.btn-verify { background: #00ff88; margin-bottom: 10px; width: 100%; }
+.btn-dismiss { background: transparent; border: 1px solid #ef4444; color: #ef4444; width: 100%; }
 
-#mapBox {
-width:90%;
-height:500px;
-margin:auto;
-border:2px solid #00d9ff;
-border-radius:10px;
-position:relative;
-z-index:1;
-}
-
-#mapLegend {
-position:absolute;
-top:30px; right:80px;
-background:rgba(0,0,0,0.85);
-padding:15px;
-border-radius:10px;
-color:white;
-z-index:1000;
-text-align:left;
-border:1px solid #00d9ff33;
-}
-
-.fix-pin {width:18px; height:18px; border-radius:50%; border:2px solid #fff;}
-.red {background:#ef4444;}
-.orange {background:#f59e0b;}
-.blue {background:#3b82f6;}
-.yellow {background:#eab308;}
-
-.issue-panel {
-width:90%;
-max-width:900px;
-margin:30px auto;
-padding:25px;
-background:#0a0f1a;
-border:1px solid #00d9ff33;
-border-radius:10px;
-text-align:left;
-}
-
-.issue-panel h3 {margin-bottom:15px; color:#00d9ff;}
-.issue-panel p {margin:8px 0; font-size:15px;}
-
-.dashboard {
-padding:100px 10%;
-background:#0f1626;
-}
-
-.grid {
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-gap:25px;
-}
-
-.box {
-background:#0a0f1a;
-padding:30px;
-border-radius:12px;
-border:1px solid #1e293b;
-transition:0.5s ease;
-}
-
-footer {
-padding:60px;
-text-align:center;
-background:#000;
-}
-
-.popup-form {
-background:rgba(10,15,26,0.95);
-padding:20px;
-border-radius:12px;
-width:300px;
-color:white;
-border:1px solid #00d9ff;
-}
-
-.popup-form input,
-.popup-form select,
-.popup-form textarea {
-width:100%;
-margin:6px 0;
-padding:10px;
-border-radius:6px;
-background:#0a0f1a;
-color:white;
-border:1px solid #00d9ff33;
-}
-
-.verifying-tag {
-font-size:11px;
-color:#00ff88;
-margin-top:10px;
-display:block;
-font-weight:bold;
-}
+.popup-form { background:rgba(10,15,26,0.95); padding:20px; border-radius:12px; width:300px; color:white; border:1px solid #00d9ff; }
+.popup-form input, .popup-form select, .popup-form textarea { width:100%; margin:6px 0; padding:10px; border-radius:6px; background:#0a0f1a; color:white; border:1px solid #00d9ff33; }
 </style>
 </head>
 
 <body>
 
-<nav>
-<div class="logo">FIXHAITI</div>
-<div>
-<a href="#">Home</a>
-<a href="#map">Intelligence Map</a>
-<a href="#dashboard">Control Dashboard</a>
+<div id="loginOverlay">
+    <div class="login-box">
+        <h2 style="font-size:11px; letter-spacing:4px; margin-bottom:20px; color:#00d9ff;">SYSTEM ACCESS REQUIRED</h2>
+        <input type="password" id="gCode" placeholder="Enter Sector Key" style="width:100%; padding:15px; margin-bottom:20px; background:#0a0f1a; color:white; border:1px solid #1e293b; text-align:center; font-size:18px; letter-spacing:5px;">
+        <button class="btn" style="width:100%;" onclick="validateGuardian()">Validate Key</button>
+        <p style="margin-top:15px; font-size:10px; color:#64748b; cursor:pointer;" onclick="document.getElementById('loginOverlay').style.display='none'">Return to Public Map</p>
+    </div>
 </div>
+
+<nav>
+    <div class="logo">FIXHAITI</div>
+    <div>
+        <a href="#map">Intelligence Feed</a>
+        <span onclick="document.getElementById('loginOverlay').style.display='flex'" style="cursor:pointer; opacity:0.1; margin-left:20px;">.</span>
+    </div>
 </nav>
 
+<div id="expertBar">
+    <div style="margin-right:20px;">🛡️ MTPTC SECURE SESSION ACTIVE</div>
+    <div style="font-weight:400; opacity:0.8;">| &nbsp; EXPERT VERIFICATION MODE ENABLED</div>
+</div>
+
 <section class="hero">
-<canvas id="roadNetwork"></canvas>
-<div class="hero-content">
-<h1>Infrastructure Intelligence Platform</h1>
-<p>Turning verified ground-truth into national reconstruction priority.</p>
-<button class="btn" onclick="document.getElementById('map').scrollIntoView({behavior:'smooth'})">
-Explore Map
-</button>
-</div>
+    <canvas id="roadNetwork"></canvas>
+    <div class="hero-content">
+        <h1>Infrastructure Intelligence</h1>
+        <p style="opacity:0.6;">National monitoring and asset verification system.</p>
+    </div>
 </section>
 
-<section class="stats">
-<div class="card"><h2 id="r1">0</h2><p>Reports Submitted</p></div>
-<div class="card"><h2 id="r2">0</h2><p>Verified Ground-Truth</p></div>
-<div class="card"><h2 id="r4">42</h2><p>Field Agents Active</p></div>
-</section>
+<section id="map" style="padding:40px 0;">
+    <div id="mapBox"></div>
+    <div style="text-align:center;"><button class="btn" onclick="reportAtMyLocation()">Signal Damage</button></div>
 
-<section id="map" class="map-section">
-<h2>Live Intelligence Feed</h2>
-
-<div id="mapLegend">
-<h3 style="font-size:14px;">Severity</h3>
-<ul style="list-style:none;font-size:12px;">
-<li>🔴 Critical</li>
-<li>🟠 Dangerous</li>
-<li>🟡 Moderate</li>
-<li>🔵 Minor</li>
-</ul>
-</div>
-
-<div id="mapBox"></div>
-
-<button class="btn" onclick="reportAtMyLocation()" style="margin-top:20px;">
-Report at My Location
-</button>
-
-<div class="issue-panel">
-<h3>Asset Intelligence Details</h3>
-<p><strong>Issue:</strong> <span id="issueTypeView">None</span></p>
-<p><strong>Description:</strong> <span id="issueDescView">Select a pin on the map.</span></p>
-<p><strong>Severity:</strong> <span id="issueSeverityView">-</span></p>
-<p><strong>Status:</strong> <span id="issueStatusView">-</span></p>
-<p><strong>Estimated Repair Cost:</strong> <span id="issueCostView">-</span></p>
-<p><strong>Responsible Authority:</strong> <span id="issueAuthorityView">-</span></p>
-<button class="btn" style="margin-top:15px;font-size:12px;">
-Initiate Reconstruction Fund
-</button>
-</div>
-</section>
-
-<section id="dashboard" class="dashboard">
-<h2>National Control Dashboard</h2>
-
-<div class="grid" id="decisionList">
-<div class="box"><h3>Pothole (Sector 4)</h3><p>Priority: Minor</p></div>
-<div class="box"><h3>RN6 Sunken Road</h3><p>Priority: Critical</p></div>
-</div>
-
+    <div class="issue-panel">
+        <div style="display:flex; justify-content:space-between;">
+            <div>
+                <h3>Asset Data</h3>
+                <p><strong>Type:</strong> <span id="issueTypeView">None</span></p>
+                <p><strong>Status:</strong> <span id="issueStatusView">Awaiting Selection</span></p>
+                <p><strong>Authority Estimate:</strong> <span id="issueCostView">-</span></p>
+            </div>
+            
+            <div id="guardianTools" style="width:250px;">
+                <p style="font-size:10px; color:#00ff88; margin-bottom:10px; font-weight:bold;">MTPTC AUTHORITY ACTIONS</p>
+                <button class="btn btn-verify" onclick="verifyReport()">Confirm & Assess</button>
+                <button class="btn btn-dismiss" onclick="dismissReport()">Dismiss Signal</button>
+            </div>
+        </div>
+    </div>
 </section>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <script>
-const canvas=document.getElementById("roadNetwork");
-const ctx=canvas.getContext("2d");
-canvas.width=window.innerWidth;
-canvas.height=window.innerHeight;
-
-let nodes=[];
-for(let i=0;i<60;i++){
-nodes.push({
-x:Math.random()*canvas.width,
-y:Math.random()*canvas.height,
-vx:(Math.random()-0.5)*0.5,
-vy:(Math.random()-0.5)*0.5
-});
-}
-
-function draw(){
-ctx.clearRect(0,0,canvas.width,canvas.height);
-nodes.forEach(n=>{
-n.x+=n.vx;n.y+=n.vy;
-if(n.x<0||n.x>canvas.width)n.vx*=-1;
-if(n.y<0||n.y>canvas.height)n.vy*=-1;
-ctx.beginPath();
-ctx.arc(n.x,n.y,2,0,Math.PI*2);
-ctx.fillStyle="#00d9ff";
-ctx.fill();
-});
-requestAnimationFrame(draw);
-}
+// --- ANIMATION ---
+const canvas=document.getElementById("roadNetwork"); const ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+let nodes=[]; for(let i=0;i<50;i++){ nodes.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, vx:(Math.random()-0.5)*0.5, vy:(Math.random()-0.5)*0.5}); }
+function draw(){ ctx.clearRect(0,0,canvas.width,canvas.height); nodes.forEach(n=>{ n.x+=n.vx; n.y+=n.vy; if(n.x<0||n.x>canvas.width)n.vx*=-1; if(n.y<0||n.y>canvas.height)n.vy*=-1; ctx.beginPath(); ctx.arc(n.x,n.y,1.5,0,Math.PI*2); ctx.fillStyle="#00d9ff"; ctx.fill(); }); requestAnimationFrame(draw); }
 draw();
 
-const map=L.map('mapBox').setView([19.1,-72.3],8);
+const map=L.map('mapBox').setView([18.54, -72.3], 12);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 
-let total=0,active=0;
+let isAuthorized = false;
+let selectedMarker = null;
 
-function update(){
-document.getElementById("r1").innerText=total;
-document.getElementById("r2").innerText=active;
+// --- THE DISCOVERY LOGIC ---
+function validateGuardian() {
+    const code = document.getElementById('gCode').value;
+
+    if(code === "1974") {
+        isAuthorized = true;
+        document.getElementById('loginOverlay').style.display = 'none';
+        
+        // REVEAL EVERYTHING AT ONCE
+        document.getElementById('expertBar').style.display = 'flex';
+        document.getElementById('guardianTools').style.display = 'block';
+        
+        // Visual Feedback
+        document.body.style.borderTop = "4px solid #00ff88";
+        alert("Sector Access Granted. Authority Mode Active.");
+    } else {
+        alert("Invalid Access Key.");
+    }
 }
 
-function addIssue(lat,lng,type,desc,severity="Critical"){
-total++;active++;update();
+// --- MAP LOGIC ---
+function addIssue(lat, lng, type, severity="Moderate") {
+    let m = L.circleMarker([lat, lng], {
+        radius: 9, color: "#fff", weight: 1, 
+        fillColor: severity === "Critical" ? "#ef4444" : "#eab308", fillOpacity: 0.8
+    }).addTo(map);
 
-let m=L.circleMarker([lat,lng],{
-radius:8,
-color:severity==="Critical"?"red":"orange"
-}).addTo(map);
-
-m.on("click",()=>{
-document.getElementById("issueTypeView").innerText=type;
-document.getElementById("issueDescView").innerText=desc;
-document.getElementById("issueSeverityView").innerText=severity;
-document.getElementById("issueStatusView").innerText="Under Review";
-document.getElementById("issueCostView").innerText="$500 - $25,000";
-document.getElementById("issueAuthorityView").innerText="MTPTC";
-});
+    m.on("click", () => {
+        selectedMarker = m;
+        document.getElementById("issueTypeView").innerText = type;
+        document.getElementById("issueStatusView").innerText = m.options.status || "SIGNAL RECEIVED";
+        document.getElementById("issueCostView").innerText = m.options.cost || "Pending Expert Assessment";
+    });
 }
 
-function reportAtMyLocation(){
-navigator.geolocation.getCurrentPosition(pos=>{
-let lat=pos.coords.latitude;
-let lng=pos.coords.longitude;
-
-let popup=`
-<div class="popup-form">
-<select id="t">
-<option>Pothole</option>
-<option>Flooding</option>
-<option>Road Damage</option>
-</select>
-<textarea id="d" placeholder="Description"></textarea>
-<input type="file">
-<button class="btn" id="s">Submit</button>
-</div>
-`;
-
-let p=L.popup().setLatLng([lat,lng]).setContent(popup).openOn(map);
-
-setTimeout(()=>{
-document.getElementById("s").onclick=()=>{
-addIssue(lat,lng,
-document.getElementById("t").value,
-document.getElementById("d").value);
-map.closePopup();
-};
-},100);
-});
+function verifyReport() {
+    if(!isAuthorized || !selectedMarker) return;
+    const cost = prompt("Input Engineering Budget Estimate:");
+    if(cost) {
+        selectedMarker.setStyle({fillColor: "#00ff88", radius: 12}); 
+        selectedMarker.options.status = "VERIFIED (MTPTC)";
+        selectedMarker.options.cost = cost;
+        document.getElementById("issueStatusView").innerText = "VERIFIED (MTPTC)";
+        document.getElementById("issueCostView").innerText = cost;
+    }
 }
 
-addIssue(19.7,-72.2,"Road Damage","Potholes cluster","Critical");
-addIssue(18.5,-72.3,"Flooding","Drainage blocked","Dangerous");
+function dismissReport() {
+    if(!isAuthorized || !selectedMarker) return;
+    if(confirm("Dismiss this report?")) { map.removeLayer(selectedMarker); selectedMarker = null; }
+}
+
+function reportAtMyLocation() {
+    navigator.geolocation.getCurrentPosition(pos => {
+        let lat = pos.coords.latitude; let lng = pos.coords.longitude;
+        let p = L.popup().setLatLng([lat, lng]).setContent(`
+            <div class="popup-form">
+                <select id="t"><option>Road Breach</option><option>Drainage Failure</option></select>
+                <button class="btn" onclick="addIssue(${lat}, ${lng}, document.getElementById('t').value); map.closePopup();" style="width:100%">Drop Signal</button>
+            </div>`).openOn(map);
+    });
+}
+
+// Initial Data
+addIssue(18.545, -72.335, "Pavement Breach", "Critical");
+addIssue(18.512, -72.292, "Main Drainage Block", "Moderate");
 
 </script>
-
-<footer>
-<h2>FIXHAITI</h2>
-<p>© 2026 — A Private Company. Built for Haiti's Reconstruction.</p>
-</footer>
-
 </body>
 </html>
