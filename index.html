@@ -6,7 +6,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
 <style>
-/* --- YOUR ORIGINAL STYLES --- */
+/* --- CORE STYLES --- */
 * {margin:0; padding:0; box-sizing:border-box; font-family:Arial, Helvetica, sans-serif;}
 body {background:#0a0f1a; color:white; overflow-x:hidden;}
 
@@ -159,7 +159,7 @@ color:white;
 border:1px solid #00d9ff33;
 }
 
-/* --- GUARDIAN INTERFACE STYLES --- */
+/* --- GUARDIAN & DASHBOARD STYLES --- */
 #expertBar {
     display: none; position: fixed; top: 75px; left: 0; width: 100%; height: 40px; 
     background: #00d9ff; border-bottom: 1px solid #1e293b; 
@@ -176,6 +176,17 @@ border:1px solid #00d9ff33;
 #guardianActions { display: none; margin-top: 20px; border-top: 1px solid #00d9ff33; padding-top: 20px; }
 .btn-verify { background: #00ff88; color: black; margin-right: 10px; }
 .btn-dismiss { background: transparent; border: 1px solid #ef4444; color: #ef4444; }
+
+.pipeline-grid {
+    display:grid; 
+    grid-template-columns: 1.5fr 1fr; 
+    gap:30px; 
+    margin-top: 30px;
+}
+
+@media (max-width: 900px) {
+    .pipeline-grid { grid-template-columns: 1fr; }
+}
 </style>
 </head>
 
@@ -260,19 +271,69 @@ Initiate Reconstruction Fund
 </section>
 
 <section id="dashboard" class="dashboard">
-<h2>National Control Dashboard</h2>
+    <h2 style="margin-bottom:40px; letter-spacing:1px;">National Control Dashboard</h2>
 
-<div class="grid" id="decisionList">
-<div class="box"><h3>Pothole (Sector 4)</h3><p>Priority: Minor</p></div>
-<div class="box"><h3>RN6 Sunken Road</h3><p>Priority: Critical</p></div>
-</div>
+    <div class="grid" style="margin-bottom:40px; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+        <div class="box" style="border-left: 4px solid #ef4444;">
+            <p style="font-size:10px; color:#64748b; text-transform:uppercase;">Critical Exposure</p>
+            <h3 style="font-size:28px; color:#ef4444; margin:10px 0;">$1.2M</h3>
+            <p style="font-size:10px; opacity:0.5;">Unfunded Repair Needs</p>
+        </div>
+        <div class="box" style="border-left: 4px solid #eab308;">
+            <p style="font-size:10px; color:#64748b; text-transform:uppercase;">Pending Experts</p>
+            <h3 style="font-size:28px; color:#eab308; margin:10px 0;">14</h3>
+            <p style="font-size:10px; opacity:0.5;">Awaiting Field Verification</p>
+        </div>
+        <div class="box" style="border-left: 4px solid #3b82f6;">
+            <p style="font-size:10px; color:#64748b; text-transform:uppercase;">Verified Assets</p>
+            <h3 style="font-size:28px; color:#3b82f6; margin:10px 0;">32</h3>
+            <p style="font-size:10px; opacity:0.5;">Dossiers Ready for Funding</p>
+        </div>
+        <div class="box" style="border-left: 4px solid #00ff88;">
+            <p style="font-size:10px; color:#64748b; text-transform:uppercase;">Recovery Rate</p>
+            <h3 style="font-size:28px; color:#00ff88; margin:10px 0;">84%</h3>
+            <p style="font-size:10px; opacity:0.5;">Institutional Efficiency</p>
+        </div>
+    </div>
 
+    <div class="pipeline-grid">
+        <div>
+            <h4 style="font-size:12px; color:#00d9ff; margin-bottom:20px; text-transform:uppercase; letter-spacing:2px;">Expert-Verified Pipeline</h4>
+            <div id="decisionList">
+                <div class="box" style="margin-bottom:15px; border:1px solid #3b82f633; background:rgba(59, 130, 246, 0.05);">
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div>
+                            <p style="font-size:10px; color:#3b82f6; font-weight:bold;">PHASE 2: VERIFIED</p>
+                            <h3 style="margin:5px 0;">RN6 Sunken Road (Dossier #109)</h3>
+                            <p style="font-size:13px; opacity:0.6;">Structural failure of sub-base.</p>
+                        </div>
+                        <div style="text-align:right;">
+                            <p style="font-size:18px; font-weight:bold;">$12,500</p>
+                            <p style="font-size:10px; color:#00ff88;">Fund: Vetted</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div style="background:rgba(255,255,255,0.02); padding:20px; border-radius:12px; border:1px solid #ffffff05;">
+            <h4 style="font-size:12px; color:#64748b; margin-bottom:20px; text-transform:uppercase;">Incoming Citizen Signals</h4>
+            <div style="font-size:13px; border-left:2px solid #eab308; padding-left:15px; margin-bottom:20px;">
+                <p style="font-weight:bold;">New Pothole - Delmas 31</p>
+                <p style="font-size:11px; opacity:0.5;">14 mins ago | Magnitude: Unknown</p>
+            </div>
+            <div style="font-size:13px; border-left:2px solid #ef4444; padding-left:15px; margin-bottom:20px;">
+                <p style="font-weight:bold;">Drainage Block - Cité Soleil</p>
+                <p style="font-size:11px; opacity:0.5;">2 hours ago | Magnitude: High</p>
+            </div>
+            <button class="btn" style="width:100%; background:transparent; border:1px solid #1e293b; color:#64748b; font-size:11px;">View All Signals</button>
+        </div>
+    </div>
 </section>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-/* --- YOUR ORIGINAL SCRIPT --- */
 const canvas=document.getElementById("roadNetwork");
 const ctx=canvas.getContext("2d");
 canvas.width=window.innerWidth;
@@ -303,11 +364,11 @@ requestAnimationFrame(draw);
 }
 draw();
 
-const map=L.map('mapBox').setView([19.1,-72.3],8);
+const map=L.map('mapBox').setView([19.1,-72.3], 8);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 
 let total=0,active=0;
-let isAuthorized = false; // Guardian State
+let isAuthorized = false;
 let currentMarker = null;
 
 function update(){
@@ -365,7 +426,6 @@ map.closePopup();
 });
 }
 
-/* --- GUARDIAN FUNCTIONS --- */
 function validateGuardian() {
     if(document.getElementById('gCode').value === "1974") {
         isAuthorized = true;
