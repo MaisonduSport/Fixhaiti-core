@@ -177,6 +177,9 @@ border:1px solid #00d9ff33;
 .btn-verify { background: #00ff88; color: black; margin-right: 10px; }
 .btn-dismiss { background: transparent; border: 1px solid #ef4444; color: #ef4444; }
 
+/* RECONSTRUCTION BUTTON HIDDEN BY DEFAULT */
+#fundBtn { display: none; margin-top:15px; font-size:12px; }
+
 .pipeline-grid {
     display:grid; 
     grid-template-columns: 1.5fr 1fr; 
@@ -262,11 +265,11 @@ Report at My Location
 <div id="guardianActions">
     <button class="btn btn-verify" onclick="verifyReport()">Verify Signal</button>
     <button class="btn btn-dismiss" onclick="dismissReport()">Dismiss Signal</button>
+    <button class="btn" id="fundBtn" onclick="alert('System: Technical ProDoc Generated. Pushing to International Funding Portal...')">
+        Initiate Reconstruction Fund
+    </button>
 </div>
 
-<button class="btn" id="fundBtn" style="margin-top:15px;font-size:12px;">
-Initiate Reconstruction Fund
-</button>
 </div>
 </section>
 
@@ -432,6 +435,7 @@ function validateGuardian() {
         document.getElementById('loginOverlay').style.display = 'none';
         document.getElementById('expertBar').style.display = 'flex';
         document.getElementById('guardianActions').style.display = 'block';
+        document.getElementById('fundBtn').style.display = 'block'; // Reveal Fund Button
     } else { alert("Invalid Sector Key."); }
 }
 
