@@ -45,12 +45,6 @@
         .issue-panel p {margin:12px 0; font-size:14px; color: #94a3b8; border-bottom: 1px solid #1e293b; padding-bottom: 8px;}
         .issue-panel span {color: white; font-weight: 600; float: right;}
 
-        /* --- DASHBOARD STYLES --- */
-        .dashboard { padding:80px 10%; background:#0f1626; border-top: 1px solid #1e293b;}
-        .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:25px; margin-bottom: 40px;}
-        .box { background:#0a0f1a; padding:30px; border-radius:12px; border:1px solid #1e293b; }
-        .pipeline-grid { display:grid; grid-template-columns: 1.5fr 1fr; gap:30px; }
-
         #expertBar {
             display: none; position: fixed; top: 70px; left: 0; width: 100%; height: 35px; 
             background: #00ff88; border-bottom: 1px solid #1e293b; 
@@ -71,9 +65,6 @@
         .popup-form input, .popup-form select, .popup-form textarea { width: 100%; margin: 8px 0; padding: 12px; border-radius: 4px; background: #0a0f1a; color: white; border: 1px solid #1e293b; font-size: 12px; }
         
         .image-preview { width: 100%; height: 100px; background: #000; margin-top: 10px; border: 1px dashed #334155; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #64748b; background-size: cover; background-position: center;}
-
-        footer { padding:60px; text-align:center; background:#05070a; border-top: 1px solid #1e293b;}
-        footer p { font-size: 11px; opacity: 0.4; text-transform: uppercase; letter-spacing: 2px;}
     </style>
 </head>
 
@@ -91,7 +82,6 @@
     <div class="logo">FIXHAITI</div>
     <div>
         <a href="#map">View Map</a>
-        <a href="#dashboard">Control Dashboard</a>
         <span onclick="document.getElementById('loginOverlay').style.display='flex'" style="cursor:pointer; opacity:0.1; color: white; margin-left: 20px;">KEY</span>
     </div>
 </nav>
@@ -133,40 +123,6 @@
     </div>
 </section>
 
-<section id="dashboard" class="dashboard">
-    <h2 style="margin-bottom:40px; letter-spacing:1px; text-transform:uppercase; font-size:14px; color:#00d9ff;">National Control Dashboard</h2>
-    <div class="grid">
-        <div class="box" style="border-left: 4px solid #ef4444;">
-            <p style="font-size:10px; color:#64748b; text-transform:uppercase;">Critical Exposure</p>
-            <h3 id="dashExposure" style="font-size:28px; margin:10px 0;">$0</h3>
-            <p style="font-size:10px; opacity:0.5;">Unfunded Repair Needs</p>
-        </div>
-        <div class="box" style="border-left: 4px solid #eab308;">
-            <p style="font-size:10px; color:#64748b; text-transform:uppercase;">Pending Verification</p>
-            <h3 id="dashPending" style="font-size:28px; margin:10px 0;">0</h3>
-            <p style="font-size:10px; opacity:0.5;">Field Signals Awaiting Audit</p>
-        </div>
-        <div class="box" style="border-left: 4px solid #3b82f6;">
-            <p style="font-size:10px; color:#64748b; text-transform:uppercase;">Verified Dossiers</p>
-            <h3 id="dashVerified" style="font-size:28px; margin:10px 0;">0</h3>
-            <p style="font-size:10px; opacity:0.5;">Ready for Funding</p>
-        </div>
-    </div>
-
-    <div class="pipeline-grid">
-        <div>
-            <h4 style="font-size:10px; color:#00d9ff; margin-bottom:20px; text-transform:uppercase; letter-spacing:2px;">Expert-Verified Pipeline</h4>
-            <div id="verifiedList">
-                <p style="font-size:12px; opacity:0.3;">No verified reports in pipeline.</p>
-            </div>
-        </div>
-        <div style="background:rgba(255,255,255,0.02); padding:20px; border-radius:12px; border:1px solid #ffffff05;">
-            <h4 style="font-size:10px; color:#64748b; margin-bottom:20px; text-transform:uppercase;">Live Signal Feed</h4>
-            <div id="signalFeed"></div>
-        </div>
-    </div>
-</section>
-
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
@@ -185,28 +141,11 @@
     let isAuthorized = false;
     let currentMarker = null;
     let tempImageData = null;
-    let stats = { pending: 0, verified: 0, exposure: 0 };
-
-    function updateDashboard() {
-        document.getElementById('dashExposure').innerText = "$" + stats.exposure.toLocaleString();
-        document.getElementById('dashPending').innerText = stats.pending;
-        document.getElementById('dashVerified').innerText = stats.verified;
-    }
 
     function addIssue(lat,lng,type,desc,severity,photo){
         let m=L.circleMarker([lat,lng],{ radius:7, color:severity==="Critical"?"#ef4444":"#f59e0b", fillOpacity: 0.8, weight: 1 }).addTo(map);
-        m.options.vData = { type, desc, severity, photo, lat: lat.toFixed(5), lng: lng.toFixed(5), status: "Pending Audit", cost: 0 };
+        m.options.vData = { type, desc, severity, photo, lat: lat.toFixed(5), lng: lng.toFixed(5), status: "Pending Audit" };
         
-        stats.pending++;
-        updateDashboard();
-
-        // Add to Live Feed
-        const feed = document.getElementById('signalFeed');
-        const item = document.createElement('div');
-        item.style = "font-size:12px; border-left:2px solid #ef4444; padding-left:15px; margin-bottom:15px; opacity:0.8;";
-        item.innerHTML = `<p><b>${type}</b></p><p style="font-size:10px; opacity:0.5;">New Signal Captured</p>`;
-        feed.prepend(item);
-
         m.on("click",()=>{
             currentMarker = m;
             const d = m.options.vData;
@@ -214,7 +153,7 @@
             document.getElementById("issueDescView").innerText = d.desc;
             document.getElementById("issueSeverityView").innerText = d.severity;
             document.getElementById("issueStatusView").innerText = d.status;
-            document.getElementById("issueCostView").innerText = d.cost ? "$" + d.cost.toLocaleString() : "Awaiting Verification";
+            document.getElementById("issueCostView").innerText = d.cost || "Awaiting Verification";
             
             if(d.photo) {
                 document.getElementById("photoContainer").style.display = "block";
@@ -234,32 +173,14 @@
 
     function verifyReport() {
         if(!isAuthorized || !currentMarker) return;
-        const val = prompt("Enter Valuation (USD Amount only):");
-        if(val && !isNaN(val)) {
-            const amount = parseInt(val);
+        const cost = prompt("Enter Valuation (USD):");
+        if(cost) {
             currentMarker.setStyle({color: "#3b82f6", radius: 9});
             currentMarker.options.vData.status = "VERIFIED BY FIXHAITI";
-            currentMarker.options.vData.cost = amount;
+            currentMarker.options.vData.cost = cost;
             currentMarker.options.vData.agent = "AG-" + Math.floor(Math.random()*900 + 100);
-            
-            stats.pending--;
-            stats.verified++;
-            stats.exposure += amount;
-            updateDashboard();
-
-            // Add to Pipeline
-            const vList = document.getElementById('verifiedList');
-            if(stats.verified === 1) vList.innerHTML = "";
-            const vItem = document.createElement('div');
-            vItem.className = "box";
-            vItem.style = "margin-bottom:15px; border:1px solid #3b82f633; padding:20px;";
-            vItem.innerHTML = `<p style="font-size:9px; color:#3b82f6; font-weight:bold;">VETTED</p>
-                               <h3 style="font-size:14px; margin:5px 0;">${currentMarker.options.vData.type}</h3>
-                               <p style="font-size:12px; opacity:0.6;">Valuation: $${amount.toLocaleString()} USD</p>`;
-            vList.prepend(vItem);
-
             document.getElementById("issueStatusView").innerText = "VERIFIED BY FIXHAITI";
-            document.getElementById("issueCostView").innerText = "$" + amount.toLocaleString();
+            document.getElementById("issueCostView").innerText = cost;
         }
     }
 
@@ -331,7 +252,7 @@
         row("CLASSIFICATION", d.type.toUpperCase());
         row("FIELD SUMMARY", d.desc);
         row("STATUS", d.status);
-        row("VALUATION", `$${d.cost.toLocaleString()} USD`);
+        row("VALUATION", `$${d.cost} USD`);
 
         if(d.photo) {
             doc.setFont("helvetica", "bold");
@@ -344,19 +265,11 @@
         doc.save(`FixHaiti_Official_Brief.pdf`);
     }
 
-    function dismissReport() { 
-        if(confirm("Remove this report permanently?")) {
-            if(currentMarker.options.vData.status === "Pending Audit") stats.pending--;
-            map.removeLayer(currentMarker);
-            updateDashboard();
-        } 
-    }
+    function dismissReport() { if(confirm("Remove this report permanently?")) map.removeLayer(currentMarker); }
 
-    // Seed Data
-    addIssue(18.541,-72.301,"Asphalt Degradation","Surface worn down to sub-base at Delmas 40B","Critical", null);
+    // Seed Data with Haitian Accuracy
+    addIssue(18.541,-72.301,"Asphalt Degradation","Surface worn down to sub-base, heavy dust at Delmas 40B","Critical", null);
     addIssue(18.528,-72.285,"Trash Accumulation","Major pile blocking two lanes of traffic","Warning", null);
-    
-    updateDashboard();
 </script>
 
 <footer>
