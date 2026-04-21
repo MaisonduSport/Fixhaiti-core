@@ -222,65 +222,10 @@
     </div>
 </section>
 
-<div id="dossierTemplate" style="display:none; padding:60px; background:white; color:#1e293b; font-family: 'Helvetica', Arial, sans-serif; width:800px;">
-    <div style="border-bottom: 2px solid #0f172a; padding-bottom: 20px; margin-bottom: 35px; display: flex; justify-content: space-between; align-items: flex-end;">
-        <div>
-            <h1 style="font-size: 20px; font-weight: 800; color: #0f172a; margin: 0; letter-spacing: 1px; text-transform: uppercase;">FIXHAITI <span style="font-weight: 300; color: #64748b;">| DATA UNIT</span></h1>
-            <p style="font-size: 9px; color: #94a3b8; text-transform: uppercase; margin-top: 5px; letter-spacing: 1px;">Infrastructure Technical Assessment</p>
-        </div>
-        <div style="text-align: right;">
-            <p style="font-size: 11px; font-weight: 600; color: #0f172a;">Ref: <span id="pdfID"></span></p>
-            <p style="font-size: 10px; color: #64748b;">Issued: April 21, 2026</p>
-        </div>
-    </div>
-
-    <div style="margin-bottom: 40px;">
-        <h2 style="font-size: 11px; text-transform: uppercase; color: #64748b; margin-bottom: 12px; border-left: 4px solid #0f172a; padding-left: 12px; font-weight: 800;">Technical Brief Summary</h2>
-        <p style="font-size: 13px; line-height: 1.7; color: #334155; text-align: justify;">
-            This document confirms ground-truth verification of infrastructure failure. The following 
-            data points have been audited for accuracy and are cleared for institutional project 
-            integration and resource allocation.
-        </p>
-    </div>
-
-    <table style="width: 100%; border-collapse: collapse; margin-bottom: 50px; font-size: 12px;">
-        <tr>
-            <td style="padding: 15px; border: 1px solid #f1f5f9; background: #f8fafc; font-weight: 700; width: 35%; text-transform: uppercase; color: #64748b; font-size: 10px;">Classification:</td>
-            <td style="padding: 15px; border: 1px solid #f1f5f9; color: #0f172a; font-weight: 600;" id="pdfType"></td>
-        </tr>
-        <tr>
-            <td style="padding: 15px; border: 1px solid #f1f5f9; background: #f8fafc; font-weight: 700; text-transform: uppercase; color: #64748b; font-size: 10px;">Location Data:</td>
-            <td style="padding: 15px; border: 1px solid #f1f5f9; color: #0f172a;">Geodetic Mapping Validated</td>
-        </tr>
-        <tr>
-            <td style="padding: 15px; border: 1px solid #f1f5f9; background: #f8fafc; font-weight: 700; text-transform: uppercase; color: #64748b; font-size: 10px;">Condition Score:</td>
-            <td style="padding: 15px; border: 1px solid #f1f5f9; font-weight: 800; color: #ef4444;" id="pdfSeverity"></td>
-        </tr>
-        <tr>
-            <td style="padding: 15px; border: 1px solid #f1f5f9; background: #f8fafc; font-weight: 700; text-transform: uppercase; color: #64748b; font-size: 10px;">Field Observations:</td>
-            <td style="padding: 15px; border: 1px solid #f1f5f9; color: #334155; line-height: 1.5;" id="pdfDesc"></td>
-        </tr>
-        <tr>
-            <td style="padding: 15px; border: 1px solid #f1f5f9; background: #f8fafc; font-weight: 700; text-transform: uppercase; color: #64748b; font-size: 10px;">Valuation Estimate:</td>
-            <td style="padding: 15px; border: 1px solid #f1f5f9; font-size: 16px; font-weight: 800; color: #0f172a;" id="pdfCost"></td>
-        </tr>
-    </table>
-
-    <div style="margin-top: 80px; border-top: 1px solid #f1f5f9; padding-top: 25px; display: flex; justify-content: space-between; align-items: center;">
-        <div>
-            <p style="font-size: 9px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;">Certification Office</p>
-            <p style="font-size: 11px; font-weight: 700; color: #0f172a; margin-top: 5px;">FixHaiti Technical Division</p>
-        </div>
-        <div style="border: 1px solid #cbd5e1; padding: 10px 20px; font-weight: 900; font-size: 10px; text-transform: uppercase; color: #475569; background: #f8fafc; letter-spacing: 2px;">
-            DATA CLEARANCE: VALIDATED
-        </div>
-    </div>
-</div>
-
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-    // Background Network Animation
+    // --- BACKGROUND ANIMATION ---
     const canvas=document.getElementById("roadNetwork");
     const ctx=canvas.getContext("2d");
     canvas.width=window.innerWidth; canvas.height=window.innerHeight;
@@ -297,7 +242,7 @@
     }
     animate();
 
-    // Leaflet Map Logic
+    // --- LEAFLET MAP LOGIC ---
     const map=L.map('mapBox', {zoomControl: false}).setView([18.539, -72.336], 13);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 
@@ -347,45 +292,72 @@
         }
     }
 
+    // --- INTEGRATED PDF GENERATION (The Blank Page Fix) ---
     function generateDossier() {
-        if(!currentMarker) {
-            alert("Select and validate a signal first.");
+        if(!currentMarker || !currentMarker.options.vCost) {
+            alert("This signal must be Validated with a valuation before generating a dossier.");
             return;
         }
-        
-        // 1. Fill the template
-        document.getElementById('pdfID').innerText = "TR-" + Math.floor(Math.random()*9000 + 1000);
-        document.getElementById('pdfType').innerText = document.getElementById("issueTypeView").innerText;
-        document.getElementById('pdfDesc').innerText = document.getElementById("issueDescView").innerText;
-        document.getElementById('pdfSeverity').innerText = document.getElementById("issueSeverityView").innerText;
-        document.getElementById('pdfCost').innerText = document.getElementById("issueCostView").innerText;
-        
-        const element = document.getElementById('dossierTemplate');
 
-        // 2. THE FIX: Invisible Stagehand Logic
-        element.style.display = 'block';
-        element.style.position = 'fixed';
-        element.style.left = '-9999px'; 
-        element.style.top = '0';
+        // Pulling live data
+        const refID = "TR-" + Math.floor(Math.random()*9000 + 1000);
+        const type = document.getElementById("issueTypeView").innerText;
+        const desc = document.getElementById("issueDescView").innerText;
+        const severity = document.getElementById("issueSeverityView").innerText;
+        const cost = document.getElementById("issueCostView").innerText;
+
+        // Creating the PDF layout directly as a string
+        const dossierHTML = `
+            <div style="padding:50px; font-family: 'Helvetica', sans-serif; color: #1e293b;">
+                <div style="border-bottom: 3px solid #0f172a; padding-bottom: 10px; margin-bottom: 30px;">
+                    <h1 style="font-size: 24px; margin:0; color:#0f172a;">FIXHAITI TECHNICAL DOSSIER</h1>
+                    <p style="font-size: 10px; color:#64748b; text-transform:uppercase; letter-spacing:1px;">Infrastructure Intelligence Unit</p>
+                </div>
+                
+                <div style="text-align: right; margin-bottom: 40px;">
+                    <p style="font-size: 12px;"><strong>REF ID:</strong> ${refID}</p>
+                    <p style="font-size: 12px;"><strong>DATE:</strong> April 21, 2026</p>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <h3 style="font-size: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; color:#64748b;">ASSESSMENT SUMMARY</h3>
+                    <table style="width:100%; border-collapse:collapse; margin-top:15px;">
+                        <tr style="background:#f8fafc;">
+                            <td style="padding:12px; border:1px solid #e2e8f0; font-weight:bold; width:30%;">Classification</td>
+                            <td style="padding:12px; border:1px solid #e2e8f0;">${type}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:12px; border:1px solid #e2e8f0; font-weight:bold;">Condition Level</td>
+                            <td style="padding:12px; border:1px solid #e2e8f0; color:#ef4444; font-weight:bold;">${severity}</td>
+                        </tr>
+                        <tr style="background:#f8fafc;">
+                            <td style="padding:12px; border:1px solid #e2e8f0; font-weight:bold;">Field Description</td>
+                            <td style="padding:12px; border:1px solid #e2e8f0;">${desc}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding:12px; border:1px solid #e2e8f0; font-weight:bold; font-size:14px;">Resource Valuation</td>
+                            <td style="padding:12px; border:1px solid #e2e8f0; font-size:16px; font-weight:bold; color:#0f172a;">${cost}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div style="margin-top: 60px; padding-top:20px; border-top:1px solid #e2e8f0;">
+                    <p style="font-size: 10px; color:#94a3b8;">This document is an official technical export from the FixHaiti Intelligence Platform. Verified Ground-Truth Data.</p>
+                    <p style="font-size: 12px; font-weight:bold; color:#0f172a; margin-top:10px;">STATUS: VALIDATED FOR INSTITUTIONAL USE</p>
+                </div>
+            </div>
+        `;
 
         const opt = {
             margin: 0.5,
-            filename: 'FH_Technical_Brief.pdf',
+            filename: `FixHaiti_Dossier_${refID}.pdf`,
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true, letterRendering: true },
+            html2canvas: { scale: 2 },
             jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
         };
 
-        // 3. Generate and Open via Blob URL
-        html2pdf().set(opt).from(element).outputPdf('bloburl').then(function(pdfUrl) {
-            window.open(pdfUrl, '_blank');
-            // Reset template visibility
-            element.style.display = 'none';
-            element.style.position = 'static';
-        }).catch(err => {
-            console.error("Dossier Generation Failed:", err);
-            element.style.display = 'none';
-        });
+        // Execution
+        html2pdf().from(dossierHTML).set(opt).save();
     }
 
     function dismissReport() {
@@ -416,7 +388,7 @@
 
     // Initial Seed Data
     addIssue(18.541,-72.301,"Structural Pothole","Sub-base degradation at Delmas 40B","Critical");
-    addIssue(18.528,-72.285,"Drainage Failure","Blocked culvert leading to localized flooding","Dangerous");
+    addIssue(18.528,-72.285,"Drainage Failure","Blocked culvert leading to localized flooding","Warning");
 
 </script>
 
