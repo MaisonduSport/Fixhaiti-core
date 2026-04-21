@@ -100,7 +100,7 @@
 <section id="map" class="map-section">
     <div id="mapBox"></div>
 
-    <button class="btn" onclick="reportAtMyLocation()" style="margin-top:30px; background:transparent; border:1px solid #1e293b; color:#94a3b8;">Add a new Report</button>
+    <button class="btn" onclick="reportAtMyLocation()" style="margin-top:30px; background:transparent; border:1px solid #1e293b; color:#94a3b8;">Report at my Location</button>
 
     <div class="issue-panel">
         <h3>Report Summary</h3>
@@ -173,13 +173,13 @@
 
     function verifyReport() {
         if(!isAuthorized || !currentMarker) return;
-        const cost = prompt("Enter Valuation (USD):");
+        const cost = prompt("Enter Estimated Valuation (USD):");
         if(cost) {
             currentMarker.setStyle({color: "#3b82f6", radius: 9});
-            currentMarker.options.vData.status = "VERIFIED BY FIXHAITI";
+            currentMarker.options.vData.status = "Report Verified";
             currentMarker.options.vData.cost = cost;
             currentMarker.options.vData.agent = "AG-" + Math.floor(Math.random()*900 + 100);
-            document.getElementById("issueStatusView").innerText = "VERIFIED BY FIXHAITI";
+            document.getElementById("issueStatusView").innerText = " Report Verified";
             document.getElementById("issueCostView").innerText = cost;
         }
     }
