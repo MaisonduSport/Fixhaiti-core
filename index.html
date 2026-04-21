@@ -225,7 +225,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-    // --- BACKGROUND ANIMATION ---
+    // --- CANVAS ANIMATION ---
     const canvas=document.getElementById("roadNetwork");
     const ctx=canvas.getContext("2d");
     canvas.width=window.innerWidth; canvas.height=window.innerHeight;
@@ -242,7 +242,7 @@
     }
     animate();
 
-    // --- LEAFLET MAP LOGIC ---
+    // --- MAP LOGIC ---
     const map=L.map('mapBox', {zoomControl: false}).setView([18.539, -72.336], 13);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 
@@ -292,58 +292,57 @@
         }
     }
 
-    // --- INTEGRATED PDF GENERATION (The Blank Page Fix) ---
+    // --- DIRECT PDF INJECTION ENGINE ---
     function generateDossier() {
         if(!currentMarker || !currentMarker.options.vCost) {
-            alert("This signal must be Validated with a valuation before generating a dossier.");
+            alert("Protocol Alert: Signal must be validated with a valuation before export.");
             return;
         }
 
-        // Pulling live data
         const refID = "TR-" + Math.floor(Math.random()*9000 + 1000);
         const type = document.getElementById("issueTypeView").innerText;
         const desc = document.getElementById("issueDescView").innerText;
         const severity = document.getElementById("issueSeverityView").innerText;
         const cost = document.getElementById("issueCostView").innerText;
 
-        // Creating the PDF layout directly as a string
+        // The "Hard-Coded" Template
         const dossierHTML = `
-            <div style="padding:50px; font-family: 'Helvetica', sans-serif; color: #1e293b;">
+            <div style="padding:50px; font-family: 'Helvetica', sans-serif; color: #1e293b; background: #fff;">
                 <div style="border-bottom: 3px solid #0f172a; padding-bottom: 10px; margin-bottom: 30px;">
-                    <h1 style="font-size: 24px; margin:0; color:#0f172a;">FIXHAITI TECHNICAL DOSSIER</h1>
-                    <p style="font-size: 10px; color:#64748b; text-transform:uppercase; letter-spacing:1px;">Infrastructure Intelligence Unit</p>
+                    <h1 style="font-size: 22px; margin:0; color:#0f172a; letter-spacing:1px;">FIXHAITI INFRASTRUCTURE BRIEF</h1>
+                    <p style="font-size: 10px; color:#64748b; text-transform:uppercase;">Data Intelligence Unit | Port-au-Prince</p>
                 </div>
                 
-                <div style="text-align: right; margin-bottom: 40px;">
-                    <p style="font-size: 12px;"><strong>REF ID:</strong> ${refID}</p>
-                    <p style="font-size: 12px;"><strong>DATE:</strong> April 21, 2026</p>
+                <div style="text-align: right; margin-bottom: 40px; font-size: 12px;">
+                    <p><strong>REPORT REF:</strong> ${refID}</p>
+                    <p><strong>DATE:</strong> April 21, 2026</p>
                 </div>
 
                 <div style="margin-bottom: 30px;">
-                    <h3 style="font-size: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px; color:#64748b;">ASSESSMENT SUMMARY</h3>
-                    <table style="width:100%; border-collapse:collapse; margin-top:15px;">
-                        <tr style="background:#f8fafc;">
-                            <td style="padding:12px; border:1px solid #e2e8f0; font-weight:bold; width:30%;">Classification</td>
+                    <h3 style="font-size: 11px; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; color:#64748b; text-transform:uppercase;">Technical Parameters</h3>
+                    <table style="width:100%; border-collapse:collapse; margin-top:15px; font-size:13px;">
+                        <tr>
+                            <td style="padding:12px; border:1px solid #e2e8f0; background:#f8fafc; font-weight:bold; width:35%;">Classification</td>
                             <td style="padding:12px; border:1px solid #e2e8f0;">${type}</td>
                         </tr>
                         <tr>
-                            <td style="padding:12px; border:1px solid #e2e8f0; font-weight:bold;">Condition Level</td>
+                            <td style="padding:12px; border:1px solid #e2e8f0; background:#f8fafc; font-weight:bold;">Condition Priority</td>
                             <td style="padding:12px; border:1px solid #e2e8f0; color:#ef4444; font-weight:bold;">${severity}</td>
                         </tr>
-                        <tr style="background:#f8fafc;">
-                            <td style="padding:12px; border:1px solid #e2e8f0; font-weight:bold;">Field Description</td>
+                        <tr>
+                            <td style="padding:12px; border:1px solid #e2e8f0; background:#f8fafc; font-weight:bold;">Field Observations</td>
                             <td style="padding:12px; border:1px solid #e2e8f0;">${desc}</td>
                         </tr>
                         <tr>
-                            <td style="padding:12px; border:1px solid #e2e8f0; font-weight:bold; font-size:14px;">Resource Valuation</td>
+                            <td style="padding:12px; border:1px solid #e2e8f0; background:#f8fafc; font-weight:bold;">Resource Valuation</td>
                             <td style="padding:12px; border:1px solid #e2e8f0; font-size:16px; font-weight:bold; color:#0f172a;">${cost}</td>
                         </tr>
                     </table>
                 </div>
 
-                <div style="margin-top: 60px; padding-top:20px; border-top:1px solid #e2e8f0;">
-                    <p style="font-size: 10px; color:#94a3b8;">This document is an official technical export from the FixHaiti Intelligence Platform. Verified Ground-Truth Data.</p>
-                    <p style="font-size: 12px; font-weight:bold; color:#0f172a; margin-top:10px;">STATUS: VALIDATED FOR INSTITUTIONAL USE</p>
+                <div style="margin-top: 80px; padding-top:20px; border-top:1px solid #e2e8f0;">
+                    <p style="font-size: 10px; color:#94a3b8; text-transform:uppercase;">Verified Ground-Truth Data Audit</p>
+                    <p style="font-size: 12px; font-weight:bold; color:#0f172a; margin-top:5px;">AUTHORIZATION STATUS: VALIDATED FOR INSTITUTIONAL USE</p>
                 </div>
             </div>
         `;
@@ -356,7 +355,7 @@
             jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
         };
 
-        // Execution
+        // This writes the data to the PDF and saves it immediately
         html2pdf().from(dossierHTML).set(opt).save();
     }
 
