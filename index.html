@@ -265,7 +265,6 @@
             document.getElementById("issueSeverityView").innerText=severity;
             document.getElementById("issueStatusView").innerText= m.options.vStatus || "Pending Field Audit";
             document.getElementById("issueCostView").innerText= m.options.vCost || "Evaluation Required";
-            // Storing coordinates for the PDF
             currentMarker.options.lat = lat.toFixed(5);
             currentMarker.options.lng = lng.toFixed(5);
         });
@@ -281,25 +280,35 @@
         } else { alert("Unauthorized Key."); }
     }
 
+    // UPDATED VALIDATION (Integrates Logic 4, 2, 1)
     function verifyReport() {
         if(!isAuthorized || !currentMarker) return;
-        const cost = prompt("Enter Technical Resource Valuation (USD):");
+        
+        const cost = prompt("Resource Valuation (USD):");
         const timeline = prompt("Estimated Days to Completion:");
+        const impact = prompt("Risk/Impact (e.g., High Density / Road Closed):");
+        const materials = prompt("Primary Materials Required (e.g., Asphalt, Concrete):");
+        const agent = "AG-" + Math.floor(Math.random()*800 + 100);
+
         if(cost) {
             active++; updateStats();
             currentMarker.setStyle({color: "#3b82f6", radius: 9});
             currentMarker.options.vStatus = "AUDITED & VALIDATED";
             currentMarker.options.vCost = cost;
             currentMarker.options.vTimeline = timeline || "TBD";
+            currentMarker.options.vImpact = impact || "Standard";
+            currentMarker.options.vMaterials = materials || "General Assessment";
+            currentMarker.options.vAgent = agent;
+            
             document.getElementById("issueStatusView").innerText = "AUDITED & VALIDATED";
             document.getElementById("issueCostView").innerText = cost;
         }
     }
 
-    // --- THE INSTITUTIONAL EXPORT ENGINE ---
+    // --- FULL INSTITUTIONAL EXPORT ENGINE ---
     function generateDossier() {
         if(!currentMarker || !currentMarker.options.vCost) {
-            alert("Administrative Protocol: Signal validation required before export.");
+            alert("Institutional Protocol: Signal must be validated with full metrics before export.");
             return;
         }
 
@@ -309,15 +318,20 @@
         const refID = "FIX-" + Math.floor(Math.random()*100000);
         const type = document.getElementById("issueTypeView").innerText;
         const desc = document.getElementById("issueDescView").innerText;
-        const cost = document.getElementById("issueCostView").innerText;
-        const timeline = currentMarker.options.vTimeline || "Assessment Pending";
+        const severity = document.getElementById("issueSeverityView").innerText;
+        const cost = currentMarker.options.vCost;
+        const timeline = currentMarker.options.vTimeline;
+        const impact = currentMarker.options.vImpact;
+        const materials = currentMarker.options.vMaterials;
+        const agent = currentMarker.options.vAgent;
         const lat = currentMarker.options.lat;
         const lng = currentMarker.options.lng;
+        const digitalHash = btoa(refID + agent).substring(0, 16).toUpperCase();
 
-        // 1. INSTITUTIONAL BORDER & HEADER
-        doc.setDrawColor(15, 23, 42); // Navy Blue
+        // 1. PAGE BORDER & HEADER
+        doc.setDrawColor(15, 23, 42); 
         doc.setLineWidth(0.5);
-        doc.rect(10, 10, 190, 277); // Page Border
+        doc.rect(10, 10, 190, 277); 
 
         doc.setFont("helvetica", "bold");
         doc.setFontSize(22);
@@ -326,63 +340,70 @@
         doc.setFontSize(9);
         doc.setFont("helvetica", "normal");
         doc.setTextColor(100);
-        doc.text("INFRASTRUCTURE INTELLIGENCE UNIT // NATIONAL DATA GRID", 20, 36);
+        doc.text("INFRASTRUCTURE INTELLIGENCE UNIT // PORT-AU-PRINCE SECTOR", 20, 36);
 
         doc.setDrawColor(200);
         doc.line(20, 40, 190, 40);
 
-        // 2. REFERENCE BLOCK
+        // 2. REFERENCE & LEDGER (Logic 1)
         doc.setTextColor(0);
+        doc.setFontSize(10);
         doc.setFont("helvetica", "bold");
-        doc.text("REFERENCE:", 140, 55);
+        doc.text("REFERENCE:", 135, 55);
         doc.setFont("helvetica", "normal");
         doc.text(refID, 165, 55);
         
         doc.setFont("helvetica", "bold");
-        doc.text("DATE:", 140, 60);
+        doc.text("FIELD AGENT:", 135, 60);
         doc.setFont("helvetica", "normal");
-        doc.text("APRIL 21, 2026", 165, 60);
+        doc.text(agent, 165, 60);
 
-        // 3. GEODETIC POSITIONING
-        doc.setFillColor(248, 250, 252);
-        doc.rect(20, 70, 170, 15, 'F');
         doc.setFont("helvetica", "bold");
-        doc.text("COORDINATES:", 25, 79);
+        doc.text("LEDGER HASH:", 135, 65);
         doc.setFont("helvetica", "normal");
-        doc.text(`LAT ${lat} / LNG ${lng}`, 60, 79);
+        doc.text(digitalHash, 165, 65);
+
+        // 3. GEODETIC DATA
+        doc.setFillColor(248, 250, 252);
+        doc.rect(20, 75, 170, 15, 'F');
+        doc.setFont("helvetica", "bold");
+        doc.text("COORDINATES:", 25, 84);
+        doc.setFont("helvetica", "normal");
+        doc.text(`LAT ${lat} / LNG ${lng} (WGS84)`, 60, 84);
 
         // 4. DATA MATRIX (Official Table Style)
-        let yPos = 100;
+        let yPos = 110;
         const drawRow = (label, value, isBold = false) => {
             doc.setDrawColor(226, 232, 240);
             doc.line(20, yPos + 2, 190, yPos + 2);
             doc.setFont("helvetica", "bold");
             doc.text(label, 20, yPos);
             doc.setFont("helvetica", isBold ? "bold" : "normal");
-            
-            // Handle long descriptions
             const splitVal = doc.splitTextToSize(value, 110);
             doc.text(splitVal, 75, yPos);
-            yPos += (splitVal.length * 7);
+            yPos += (splitVal.length * 8);
         };
 
         drawRow("CLASSIFICATION", type);
-        drawRow("FIELD OBSERVATION", desc);
+        drawRow("TECHNICAL DESC.", desc);
+        drawRow("SEVERITY", severity);
+        drawRow("RISK/IMPACT", impact); // Logic 2
+        drawRow("MATERIALS REQ.", materials); // Logic 4
         drawRow("TIMELINE EST.", `${timeline} DAYS`);
         drawRow("VALUATION (USD)", cost, true);
 
-        // 5. SOVEREIGN CLEARANCE
+        // 5. CLEARANCE
         doc.setFont("helvetica", "bold");
-        doc.setFontSize(14);
-        doc.text("STATUS: AUDITED & VALIDATED", 20, yPos + 20);
+        doc.setFontSize(12);
+        doc.text("DATA STATUS: GROUND-TRUTH VERIFIED", 20, yPos + 20);
         
         doc.setFontSize(8);
         doc.setTextColor(150);
-        const footerText = "This document is a certified ground-truth report generated by FixHaiti. The data contained herein is intended for official resource allocation and infrastructure planning.";
-        doc.text(doc.splitTextToSize(footerText, 160), 20, 270);
+        const footerText = "CERTIFIED INTEL: This technical dossier is validated for institutional modernization initiatives. The valuation provided is an estimate for resource allocation purposes only.";
+        doc.text(doc.splitTextToSize(footerText, 160), 20, 275);
 
-        // 6. SAVE
-        doc.save(`FixHaiti_Official_Brief_${refID}.pdf`);
+        // 6. EXECUTE
+        doc.save(`FixHaiti_TechnicalBrief_${refID}.pdf`);
     }
 
     function dismissReport() {
@@ -411,7 +432,7 @@
         });
     }
 
-    // Initial Seed Data
+    // Initial Seeds
     addIssue(18.541,-72.301,"Structural Pothole","Sub-base degradation at Delmas 40B","Critical");
     addIssue(18.528,-72.285,"Drainage Failure","Blocked culvert leading to localized flooding","Warning");
 
