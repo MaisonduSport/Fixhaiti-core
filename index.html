@@ -348,9 +348,12 @@
     }
 
     function generateDossier() {
-        if(!currentMarker) return;
+        if(!currentMarker) {
+            alert("Select and validate a signal first.");
+            return;
+        }
         
-        // Populate Hidden Template
+        // 1. Fill the template
         document.getElementById('pdfID').innerText = "TR-" + Math.floor(Math.random()*9000 + 1000);
         document.getElementById('pdfType').innerText = document.getElementById("issueTypeView").innerText;
         document.getElementById('pdfDesc').innerText = document.getElementById("issueDescView").innerText;
@@ -358,22 +361,30 @@
         document.getElementById('pdfCost').innerText = document.getElementById("issueCostView").innerText;
         
         const element = document.getElementById('dossierTemplate');
-        element.style.display = 'block'; // Reveal for PDF capture
+
+        // 2. THE FIX: Invisible Stagehand Logic
+        element.style.display = 'block';
+        element.style.position = 'fixed';
+        element.style.left = '-9999px'; 
+        element.style.top = '0';
 
         const opt = {
             margin: 0.5,
             filename: 'FH_Technical_Brief.pdf',
             image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true },
+            html2canvas: { scale: 2, useCORS: true, letterRendering: true },
             jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
         };
 
-        // GitHub Friendly: Opens in New Tab via Blob URL
+        // 3. Generate and Open via Blob URL
         html2pdf().set(opt).from(element).outputPdf('bloburl').then(function(pdfUrl) {
             window.open(pdfUrl, '_blank');
-            element.style.display = 'none'; // Hide again
+            // Reset template visibility
+            element.style.display = 'none';
+            element.style.position = 'static';
         }).catch(err => {
             console.error("Dossier Generation Failed:", err);
+            element.style.display = 'none';
         });
     }
 
