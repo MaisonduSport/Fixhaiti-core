@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>FixHaiti — Infrastructure Intelligence Platform</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <style>
@@ -15,13 +16,14 @@
             position:fixed; top:0; width:100%;
             display:flex; justify-content:space-between; align-items:center;
             padding:20px 60px;
-            background:rgba(0,0,0,0.7);
+            background:rgba(0,0,0,0.8);
             backdrop-filter:blur(10px);
             z-index:1000;
+            border-bottom: 1px solid #1e293b;
         }
 
-        .logo {font-size:26px; font-weight:bold; color:#00d9ff; letter-spacing:1px;}
-        nav a {color:white; margin-left:25px; text-decoration:none; font-size:14px; opacity:0.8;}
+        .logo {font-size:24px; font-weight:900; color:#00d9ff; letter-spacing:2px; text-transform: uppercase;}
+        nav a {color:white; margin-left:25px; text-decoration:none; font-size:12px; opacity:0.6; text-transform: uppercase; font-weight: 700;}
 
         .hero {
             height:100vh;
@@ -33,116 +35,120 @@
             overflow:hidden;
         }
 
-        .hero-content {position:relative; z-index:2; max-width:700px;}
-        .hero h1 {font-size:60px; margin-bottom:20px; letter-spacing:2px;}
+        .hero-content {position:relative; z-index:2; max-width:800px;}
+        .hero h1 {font-size:55px; margin-bottom:20px; letter-spacing:-1px; line-height: 1.1;}
+        .hero p {font-size: 18px; color: #94a3b8; margin-bottom: 30px;}
 
         #roadNetwork {
             position:absolute;
             top:0; left:0;
             width:100%; height:100%;
             z-index:1;
+            opacity: 0.4;
         }
 
         .btn {
-            padding:15px 30px;
+            padding:14px 28px;
             border:none;
             background:#00d9ff;
             color:black;
-            border-radius:5px;
+            border-radius:4px;
             cursor:pointer;
-            font-weight:bold;
-            transition:0.3s;
+            font-weight:800;
+            text-transform: uppercase;
+            font-size: 12px;
+            transition: 0.2s ease;
         }
 
-        .btn:hover {opacity:0.9; transform:scale(1.02);}
+        .btn:hover {opacity:0.9; transform:translateY(-2px);}
 
         .stats {
             display:flex;
             justify-content:space-around;
-            padding:100px 40px;
+            padding:80px 40px;
             background:#0f1626;
+            border-top: 1px solid #1e293b;
         }
 
         .card {text-align:center;}
-        .card h2 {font-size:48px; color:#00d9ff;}
+        .card h2 {font-size:42px; color:#00d9ff; margin-bottom: 5px;}
+        .card p {font-size: 10px; text-transform: uppercase; color: #64748b; letter-spacing: 1px;}
 
         .map-section {
-            padding:50px 40px;
+            padding:60px 40px;
             text-align:center;
-            position:relative;
+            background: #0a0f1a;
         }
 
         #mapBox {
-            width:90%;
-            height:500px;
+            width:100%;
+            max-width: 1200px;
+            height:550px;
             margin:auto;
             border:1px solid #1e293b;
-            border-radius:10px;
+            border-radius:8px;
             position:relative;
             z-index:1;
         }
 
         #mapLegend {
             position:absolute;
-            top:30px; right:80px;
+            top:20px; right:20px;
             background:rgba(10,15,26,0.95);
             padding:15px;
-            border-radius:10px;
+            border-radius:6px;
             color:white;
             z-index:1000;
             text-align:left;
-            border:1px solid #00d9ff33;
+            border:1px solid #1e293b;
         }
 
         .issue-panel {
-            width:90%;
-            max-width:900px;
-            margin:30px auto;
-            padding:25px;
-            background:#0a0f1a;
+            width:100%;
+            max-width:1200px;
+            margin:40px auto;
+            padding:35px;
+            background:#0f1626;
             border:1px solid #1e293b;
-            border-radius:10px;
+            border-radius:8px;
             text-align:left;
         }
 
-        .issue-panel h3 {margin-bottom:15px; color:#00d9ff; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;}
-        .issue-panel p {margin:10px 0; font-size:14px; color: #94a3b8;}
-        .issue-panel span {color: white; font-weight: 600;}
+        .issue-panel h3 {margin-bottom:20px; color:#00d9ff; font-size: 12px; text-transform: uppercase; letter-spacing: 2px;}
+        .issue-panel p {margin:12px 0; font-size:14px; color: #94a3b8; border-bottom: 1px solid #1e293b; padding-bottom: 8px;}
+        .issue-panel span {color: white; font-weight: 600; float: right;}
 
         #expertBar {
-            display: none; position: fixed; top: 75px; left: 0; width: 100%; height: 40px; 
-            background: #00d9ff; border-bottom: 1px solid #1e293b; 
+            display: none; position: fixed; top: 70px; left: 0; width: 100%; height: 35px; 
+            background: #00ff88; border-bottom: 1px solid #1e293b; 
             align-items: center; padding: 0 60px; z-index: 999;
-            font-size: 11px; color: #000; font-weight: 800; text-transform: uppercase;
+            font-size: 10px; color: #000; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;
         }
 
         #loginOverlay {
             display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
-            background:rgba(5,7,10,0.98); z-index:10000; align-items:center; justify-content:center;
+            background:rgba(5,7,10,0.99); z-index:10000; align-items:center; justify-content:center;
         }
-        .login-box {background:#0f1626; padding:40px; border:1px solid #00d9ff; border-radius:10px; width:340px; text-align:center;}
+        .login-box {background:#0f1626; padding:50px; border:1px solid #1e293b; border-radius:8px; width:360px; text-align:center;}
 
-        #guardianActions { display: none; margin-top: 25px; border-top: 1px solid #1e293b; padding-top: 20px; }
-        .btn-verify { background: #00ff88; color: black; margin-right: 10px; }
-        .btn-dismiss { background: transparent; border: 1px solid #ef4444; color: #ef4444; margin-right: 10px;}
+        #guardianActions { display: none; margin-top: 30px; padding-top: 20px; }
+        .btn-verify { background: #00ff88; color: black; margin-right: 12px; }
+        .btn-dismiss { background: transparent; border: 1px solid #ef4444; color: #ef4444; margin-right: 12px;}
         
         #fundBtn { 
             display: none; 
-            margin-top:15px; 
-            background: #f8fafc; 
+            margin-top:20px; 
+            background: #ffffff; 
             color: #0f172a; 
             border: 1px solid #e2e8f0; 
-            font-size: 12px;
+            width: 100%;
         }
 
-        .dashboard { padding: 100px 10%; background: #0f1626; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap: 25px; }
-        .box { background: #0a0f1a; padding: 30px; border-radius: 12px; border: 1px solid #1e293b; }
+        footer { padding: 80px; text-align: center; background: #05070a; border-top: 1px solid #1e293b; }
+        footer p { font-size: 10px; color: #475569; text-transform: uppercase; letter-spacing: 2px; }
 
-        footer { padding: 60px; text-align: center; background: #000; color: #475569; font-size: 12px; }
-
-        .popup-form { background: rgba(10,15,26,0.95); padding: 20px; border-radius: 12px; width: 300px; color: white; border: 1px solid #00d9ff; }
-        .popup-form input, .popup-form select, .popup-form textarea { width: 100%; margin: 6px 0; padding: 10px; border-radius: 6px; background: #0a0f1a; color: white; border: 1px solid #1e293b; }
+        .popup-form { background: #0f1626; padding: 20px; border-radius: 8px; width: 280px; color: white; border: 1px solid #00d9ff33; }
+        .popup-form input, .popup-form select, .popup-form textarea { width: 100%; margin: 8px 0; padding: 12px; border-radius: 4px; background: #0a0f1a; color: white; border: 1px solid #1e293b; font-size: 12px; }
     </style>
 </head>
 
@@ -150,62 +156,61 @@
 
 <div id="loginOverlay">
     <div class="login-box">
-        <h2 style="font-size:11px; letter-spacing:4px; margin-bottom:20px; color:#00d9ff;">TECHNICAL AUTHORIZATION</h2>
-        <input type="password" id="gCode" placeholder="Enter Sector Key" style="width:100%; padding:15px; margin-bottom:20px; background:#0a0f1a; color:white; border:1px solid #1e293b; text-align:center;">
-        <button class="btn" style="width:100%;" onclick="validateGuardian()">Authorize Session</button>
+        <h2 style="font-size:10px; letter-spacing:5px; margin-bottom:30px; color:#00d9ff; text-transform: uppercase;">Technical Access</h2>
+        <input type="password" id="gCode" placeholder="SECTOR KEY" style="width:100%; padding:15px; margin-bottom:20px; background:#0a0f1a; color:white; border:1px solid #1e293b; text-align:center; font-weight: 900; letter-spacing: 5px;">
+        <button class="btn" style="width:100%;" onclick="validateGuardian()">Authorize</button>
     </div>
 </div>
 
 <nav>
     <div class="logo">FIXHAITI</div>
     <div>
-        <a href="#">Home</a>
-        <a href="#map">Intelligence Map</a>
-        <a href="#dashboard">Control Dashboard</a>
-        <span onclick="document.getElementById('loginOverlay').style.display='flex'" style="cursor:pointer; opacity:0; margin-left:10px;">.</span>
+        <a href="#">Analysis</a>
+        <a href="#map">Map</a>
+        <span onclick="document.getElementById('loginOverlay').style.display='flex'" style="cursor:pointer; opacity:0.1; color: white; margin-left: 20px;">KEY</span>
     </div>
 </nav>
 
 <div id="expertBar">
-    🛡️ INSTITUTIONAL SESSION ACTIVE | DATA VERIFICATION MODE
+    INSTITUTIONAL SESSION ACTIVE // PORT-AU-PRINCE SECTOR
 </div>
 
 <section class="hero">
     <canvas id="roadNetwork"></canvas>
     <div class="hero-content">
-        <h1>Infrastructure Intelligence</h1>
-        <p style="opacity: 0.6; margin-bottom: 30px;">Ground-truth data for national reconstruction priorities.</p>
-        <button class="btn" onclick="document.getElementById('map').scrollIntoView({behavior:'smooth'})">Explore Map</button>
+        <h1>Institutional Infrastructure Intelligence</h1>
+        <p>Providing verified ground-truth data to facilitate national reconstruction.</p>
+        <button class="btn" onclick="document.getElementById('map').scrollIntoView({behavior:'smooth'})">Access Intelligence Map</button>
     </div>
 </section>
 
 <section class="stats">
-    <div class="card"><h2 id="r1">0</h2><p style="font-size:12px; opacity:0.5; text-transform:uppercase;">Signals Logged</p></div>
-    <div class="card"><h2 id="r2">0</h2><p style="font-size:12px; opacity:0.5; text-transform:uppercase;">Verified Assets</p></div>
-    <div class="card"><h2>42</h2><p style="font-size:12px; opacity:0.5; text-transform:uppercase;">Active Agents</p></div>
+    <div class="card"><h2 id="r1">0</h2><p>Data Points</p></div>
+    <div class="card"><h2 id="r2">0</h2><p>Verified Briefs</p></div>
+    <div class="card"><h2>42</h2><p>Agents in Field</p></div>
 </section>
 
 <section id="map" class="map-section">
-    <div id="mapLegend">
-        <h3 style="font-size:11px; text-transform:uppercase; margin-bottom:10px; color:#00d9ff;">Severity Index</h3>
-        <ul style="list-style:none;font-size:11px; line-height:1.8;">
-            <li><span style="color:#ef4444;">●</span> Critical</li>
-            <li><span style="color:#f59e0b;">●</span> Dangerous</li>
-            <li><span style="color:#3b82f6;">●</span> Verified</li>
-        </ul>
+    <div id="mapBox">
+        <div id="mapLegend">
+            <h3 style="font-size:10px; text-transform:uppercase; margin-bottom:12px; color:#94a3b8; letter-spacing: 1px;">Classification</h3>
+            <ul style="list-style:none;font-size:11px; line-height:2;">
+                <li><span style="color:#ef4444;">●</span> Critical</li>
+                <li><span style="color:#f59e0b;">●</span> Warning</li>
+                <li><span style="color:#3b82f6;">●</span> Validated</li>
+            </ul>
+        </div>
     </div>
 
-    <div id="mapBox"></div>
-
-    <button class="btn" onclick="reportAtMyLocation()" style="margin-top:20px; background:transparent; border:1px solid #00d9ff; color:#00d9ff;">Report Local Issue</button>
+    <button class="btn" onclick="reportAtMyLocation()" style="margin-top:30px; background:transparent; border:1px solid #1e293b; color:#94a3b8;">Manual Field Entry</button>
 
     <div class="issue-panel">
-        <h3>Asset Intelligence Details</h3>
-        <p>Issue Type: <span id="issueTypeView">None</span></p>
-        <p>Description: <span id="issueDescView">Select a signal on the map.</span></p>
-        <p>Severity Score: <span id="issueSeverityView">-</span></p>
-        <p>Validation Status: <span id="issueStatusView">-</span></p>
-        <p>Resource Estimate: <span id="issueCostView">-</span></p>
+        <h3>Asset Assessment Brief</h3>
+        <p>Technical Class: <span id="issueTypeView">---</span></p>
+        <p>Field Description: <span id="issueDescView">Select coordinate on map.</span></p>
+        <p>Priority Level: <span id="issueSeverityView">---</span></p>
+        <p>Data Integrity: <span id="issueStatusView">---</span></p>
+        <p>Resource Estimate: <span id="issueCostView">---</span></p>
 
         <div id="guardianActions">
             <button class="btn btn-verify" onclick="verifyReport()">Validate Signal</button>
@@ -217,33 +222,83 @@
     </div>
 </section>
 
-<div id="dossierTemplate" style="display:none; padding:60px; background:white; color:#1e293b; font-family: Helvetica, Arial, sans-serif; width:800px;">
-    <!-- (PDF template content continues exactly as you wrote it) -->
+<div id="dossierTemplate" style="display:none; padding:60px; background:white; color:#1e293b; font-family: 'Helvetica', Arial, sans-serif; width:800px;">
+    <div style="border-bottom: 2px solid #0f172a; padding-bottom: 20px; margin-bottom: 35px; display: flex; justify-content: space-between; align-items: flex-end;">
+        <div>
+            <h1 style="font-size: 20px; font-weight: 800; color: #0f172a; margin: 0; letter-spacing: 1px; text-transform: uppercase;">FIXHAITI <span style="font-weight: 300; color: #64748b;">| DATA UNIT</span></h1>
+            <p style="font-size: 9px; color: #94a3b8; text-transform: uppercase; margin-top: 5px; letter-spacing: 1px;">Infrastructure Technical Assessment</p>
+        </div>
+        <div style="text-align: right;">
+            <p style="font-size: 11px; font-weight: 600; color: #0f172a;">Ref: <span id="pdfID"></span></p>
+            <p style="font-size: 10px; color: #64748b;">Issued: April 21, 2026</p>
+        </div>
+    </div>
+
+    <div style="margin-bottom: 40px;">
+        <h2 style="font-size: 11px; text-transform: uppercase; color: #64748b; margin-bottom: 12px; border-left: 4px solid #0f172a; padding-left: 12px; font-weight: 800;">Technical Brief Summary</h2>
+        <p style="font-size: 13px; line-height: 1.7; color: #334155; text-align: justify;">
+            This document confirms ground-truth verification of infrastructure failure. The following 
+            data points have been audited for accuracy and are cleared for institutional project 
+            integration and resource allocation.
+        </p>
+    </div>
+
+    <table style="width: 100%; border-collapse: collapse; margin-bottom: 50px; font-size: 12px;">
+        <tr>
+            <td style="padding: 15px; border: 1px solid #f1f5f9; background: #f8fafc; font-weight: 700; width: 35%; text-transform: uppercase; color: #64748b; font-size: 10px;">Classification:</td>
+            <td style="padding: 15px; border: 1px solid #f1f5f9; color: #0f172a; font-weight: 600;" id="pdfType"></td>
+        </tr>
+        <tr>
+            <td style="padding: 15px; border: 1px solid #f1f5f9; background: #f8fafc; font-weight: 700; text-transform: uppercase; color: #64748b; font-size: 10px;">Location Data:</td>
+            <td style="padding: 15px; border: 1px solid #f1f5f9; color: #0f172a;">Geodetic Mapping Validated</td>
+        </tr>
+        <tr>
+            <td style="padding: 15px; border: 1px solid #f1f5f9; background: #f8fafc; font-weight: 700; text-transform: uppercase; color: #64748b; font-size: 10px;">Condition Score:</td>
+            <td style="padding: 15px; border: 1px solid #f1f5f9; font-weight: 800; color: #ef4444;" id="pdfSeverity"></td>
+        </tr>
+        <tr>
+            <td style="padding: 15px; border: 1px solid #f1f5f9; background: #f8fafc; font-weight: 700; text-transform: uppercase; color: #64748b; font-size: 10px;">Field Observations:</td>
+            <td style="padding: 15px; border: 1px solid #f1f5f9; color: #334155; line-height: 1.5;" id="pdfDesc"></td>
+        </tr>
+        <tr>
+            <td style="padding: 15px; border: 1px solid #f1f5f9; background: #f8fafc; font-weight: 700; text-transform: uppercase; color: #64748b; font-size: 10px;">Valuation Estimate:</td>
+            <td style="padding: 15px; border: 1px solid #f1f5f9; font-size: 16px; font-weight: 800; color: #0f172a;" id="pdfCost"></td>
+        </tr>
+    </table>
+
+    <div style="margin-top: 80px; border-top: 1px solid #f1f5f9; padding-top: 25px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <p style="font-size: 9px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;">Certification Office</p>
+            <p style="font-size: 11px; font-weight: 700; color: #0f172a; margin-top: 5px;">FixHaiti Technical Division</p>
+        </div>
+        <div style="border: 1px solid #cbd5e1; padding: 10px 20px; font-weight: 900; font-size: 10px; text-transform: uppercase; color: #475569; background: #f8fafc; letter-spacing: 2px;">
+            DATA CLEARANCE: VALIDATED
+        </div>
+    </div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-    // Background Animation
+    // Background Network Animation
     const canvas=document.getElementById("roadNetwork");
     const ctx=canvas.getContext("2d");
-    canvas.width=window.innerWidth;
-    canvas.height=window.innerHeight;
+    canvas.width=window.innerWidth; canvas.height=window.innerHeight;
     let nodes=[];
-    for(let i=0;i<60;i++){ nodes.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, vx:(Math.random()-0.5)*0.5, vy:(Math.random()-0.5)*0.5}); }
-    function draw(){
+    for(let i=0;i<60;i++){ nodes.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, vx:(Math.random()-0.5)*0.3, vy:(Math.random()-0.5)*0.3}); }
+    function animate(){
         ctx.clearRect(0,0,canvas.width,canvas.height);
         nodes.forEach(n=>{
             n.x+=n.vx; n.y+=n.vy;
             if(n.x<0||n.x>canvas.width)n.vx*=-1; if(n.y<0||n.y>canvas.height)n.vy*=-1;
-            ctx.beginPath(); ctx.arc(n.x,n.y,1.5,0,Math.PI*2); ctx.fillStyle="#00d9ff22"; ctx.fill();
+            ctx.beginPath(); ctx.arc(n.x,n.y,1.5,0,Math.PI*2); ctx.fillStyle="#00d9ff"; ctx.fill();
         });
-        requestAnimationFrame(draw);
+        requestAnimationFrame(animate);
     }
-    draw();
+    animate();
 
-    // Map Setup
-    const map=L.map('mapBox', {zoomControl: false}).setView([18.53, -72.33], 12);
+    // Leaflet Map Logic
+    const map=L.map('mapBox', {zoomControl: false}).setView([18.539, -72.336], 13);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 
     let total=0, active=0;
@@ -257,25 +312,86 @@
 
     function addIssue(lat,lng,type,desc,severity="Critical"){
         total++; updateStats();
-        let m=L.circleMarker([lat,lng],{ radius:8, color:severity==="Critical"?"#ef4444":"#f59e0b", fillOpacity: 0.6 }).addTo(map);
+        let m=L.circleMarker([lat,lng],{ radius:7, color:severity==="Critical"?"#ef4444":"#f59e0b", fillOpacity: 0.8, weight: 1 }).addTo(map);
         
         m.on("click",()=>{
             currentMarker = m;
             document.getElementById("issueTypeView").innerText=type;
             document.getElementById("issueDescView").innerText=desc;
             document.getElementById("issueSeverityView").innerText=severity;
-            document.getElementById("issueStatusView").innerText= m.options.vStatus || "Citizen Reported";
+            document.getElementById("issueStatusView").innerText= m.options.vStatus || "Pending Field Audit";
             document.getElementById("issueCostView").innerText= m.options.vCost || "Evaluation Required";
         });
+    }
+
+    function validateGuardian() {
+        if(document.getElementById('gCode').value === "1974") {
+            isAuthorized = true;
+            document.getElementById('loginOverlay').style.display = 'none';
+            document.getElementById('expertBar').style.display = 'flex';
+            document.getElementById('guardianActions').style.display = 'block';
+            document.getElementById('fundBtn').style.display = 'block';
+        } else { alert("Unauthorized Key."); }
+    }
+
+    function verifyReport() {
+        if(!isAuthorized || !currentMarker) return;
+        const cost = prompt("Enter Technical Resource Valuation (USD):");
+        if(cost) {
+            active++; updateStats();
+            currentMarker.setStyle({color: "#3b82f6", radius: 9});
+            currentMarker.options.vStatus = "AUDITED & VALIDATED";
+            currentMarker.options.vCost = cost;
+            document.getElementById("issueStatusView").innerText = "AUDITED & VALIDATED";
+            document.getElementById("issueCostView").innerText = cost;
+        }
+    }
+
+    function generateDossier() {
+        if(!currentMarker) return;
+        
+        // Populate Hidden Template
+        document.getElementById('pdfID').innerText = "TR-" + Math.floor(Math.random()*9000 + 1000);
+        document.getElementById('pdfType').innerText = document.getElementById("issueTypeView").innerText;
+        document.getElementById('pdfDesc').innerText = document.getElementById("issueDescView").innerText;
+        document.getElementById('pdfSeverity').innerText = document.getElementById("issueSeverityView").innerText;
+        document.getElementById('pdfCost').innerText = document.getElementById("issueCostView").innerText;
+        
+        const element = document.getElementById('dossierTemplate');
+        element.style.display = 'block'; // Reveal for PDF capture
+
+        const opt = {
+            margin: 0.5,
+            filename: 'FH_Technical_Brief.pdf',
+            image: { type: 'jpeg', quality: 0.98 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        };
+
+        // GitHub Friendly: Opens in New Tab via Blob URL
+        html2pdf().set(opt).from(element).outputPdf('bloburl').then(function(pdfUrl) {
+            window.open(pdfUrl, '_blank');
+            element.style.display = 'none'; // Hide again
+        }).catch(err => {
+            console.error("Dossier Generation Failed:", err);
+        });
+    }
+
+    function dismissReport() {
+        if(!isAuthorized || !currentMarker) return;
+        if(confirm("Permanently dismiss this data point?")) {
+            map.removeLayer(currentMarker);
+            document.getElementById("issueTypeView").innerText = "---";
+        }
     }
 
     function reportAtMyLocation(){
         navigator.geolocation.getCurrentPosition(pos=>{
             let lat=pos.coords.latitude; let lng=pos.coords.longitude;
             let popup=`<div class="popup-form">
-                <select id="t"><option>Pothole</option><option>Flooding</option><option>Road Damage</option></select>
-                <textarea id="d" placeholder="Nature of damage..."></textarea>
-                <button class="btn" id="s" style="width:100%">Submit Signal</button>
+                <select id="t"><option>Structural Pothole</option><option>Drainage Failure</option><option>Bridge Anomaly</option></select>
+                <textarea id="d" placeholder="Describe observation..."></textarea>
+                <button class="btn" id="s" style="width:100%">Log Signal</button>
             </div>`;
             L.popup().setLatLng([lat,lng]).setContent(popup).openOn(map);
             setTimeout(()=>{
@@ -287,70 +403,15 @@
         });
     }
 
-    function validateGuardian() {
-        if(document.getElementById('gCode').value === "1974") {
-            isAuthorized = true;
-            document.getElementById('loginOverlay').style.display = 'none';
-            document.getElementById('expertBar').style.display = 'flex';
-            document.getElementById('guardianActions').style.display = 'block';
-            document.getElementById('fundBtn').style.display = 'block';
-        } else { alert("Access Denied."); }
-    }
-
-    function verifyReport() {
-        if(!isAuthorized || !currentMarker) return;
-        const cost = prompt("Enter Technical Resource Estimate (USD):");
-        if(cost) {
-            active++; updateStats();
-            currentMarker.setStyle({color: "#3b82f6", radius: 10});
-            currentMarker.options.vStatus = "VALIDATED DATA";
-            currentMarker.options.vCost = cost;
-            document.getElementById("issueStatusView").innerText = "VALIDATED DATA";
-            document.getElementById("issueCostView").innerText = cost;
-        }
-    }
-
-    function dismissReport() {
-        if(!isAuthorized || !currentMarker) return;
-        if(confirm("Dismiss this technical signal?")) {
-            map.removeLayer(currentMarker);
-            document.getElementById("issueTypeView").innerText = "None";
-        }
-    }
-
-    function generateDossier() {
-        if(!currentMarker) return;
-        
-        document.getElementById('pdfID').innerText = "TR-" + Math.floor(Math.random()*9000 + 1000);
-        document.getElementById('pdfType').innerText = document.getElementById("issueTypeView").innerText;
-        document.getElementById('pdfDesc').innerText = document.getElementById("issueDescView").innerText;
-        document.getElementById('pdfSeverity').innerText = document.getElementById("issueSeverityView").innerText;
-        document.getElementById('pdfCost').innerText = document.getElementById("issueCostView").innerText;
-        
-        const element = document.getElementById('dossierTemplate');
-        element.style.display = 'block';
-
-        const opt = {
-            margin: 0.5,
-            filename: 'FH_Technical_Brief.pdf',
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-        };
-
-        html2pdf().set(opt).from(element).save().then(() => {
-            element.style.display = 'none';
-        });
-    }
-
-    addIssue(18.54,-72.30,"Road Damage","Surface erosion at intersection","Critical");
-    addIssue(18.52,-72.28,"Flooding","Drainage canal overflow","Dangerous");
+    // Initial Seed Data
+    addIssue(18.541,-72.301,"Structural Pothole","Sub-base degradation at Delmas 40B","Critical");
+    addIssue(18.528,-72.285,"Drainage Failure","Blocked culvert leading to localized flooding","Dangerous");
 
 </script>
 
 <footer>
-    <p>FIXHAITI — INFRASTRUCTURE INTELLIGENCE UNIT</p>
-    <p>© 2026. Data strictly for institutional assessment purposes.</p>
+    <p>FixHaiti — Infrastructure Intelligence Unit</p>
+    <p>© 2026. Private Asset Intelligence. All Data Encrypted.</p>
 </footer>
 
 </body>
