@@ -5,7 +5,7 @@
     <title>FixHaiti — Infrastructure Intelligence Platform</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
     
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
         /* --- CORE STYLES --- */
@@ -225,7 +225,7 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-    // --- CANVAS ANIMATION ---
+    // --- ANIMATION & MAP CORE ---
     const canvas=document.getElementById("roadNetwork");
     const ctx=canvas.getContext("2d");
     canvas.width=window.innerWidth; canvas.height=window.innerHeight;
@@ -242,7 +242,6 @@
     }
     animate();
 
-    // --- MAP LOGIC ---
     const map=L.map('mapBox', {zoomControl: false}).setView([18.539, -72.336], 13);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 
@@ -266,6 +265,9 @@
             document.getElementById("issueSeverityView").innerText=severity;
             document.getElementById("issueStatusView").innerText= m.options.vStatus || "Pending Field Audit";
             document.getElementById("issueCostView").innerText= m.options.vCost || "Evaluation Required";
+            // Storing coordinates for the PDF
+            currentMarker.options.lat = lat.toFixed(5);
+            currentMarker.options.lng = lng.toFixed(5);
         });
     }
 
@@ -282,81 +284,105 @@
     function verifyReport() {
         if(!isAuthorized || !currentMarker) return;
         const cost = prompt("Enter Technical Resource Valuation (USD):");
+        const timeline = prompt("Estimated Days to Completion:");
         if(cost) {
             active++; updateStats();
             currentMarker.setStyle({color: "#3b82f6", radius: 9});
             currentMarker.options.vStatus = "AUDITED & VALIDATED";
             currentMarker.options.vCost = cost;
+            currentMarker.options.vTimeline = timeline || "TBD";
             document.getElementById("issueStatusView").innerText = "AUDITED & VALIDATED";
             document.getElementById("issueCostView").innerText = cost;
         }
     }
 
-    // --- DIRECT PDF INJECTION ENGINE ---
+    // --- THE INSTITUTIONAL EXPORT ENGINE ---
     function generateDossier() {
         if(!currentMarker || !currentMarker.options.vCost) {
-            alert("Protocol Alert: Signal must be validated with a valuation before export.");
+            alert("Administrative Protocol: Signal validation required before export.");
             return;
         }
 
-        const refID = "TR-" + Math.floor(Math.random()*9000 + 1000);
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        const refID = "FIX-" + Math.floor(Math.random()*100000);
         const type = document.getElementById("issueTypeView").innerText;
         const desc = document.getElementById("issueDescView").innerText;
-        const severity = document.getElementById("issueSeverityView").innerText;
         const cost = document.getElementById("issueCostView").innerText;
+        const timeline = currentMarker.options.vTimeline || "Assessment Pending";
+        const lat = currentMarker.options.lat;
+        const lng = currentMarker.options.lng;
 
-        // The "Hard-Coded" Template
-        const dossierHTML = `
-            <div style="padding:50px; font-family: 'Helvetica', sans-serif; color: #1e293b; background: #fff;">
-                <div style="border-bottom: 3px solid #0f172a; padding-bottom: 10px; margin-bottom: 30px;">
-                    <h1 style="font-size: 22px; margin:0; color:#0f172a; letter-spacing:1px;">FIXHAITI INFRASTRUCTURE BRIEF</h1>
-                    <p style="font-size: 10px; color:#64748b; text-transform:uppercase;">Data Intelligence Unit | Port-au-Prince</p>
-                </div>
-                
-                <div style="text-align: right; margin-bottom: 40px; font-size: 12px;">
-                    <p><strong>REPORT REF:</strong> ${refID}</p>
-                    <p><strong>DATE:</strong> April 21, 2026</p>
-                </div>
+        // 1. INSTITUTIONAL BORDER & HEADER
+        doc.setDrawColor(15, 23, 42); // Navy Blue
+        doc.setLineWidth(0.5);
+        doc.rect(10, 10, 190, 277); // Page Border
 
-                <div style="margin-bottom: 30px;">
-                    <h3 style="font-size: 11px; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; color:#64748b; text-transform:uppercase;">Technical Parameters</h3>
-                    <table style="width:100%; border-collapse:collapse; margin-top:15px; font-size:13px;">
-                        <tr>
-                            <td style="padding:12px; border:1px solid #e2e8f0; background:#f8fafc; font-weight:bold; width:35%;">Classification</td>
-                            <td style="padding:12px; border:1px solid #e2e8f0;">${type}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding:12px; border:1px solid #e2e8f0; background:#f8fafc; font-weight:bold;">Condition Priority</td>
-                            <td style="padding:12px; border:1px solid #e2e8f0; color:#ef4444; font-weight:bold;">${severity}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding:12px; border:1px solid #e2e8f0; background:#f8fafc; font-weight:bold;">Field Observations</td>
-                            <td style="padding:12px; border:1px solid #e2e8f0;">${desc}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding:12px; border:1px solid #e2e8f0; background:#f8fafc; font-weight:bold;">Resource Valuation</td>
-                            <td style="padding:12px; border:1px solid #e2e8f0; font-size:16px; font-weight:bold; color:#0f172a;">${cost}</td>
-                        </tr>
-                    </table>
-                </div>
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(22);
+        doc.text("FIXHAITI TECHNICAL BRIEF", 20, 30);
+        
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(100);
+        doc.text("INFRASTRUCTURE INTELLIGENCE UNIT // NATIONAL DATA GRID", 20, 36);
 
-                <div style="margin-top: 80px; padding-top:20px; border-top:1px solid #e2e8f0;">
-                    <p style="font-size: 10px; color:#94a3b8; text-transform:uppercase;">Verified Ground-Truth Data Audit</p>
-                    <p style="font-size: 12px; font-weight:bold; color:#0f172a; margin-top:5px;">AUTHORIZATION STATUS: VALIDATED FOR INSTITUTIONAL USE</p>
-                </div>
-            </div>
-        `;
+        doc.setDrawColor(200);
+        doc.line(20, 40, 190, 40);
 
-        const opt = {
-            margin: 0.5,
-            filename: `FixHaiti_Dossier_${refID}.pdf`,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2 },
-            jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+        // 2. REFERENCE BLOCK
+        doc.setTextColor(0);
+        doc.setFont("helvetica", "bold");
+        doc.text("REFERENCE:", 140, 55);
+        doc.setFont("helvetica", "normal");
+        doc.text(refID, 165, 55);
+        
+        doc.setFont("helvetica", "bold");
+        doc.text("DATE:", 140, 60);
+        doc.setFont("helvetica", "normal");
+        doc.text("APRIL 21, 2026", 165, 60);
+
+        // 3. GEODETIC POSITIONING
+        doc.setFillColor(248, 250, 252);
+        doc.rect(20, 70, 170, 15, 'F');
+        doc.setFont("helvetica", "bold");
+        doc.text("COORDINATES:", 25, 79);
+        doc.setFont("helvetica", "normal");
+        doc.text(`LAT ${lat} / LNG ${lng}`, 60, 79);
+
+        // 4. DATA MATRIX (Official Table Style)
+        let yPos = 100;
+        const drawRow = (label, value, isBold = false) => {
+            doc.setDrawColor(226, 232, 240);
+            doc.line(20, yPos + 2, 190, yPos + 2);
+            doc.setFont("helvetica", "bold");
+            doc.text(label, 20, yPos);
+            doc.setFont("helvetica", isBold ? "bold" : "normal");
+            
+            // Handle long descriptions
+            const splitVal = doc.splitTextToSize(value, 110);
+            doc.text(splitVal, 75, yPos);
+            yPos += (splitVal.length * 7);
         };
 
-        // This writes the data to the PDF and saves it immediately
-        html2pdf().from(dossierHTML).set(opt).save();
+        drawRow("CLASSIFICATION", type);
+        drawRow("FIELD OBSERVATION", desc);
+        drawRow("TIMELINE EST.", `${timeline} DAYS`);
+        drawRow("VALUATION (USD)", cost, true);
+
+        // 5. SOVEREIGN CLEARANCE
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(14);
+        doc.text("STATUS: AUDITED & VALIDATED", 20, yPos + 20);
+        
+        doc.setFontSize(8);
+        doc.setTextColor(150);
+        const footerText = "This document is a certified ground-truth report generated by FixHaiti. The data contained herein is intended for official resource allocation and infrastructure planning.";
+        doc.text(doc.splitTextToSize(footerText, 160), 20, 270);
+
+        // 6. SAVE
+        doc.save(`FixHaiti_Official_Brief_${refID}.pdf`);
     }
 
     function dismissReport() {
