@@ -91,7 +91,7 @@
 <section class="hero">
     <canvas id="roadNetwork"></canvas>
     <div class="hero-content">
-        <h1>Help Rebuild Haiti</h1>
+        <h1>Infrastructure Intelligence Platform</h1>
         <p>Report the real issues on our streets. We turn your photos into official data for repair.</p>
         <button class="btn" onclick="document.getElementById('map').scrollIntoView({behavior:'smooth'})">See the Map</button>
     </div>
@@ -100,7 +100,7 @@
 <section id="map" class="map-section">
     <div id="mapBox"></div>
 
-    <button class="btn" onclick="reportAtMyLocation()" style="margin-top:30px; background:transparent; border:1px solid #1e293b; color:#94a3b8;">Add a new Report</button>
+    <button class="btn" onclick="reportAtMyLocation()" style="margin-top:30px; background:transparent; border:1px solid #1e293b; color:#94a3b8;">Report at my Location</button>
 
     <div class="issue-panel">
         <h3>Report Summary</h3>
@@ -116,7 +116,7 @@
         </div>
 
         <div id="guardianActions">
-            <button class="btn btn-verify" onclick="verifyReport()">Confirm & Set Budget</button>
+            <button class="btn btn-verify" onclick="verifyReport()">Validate Report & Set Budget</button>
             <button class="btn btn-dismiss" onclick="dismissReport()">Remove</button>
             <button class="btn" style="background:#fff; color:#000; width:100%; margin-top:15px;" onclick="generateDossier()">Download Official PDF Dossier</button>
         </div>
@@ -173,10 +173,10 @@
 
     function verifyReport() {
         if(!isAuthorized || !currentMarker) return;
-        const cost = prompt("Enter Valuation (USD):");
+        const cost = prompt("Provide Estimation Cost(USD):");
         if(cost) {
             currentMarker.setStyle({color: "#3b82f6", radius: 9});
-            currentMarker.options.vData.status = "VERIFIED BY FIXHAITI";
+            currentMarker.options.vData.status = "VERIFIED";
             currentMarker.options.vData.cost = cost;
             currentMarker.options.vData.agent = "AG-" + Math.floor(Math.random()*900 + 100);
             document.getElementById("issueStatusView").innerText = "VERIFIED BY FIXHAITI";
