@@ -97,8 +97,8 @@
 </section>
 
 <section class="stats">
-    <div class="card"><h2 id="r1">128</h2><p>Signals Reported</p></div>
-    <div class="card"><h2 id="r2">42</h2><p>Verified Assets</p></div>
+    <div class="card"><h2 id="statReports">0</h2><p>Signals Reported</p></div>
+    <div class="card"><h2 id="statVerified">0</h2><p>Verified Assets</p></div>
     <div class="card"><h2>19</h2><p>Active Agents</p></div>
 </section>
 
@@ -131,17 +131,17 @@
     <div class="grid">
         <div class="box" style="border-left: 4px solid #ef4444;">
             <p style="font-size:10px; color:#64748b; text-transform:uppercase;">Critical Exposure</p>
-            <h3 style="font-size:28px; margin:10px 0;">$1.2M</h3>
+            <h3 id="dashExposure" style="font-size:28px; margin:10px 0;">$0</h3>
             <p style="font-size:10px; opacity:0.5;">Unfunded Infrastructure Needs</p>
         </div>
         <div class="box" style="border-left: 4px solid #eab308;">
             <p style="font-size:10px; color:#64748b; text-transform:uppercase;">Pending Verification</p>
-            <h3 style="font-size:28px; margin:10px 0;">14</h3>
+            <h3 id="dashPending" style="font-size:28px; margin:10px 0;">0</h3>
             <p style="font-size:10px; opacity:0.5;">Field Signals Awaiting Audit</p>
         </div>
         <div class="box" style="border-left: 4px solid #3b82f6;">
             <p style="font-size:10px; color:#64748b; text-transform:uppercase;">Verified Dossiers</p>
-            <h3 style="font-size:28px; margin:10px 0;">32</h3>
+            <h3 id="dashVerified" style="font-size:28px; margin:10px 0;">0</h3>
             <p style="font-size:10px; opacity:0.5;">Ready for Institutional Funding</p>
         </div>
     </div>
@@ -149,18 +149,14 @@
     <div class="pipeline-grid">
         <div>
             <h4 style="font-size:10px; color:#00d9ff; margin-bottom:20px; text-transform:uppercase; letter-spacing:2px;">Expert-Verified Pipeline</h4>
-            <div class="box" style="margin-bottom:15px; border:1px solid #3b82f633;">
-                <p style="font-size:9px; color:#3b82f6; font-weight:bold;">PHASE 2: VETTED</p>
-                <h3 style="font-size:16px; margin:5px 0;">RN6 Sunken Road (Dossier #109)</h3>
-                <p style="font-size:12px; opacity:0.6;">Valuation: $12,500 USD</p>
+            <div id="verifiedList">
+                <p style="font-size:11px; opacity:0.3;">No dossiers vetted yet.</p>
             </div>
         </div>
         <div style="background:rgba(255,255,255,0.02); padding:20px; border-radius:12px; border:1px solid #ffffff05;">
-            <h4 style="font-size:10px; color:#64748b; margin-bottom:20px; text-transform:uppercase;">Incoming Signals</h4>
-            <div style="font-size:12px; border-left:2px solid #ef4444; padding-left:15px; margin-bottom:15px;">
-                <p><b>Trash Accumulation - Pétion-Ville</b></p>
-                <p style="opacity:0.5;">12m ago | Priority: High</p>
-            </div>
+            <h4 style="font-size:10px; color:#64748b; margin-bottom:20px; text-transform:uppercase;">Live Signal Feed</h4>
+            <div id="signalFeed">
+                </div>
         </div>
     </div>
 </section>
@@ -177,17 +173,40 @@
     const map=L.map('mapBox', {zoomControl: false}).setView([18.539, -72.336], 13);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 
-    let isAuthorized = false; let currentMarker = null; let tempImageData = null;
+    let isAuthorized = false; 
+    let currentMarker = null; 
+    let tempImageData = null;
+    let stats = { total: 0, pending: 0, verified: 0, exposure: 0 };
 
-    function addIssue(lat,lng,type,desc,status="Pending Audit",photo,cost=null){
+    function updateDashboard() {
+        document.getElementById('statReports').innerText = stats.total;
+        document.getElementById('statVerified').innerText = stats.verified;
+        document.getElementById('dashExposure').innerText = "$" + stats.exposure.toLocaleString();
+        document.getElementById('dashPending').innerText = stats.pending;
+        document.getElementById('dashVerified').innerText = stats.verified;
+    }
+
+    function addIssue(lat,lng,type,desc,status="Pending Audit",photo,cost=0){
         let m=L.circleMarker([lat,lng],{ radius:7, color:status.includes("VERIFIED")?"#3b82f6":"#ef4444", fillOpacity: 0.8, weight: 1 }).addTo(map);
         m.options.vData = { type, desc, status, photo, cost, lat: lat.toFixed(5), lng: lng.toFixed(5) };
+        
+        stats.total++;
+        if(status === "Pending Audit") stats.pending++;
+        updateDashboard();
+
+        // Add to Sidebar Feed
+        const feed = document.getElementById('signalFeed');
+        const item = document.createElement('div');
+        item.style = "font-size:12px; border-left:2px solid #ef4444; padding-left:15px; margin-bottom:15px; opacity:0.8;";
+        item.innerHTML = `<p><b>${type}</b></p><p style="opacity:0.5;">New Signal Captured</p>`;
+        feed.prepend(item);
+
         m.on("click",()=>{
             currentMarker = m; const d = m.options.vData;
             document.getElementById("issueTypeView").innerText = d.type;
             document.getElementById("issueDescView").innerText = d.desc;
             document.getElementById("issueStatusView").innerText = d.status;
-            document.getElementById("issueCostView").innerText = d.cost || "Checking...";
+            document.getElementById("issueCostView").innerText = d.cost ? "$" + d.cost.toLocaleString() : "Awaiting Audit";
             if(d.photo) { document.getElementById("photoContainer").style.display = "block"; document.getElementById("displayPhoto").style.backgroundImage = `url(${d.photo})`; }
             else { document.getElementById("photoContainer").style.display = "none"; }
         });
@@ -203,13 +222,31 @@
 
     function verifyReport() {
         if(!isAuthorized || !currentMarker) return;
-        const val = prompt("Engineering Valuation (USD):");
-        if(val) {
+        const val = prompt("Engineering Valuation (USD Amount Only):");
+        if(val && !isNaN(val)) {
+            const amount = parseInt(val);
             currentMarker.setStyle({color: "#3b82f6", radius: 9});
             currentMarker.options.vData.status = "VERIFIED BY FIXHAITI";
-            currentMarker.options.vData.cost = "$" + val;
+            currentMarker.options.vData.cost = amount;
+            
+            stats.pending--;
+            stats.verified++;
+            stats.exposure += amount;
+            updateDashboard();
+
+            // Add to Verified Pipeline List
+            const vList = document.getElementById('verifiedList');
+            if(stats.verified === 1) vList.innerHTML = ""; // Clear placeholder
+            const vItem = document.createElement('div');
+            vItem.className = "box";
+            vItem.style = "margin-bottom:15px; border:1px solid #3b82f633; padding:15px;";
+            vItem.innerHTML = `<p style="font-size:9px; color:#3b82f6; font-weight:bold;">VETTED</p>
+                               <h3 style="font-size:14px; margin:5px 0;">${currentMarker.options.vData.type}</h3>
+                               <p style="font-size:12px; opacity:0.6;">Valuation: $${amount.toLocaleString()} USD</p>`;
+            vList.prepend(vItem);
+
             document.getElementById("issueStatusView").innerText = "VERIFIED BY FIXHAITI";
-            document.getElementById("issueCostView").innerText = "$" + val;
+            document.getElementById("issueCostView").innerText = "$" + amount.toLocaleString();
         }
     }
 
@@ -226,7 +263,7 @@
         navigator.geolocation.getCurrentPosition(pos=>{
             let lat=pos.coords.latitude; let lng=pos.coords.longitude;
             let popup=`<div class="popup-form">
-                <select id="t"><option>Asphalt Degradation</option><option>Structural Pothole</option><option>Trash Accumulation</option><option>Drainage Blockage</option></select>
+                <select id="t"><option>Structural Pothole</option><option>Asphalt Degradation</option><option>Trash Accumulation</option><option>Drainage Blockage</option></select>
                 <textarea id="d" placeholder="Description..."></textarea>
                 <input type="file" accept="image/*" onchange="handleImage(this)">
                 <div id="pPreview" class="image-preview">Add Photo Evidence</div>
@@ -247,15 +284,15 @@
         doc.setFontSize(22); doc.text("FIXHAITI TECHNICAL BRIEF", 20, 30);
         doc.setFontSize(10); doc.text(`COORDINATES: ${d.lat} / ${d.lng}`, 20, 50);
         doc.text(`ISSUE: ${d.type.toUpperCase()}`, 20, 60);
-        doc.text(`VALUATION: ${d.cost}`, 20, 70);
+        doc.text(`VALUATION: $${d.cost.toLocaleString()}`, 20, 70);
         if(d.photo) { doc.text("EXHIBIT A: SITE EVIDENCE", 20, 90); doc.addImage(d.photo, 'JPEG', 20, 95, 170, 95); }
         doc.save(`FixHaiti_Dossier.pdf`);
     }
 
-    function dismissReport() { if(confirm("Remove signal?")) map.removeLayer(currentMarker); }
+    function dismissReport() { if(confirm("Remove signal?")) { map.removeLayer(currentMarker); stats.total--; if(currentMarker.options.vData.status === "Pending Audit") stats.pending--; updateDashboard(); } }
 
-    // Seed Data
-    addIssue(18.541,-72.301,"Asphalt Degradation","Surface failure at Delmas 40","Pending Audit", null);
+    // Start
+    updateDashboard();
 </script>
 
 <footer>
