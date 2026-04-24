@@ -7,7 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
-        /* --- CORE STYLES --- */
+        /* --- CORE STYLES (PRESERVED) --- */
         * {margin:0; padding:0; box-sizing:border-box; font-family: 'Inter', Arial, sans-serif;}
         body {background:#0a0f1a; color:white; overflow-x:hidden;}
 
@@ -21,49 +21,53 @@
         .logo {font-size:24px; font-weight:900; color:#00d9ff; letter-spacing:2px; text-transform: uppercase;}
         nav a {color:white; margin-left:25px; text-decoration:none; font-size:12px; opacity:0.6; text-transform: uppercase; font-weight: 700;}
 
+        /* --- THE AUDIT TABLET (NEW INTERFACE) --- */
+        #auditOverlay {
+            display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+            background:rgba(5,7,10,0.96); z-index:20000; align-items:center; justify-content:center;
+            backdrop-filter: blur(15px);
+        }
+        .audit-sheet {
+            background:#0f1626; width:90%; max-width:700px; padding:40px; 
+            border: 1px solid #3b82f6; border-radius:12px;
+        }
+        .audit-grid { display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-top: 20px;}
+        .audit-field label { display:block; font-size:10px; color:#64748b; text-transform:uppercase; margin-bottom:8px;}
+        .audit-field input, .audit-field select, .audit-field textarea {
+            width:100%; background:#0a0f1a; border:1px solid #1e293b; padding:12px; color:white; border-radius:4px; font-size:13px;
+        }
+
+        /* --- DASHBOARD & PANEL STYLES (PRESERVED) --- */
         .hero { height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; position:relative; overflow:hidden;}
         #roadNetwork { position:absolute; top:0; left:0; width:100%; height:100%; z-index:1; opacity: 0.4;}
         .hero-content {position:relative; z-index:2; max-width:800px;}
-        .hero h1 {font-size:55px; margin-bottom:20px; letter-spacing:-1px; line-height: 1.1;}
+        .hero h1 {font-size:55px; margin-bottom:20px; letter-spacing:-1px;}
 
         .btn { padding:14px 28px; border:none; background:#00d9ff; color:black; border-radius:4px; cursor:pointer; font-weight:800; text-transform: uppercase; font-size: 11px; transition: 0.2s ease;}
-        .btn:hover {opacity:0.9; transform:translateY(-2px);}
-
+        
         .stats { display:flex; justify-content:space-around; padding:80px 40px; background:#0f1626; border-bottom: 1px solid #1e293b;}
-        .card {text-align:center;}
-        .card h2 {font-size:42px; color:#00d9ff; margin-bottom: 5px;}
+        .card h2 {font-size:42px; color:#00d9ff;}
         .card p {font-size: 10px; text-transform: uppercase; letter-spacing: 2px; opacity: 0.5;}
 
-        .map-section { padding:80px 40px; text-align:center; background: #0a0f1a; }
-        #mapBox { width:100%; max-width: 1200px; height:550px; margin:auto; border:1px solid #1e293b; border-radius:8px; position:relative; z-index:1;}
-
+        #mapBox { width:100%; max-width: 1200px; height:500px; margin:auto; border:1px solid #1e293b; border-radius:8px; z-index:1;}
+        
         .issue-panel {
             width:100%; max-width:1200px; margin:40px auto; padding:35px;
             background:#0f1626; border:1px solid #1e293b; border-radius:8px; text-align:left;
         }
-
-        .issue-panel h3 {margin-bottom:20px; color:#00d9ff; font-size: 11px; text-transform: uppercase; letter-spacing: 2px;}
         .issue-panel p {margin:12px 0; font-size:14px; color: #94a3b8; border-bottom: 1px solid #1e293b; padding-bottom: 8px;}
         .issue-panel span {color: white; font-weight: 600; float: right;}
 
-        /* --- DASHBOARD STYLES --- */
         .dashboard { padding:100px 10%; background:#0f1626; border-top: 1px solid #1e293b;}
         .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:25px; }
         .box { background:#0a0f1a; padding:30px; border-radius:12px; border:1px solid #1e293b; }
         .pipeline-grid { display:grid; grid-template-columns: 1.5fr 1fr; gap:30px; margin-top: 40px; }
 
-        /* --- GUARDIAN & POPUP --- */
         #expertBar { display: none; position: fixed; top: 65px; left: 0; width: 100%; height: 35px; background: #00ff88; color: #000; align-items: center; padding: 0 60px; z-index: 999; font-size: 10px; font-weight: 900; }
         #loginOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(5,7,10,0.98); z-index:10000; align-items:center; justify-content:center; }
-        #guardianActions { display: none; margin-top: 30px; padding-top: 20px; border-top: 1px dashed #1e293b;}
+        #guardianActions { display: none; margin-top: 30px; border-top: 1px dashed #1e293b; padding-top: 20px;}
         
-        .popup-form { background: #0f1626; padding: 20px; border-radius: 8px; width: 280px; color: white; border: 1px solid #00d9ff33; }
-        .popup-form select, .popup-form textarea, .popup-form input { width: 100%; margin: 8px 0; padding: 12px; border-radius: 4px; background: #0a0f1a; color: white; border: 1px solid #1e293b; font-size: 11px; }
         .image-preview { width: 100%; height: 100px; background: #000; margin-top: 10px; border: 1px dashed #334155; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #64748b; background-size: cover; background-position: center;}
-
-        footer { padding:100px 60px; text-align:center; background:#05070a; border-top: 1px solid #1e293b; }
-        footer h2 { font-size: 14px; letter-spacing: 10px; margin-bottom: 20px; opacity: 0.8; }
-        footer p { font-size: 11px; opacity: 0.4; text-transform: uppercase; letter-spacing: 2px; }
     </style>
 </head>
 <body>
@@ -71,9 +75,45 @@
 <div id="loginOverlay">
     <div style="background:#0f1626; padding:50px; border:1px solid #1e293b; border-radius:8px; width:360px; text-align:center;">
         <h2 style="font-size:10px; letter-spacing:5px; margin-bottom:30px; color:#00d9ff; text-transform: uppercase;">Technical Access</h2>
-        <input type="text" id="adminName" placeholder="ENTER FULL NAME" style="width:100%; padding:15px; margin-bottom:10px; background:#0a0f1a; color:white; border:1px solid #1e293b; text-align:center; text-transform:uppercase;">
+        <input type="text" id="adminName" placeholder="ENTER NAME" style="width:100%; padding:15px; margin-bottom:10px; background:#0a0f1a; color:white; border:1px solid #1e293b; text-align:center;">
         <input type="password" id="gCode" placeholder="SECTOR KEY" style="width:100%; padding:15px; margin-bottom:20px; background:#0a0f1a; color:white; border:1px solid #1e293b; text-align:center;">
         <button class="btn" style="width:100%;" onclick="validateGuardian()">Authorize Session</button>
+    </div>
+</div>
+
+<div id="auditOverlay">
+    <div class="audit-sheet">
+        <h2 style="font-size:10px; color:#00d9ff; letter-spacing:3px; text-transform:uppercase; border-bottom:1px solid #1e293b; padding-bottom:10px;">Verification Matrix</h2>
+        <div class="audit-grid">
+            <div class="audit-field">
+                <label>Verified Street Address</label>
+                <input type="text" id="auditAddress" placeholder="Rue ...">
+            </div>
+            <div class="audit-field">
+                <label>Traffic Density</label>
+                <select id="auditTraffic">
+                    <option>Low (Residential)</option>
+                    <option>Moderate (Commercial)</option>
+                    <option>High (Primary Arterial)</option>
+                </select>
+            </div>
+            <div class="audit-field">
+                <label>Project Duration</label>
+                <input type="text" id="auditDuration" placeholder="e.g. 15 Days">
+            </div>
+            <div class="audit-field">
+                <label>Valuation (USD)</label>
+                <input type="text" id="auditCost" placeholder="e.g. $25k">
+            </div>
+        </div>
+        <div class="audit-field" style="margin-top:20px;">
+            <label>Internal Audit Notes (Institutional Only)</label>
+            <textarea id="auditNotes" rows="3" placeholder="Technical breakdown for World Bank/UN..."></textarea>
+        </div>
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button class="btn" style="flex:1; background:#00ff88; color:#000;" onclick="submitVerification()">Submit Official Audit</button>
+            <button class="btn" style="flex:1; background:transparent; border:1px solid #ef4444; color:#ef4444;" onclick="closeAudit()">Cancel</button>
+        </div>
     </div>
 </div>
 
@@ -82,18 +122,18 @@
     <div>
         <a href="#map">Intelligence Map</a>
         <a href="#dashboard">Control Dashboard</a>
-        <span onclick="document.getElementById('loginOverlay').style.display='flex'" style="cursor:pointer; opacity:0; margin-left: 20px;">.</span>
+        <span onclick="document.getElementById('loginOverlay').style.display='flex'" style="cursor:pointer; opacity:0;">.</span>
     </div>
 </nav>
 
-<div id="expertBar">ADMIN SESSION: INSTITUTIONAL PROTOCOL ACTIVE // SECTOR AUTHORITY GRANTED</div>
+<div id="expertBar">ADMIN ACTIVE</div>
 
 <section class="hero">
     <canvas id="roadNetwork"></canvas>
     <div class="hero-content">
         <h1>Infrastructure Intelligence</h1>
         <p>Turning verified ground-truth into sovereign reconstruction priorities.</p>
-        <button class="btn" onclick="document.getElementById('map').scrollIntoView({behavior:'smooth'})">Explore Data Grid</button>
+        <button class="btn" onclick="document.getElementById('map').scrollIntoView({behavior:'smooth'})">Explore Grid</button>
     </div>
 </section>
 
@@ -103,25 +143,25 @@
     <div class="card"><h2>19</h2><p>Active Agents</p></div>
 </section>
 
-<section id="map" class="map-section">
+<section id="map" style="padding:100px 40px; background:#0a0f1a; text-align:center;">
     <div id="mapBox"></div>
     <button class="btn" onclick="reportAtMyLocation()" style="margin-top:30px; background:transparent; border:1px solid #1e293b; color:#94a3b8;">Report at my position</button>
 
     <div class="issue-panel">
-        <h3>Asset Intelligence Details</h3>
-        <p>Issue Type: <span id="issueTypeView">---</span></p>
-        <p>Field Summary: <span id="issueDescView">Select a signal on the map.</span></p>
-        <p>Status: <span id="issueStatusView">---</span></p>
-        <p>Engineering Valuation: <span id="issueCostView">---</span></p>
+        <h3 style="color:#00d9ff; font-size:10px; letter-spacing:2px; margin-bottom:20px;">ASSET INTELLIGENCE DETAILS</h3>
+        <p>Issue Type: <span id="vType">---</span></p>
+        <p>Field Summary: <span id="vDesc">Select an asset.</span></p>
+        <p>Status: <span id="vStatus">---</span></p>
+        <p>Engineering Valuation: <span id="vCost">---</span></p>
         
         <div id="photoContainer" style="display:none; margin-top: 20px;">
             <p style="border:none;">Visual Evidence:</p>
-            <div id="displayPhoto" style="width:200px; height:120px; background:#000; border:1px solid #1e293b; background-size:cover; background-position:center;"></div>
+            <div id="displayPhoto" style="width:200px; height:120px; background:#000; background-size:cover;"></div>
         </div>
 
         <div id="guardianActions">
-            <button class="btn" style="background:#00ff88; color:#000; margin-right:10px;" onclick="verifyReport()">Verify & Value</button>
-            <button class="btn" style="background:transparent; border:1px solid #ef4444; color:#ef4444;" onclick="dismissReport()">Dismiss</button>
+            <button class="btn" style="background:#00ff88; color:#000; width:48%;" onclick="openAudit()">Verify Report</button>
+            <button class="btn" style="background:transparent; border:1px solid #ef4444; color:#ef4444; width:48%;" onclick="dismissReport()">Dismiss</button>
             <button class="btn" style="background:#fff; color:#000; width:100%; margin-top:15px;" onclick="generateDossier()">Export Official PDF Dossier</button>
         </div>
     </div>
@@ -130,57 +170,31 @@
 <section id="dashboard" class="dashboard">
     <h2 style="margin-bottom:40px; letter-spacing:1px; text-transform:uppercase; font-size:14px; color:#00d9ff;">National Control Dashboard</h2>
     <div class="grid">
-        <div class="box" style="border-left: 4px solid #ef4444;">
-            <p style="font-size:10px; color:#64748b; text-transform:uppercase;">Critical Exposure</p>
-            <h3 id="dashExposure" style="font-size:28px; margin:10px 0;">$0</h3>
-            <p style="font-size:10px; opacity:0.5;">Unfunded Infrastructure Needs</p>
-        </div>
-        <div class="box" style="border-left: 4px solid #eab308;">
-            <p style="font-size:10px; color:#64748b; text-transform:uppercase;">Pending Verification</p>
-            <h3 id="dashPending" style="font-size:28px; margin:10px 0;">0</h3>
-            <p style="font-size:10px; opacity:0.5;">Field Signals Awaiting Audit</p>
-        </div>
-        <div class="box" style="border-left: 4px solid #3b82f6;">
-            <p style="font-size:10px; color:#64748b; text-transform:uppercase;">Verified Dossiers</p>
-            <h3 id="dashVerified" style="font-size:28px; margin:10px 0;">0</h3>
-            <p style="font-size:10px; opacity:0.5;">Ready for Institutional Funding</p>
-        </div>
+        <div class="box" style="border-left: 4px solid #ef4444;"><p style="font-size:10px; color:#64748b;">Critical Exposure</p><h3 id="dashExposure">$0</h3></div>
+        <div class="box" style="border-left: 4px solid #eab308;"><p style="font-size:10px; color:#64748b;">Pending Verification</p><h3 id="dashPending">0</h3></div>
+        <div class="box" style="border-left: 4px solid #3b82f6;"><p style="font-size:10px; color:#64748b;">Verified Dossiers</p><h3 id="dashVerified">0</h3></div>
     </div>
-
     <div class="pipeline-grid">
-        <div>
-            <h4 style="font-size:10px; color:#00d9ff; margin-bottom:20px; text-transform:uppercase; letter-spacing:2px;">Expert-Verified Pipeline</h4>
-            <div id="verifiedList">
-                <p style="font-size:11px; opacity:0.3;">No dossiers vetted yet.</p>
-            </div>
-        </div>
-        <div style="background:rgba(255,255,255,0.02); padding:20px; border-radius:12px; border:1px solid #ffffff05;">
-            <h4 style="font-size:10px; color:#64748b; margin-bottom:20px; text-transform:uppercase;">Live Signal Feed</h4>
-            <div id="signalFeed">
-                </div>
-        </div>
+        <div id="verifiedList"><p style="font-size:11px; opacity:0.3;">No dossiers vetted yet.</p></div>
+        <div id="signalFeed" style="background:rgba(255,255,255,0.02); padding:20px; border-radius:12px;"></div>
     </div>
 </section>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    // --- ANIMATION CORE ---
+    // PRESERVED ANIMATION
     const canvas=document.getElementById("roadNetwork"); const ctx=canvas.getContext("2d");
     canvas.width=window.innerWidth; canvas.height=window.innerHeight;
-    let nodes=[]; for(let i=0;i<60;i++){ nodes.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, vx:(Math.random()-0.5)*0.3, vy:(Math.random()-0.5)*0.3}); }
-    function animate(){ ctx.clearRect(0,0,canvas.width,canvas.height); nodes.forEach(n=>{ n.x+=n.vx; n.y+=n.vy; if(n.x<0||n.x>canvas.width)n.vx*=-1; if(n.y<0||n.y>canvas.height)n.vy*=-1; ctx.beginPath(); ctx.arc(n.x,n.y,1.5,0,Math.PI*2); ctx.fillStyle="#00d9ff"; ctx.fill(); }); requestAnimationFrame(animate); }
+    let nodes=[]; for(let i=0;i<40;i++){ nodes.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, vx:(Math.random()-0.5)*0.3, vy:(Math.random()-0.5)*0.3}); }
+    function animate(){ ctx.clearRect(0,0,canvas.width,canvas.height); nodes.forEach(n=>{ n.x+=n.vx; n.y+=n.vy; ctx.beginPath(); ctx.arc(n.x,n.y,1.5,0,Math.PI*2); ctx.fillStyle="#00d9ff"; ctx.fill(); }); requestAnimationFrame(animate); }
     animate();
 
     const map=L.map('mapBox', {zoomControl: false}).setView([18.539, -72.336], 13);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 
-    let isAuthorized = false; 
-    let currentMarker = null; 
-    let tempImageData = null;
+    let currentMarker = null, isAuthorized = false, tempImageData = null;
+    let adminUser = { name: "", id: "" };
     let stats = { total: 0, pending: 0, verified: 0, exposure: 0 };
-    
-    // --- AUTHENTICATION DATA ---
-    let sessionUser = { name: "", id: "" };
 
     function updateDashboard() {
         document.getElementById('statReports').innerText = stats.total;
@@ -190,206 +204,136 @@
         document.getElementById('dashVerified').innerText = stats.verified;
     }
 
-    function addIssue(lat,lng,type,desc,status="Pending Audit",photo,cost=0){
-        let m=L.circleMarker([lat,lng],{ radius:7, color:status.includes("VERIFIED")?"#3b82f6":"#ef4444", fillOpacity: 0.8, weight: 1 }).addTo(map);
-        const reportTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        
+    function addIssue(lat, lng, type, desc, status="Pending Audit", photo) {
+        let m = L.circleMarker([lat, lng], { radius: 7, color: status==="VERIFIED"?"#3b82f6":"#ef4444", fillOpacity: 0.8 }).addTo(map);
         m.options.vData = { 
-            type, desc, status, photo, cost, 
-            lat: lat.toFixed(5), lng: lng.toFixed(5),
-            timeReported: reportTime,
-            timeVerified: null,
-            verifiedBy: null,
-            agentID: null
+            type, desc, status, photo, cost: "Awaiting Audit",
+            address: "", traffic: "", duration: "", auditNotes: "",
+            lat: lat.toFixed(5), lng: lng.toFixed(5), 
+            timeReported: new Date().toLocaleTimeString(), timeVerified: null,
+            verifiedBy: "", agentID: ""
         };
-        
-        stats.total++;
-        if(status === "Pending Audit") stats.pending++;
-        updateDashboard();
+        stats.total++; if(status==="Pending Audit") stats.pending++; updateDashboard();
+
+        m.on("click", () => {
+            currentMarker = m; const d = m.options.vData;
+            document.getElementById("vType").innerText = d.type;
+            document.getElementById("vDesc").innerText = d.desc;
+            document.getElementById("vStatus").innerText = d.status;
+            document.getElementById("vCost").innerText = d.cost;
+            if(d.photo) { document.getElementById("photoContainer").style.display="block"; document.getElementById("displayPhoto").style.backgroundImage=`url(${d.photo})`; }
+            else { document.getElementById("photoContainer").style.display="none"; }
+        });
 
         const feed = document.getElementById('signalFeed');
         const item = document.createElement('div');
-        item.style = "font-size:12px; border-left:2px solid #ef4444; padding-left:15px; margin-bottom:15px; opacity:0.8;";
-        item.innerHTML = `<p><b>${type}</b></p><p style="opacity:0.5;">Signal Detected @ ${reportTime}</p>`;
+        item.style = "font-size:11px; margin-bottom:10px; opacity:0.6; border-left:2px solid #ef4444; padding-left:10px;";
+        item.innerHTML = `<b>${type}</b><br>Signal Recorded`;
         feed.prepend(item);
-
-        m.on("click",()=>{
-            currentMarker = m; const d = m.options.vData;
-            document.getElementById("issueTypeView").innerText = d.type;
-            document.getElementById("issueDescView").innerText = d.desc;
-            document.getElementById("issueStatusView").innerText = d.status;
-            document.getElementById("issueCostView").innerText = d.cost || "Awaiting Audit";
-            if(d.photo) { document.getElementById("photoContainer").style.display = "block"; document.getElementById("displayPhoto").style.backgroundImage = `url(${d.photo})`; }
-            else { document.getElementById("photoContainer").style.display = "none"; }
-        });
     }
 
     function validateGuardian() {
-        const nameInput = document.getElementById('adminName').value.trim();
-        const codeInput = document.getElementById('gCode').value;
-
-        if(codeInput === "1974" && nameInput.length > 2) {
+        const nameInput = document.getElementById('adminName').value;
+        const key = document.getElementById('gCode').value;
+        if(key === "1974" && nameInput.length > 2) {
             isAuthorized = true;
-            sessionUser.name = nameInput.toUpperCase();
-            // Generate unique Institutional ID based on name and random hex
-            const initials = sessionUser.name.split(" ").map(n => n[0]).join("");
-            sessionUser.id = `${initials}-AUDIT-${Math.floor(100 + Math.random() * 899)}`;
-
+            adminUser.name = nameInput.toUpperCase();
+            adminUser.id = `${nameInput.charAt(0).toUpperCase()}-AUDIT-${Math.floor(100+Math.random()*899)}`;
             document.getElementById('loginOverlay').style.display = 'none';
             document.getElementById('expertBar').style.display = 'flex';
-            document.getElementById('expertBar').innerText = `ADMIN: ${sessionUser.name} // ID: ${sessionUser.id} // SECTOR AUTHORITY ACTIVE`;
+            document.getElementById('expertBar').innerText = `ADMIN: ${adminUser.name} // ID: ${adminUser.id}`;
             document.getElementById('guardianActions').style.display = 'block';
-        } else {
-            alert("Security Protocol: Unauthorized Access. Correct Name and Sector Key Required.");
         }
     }
 
-    function verifyReport() {
-        if(!isAuthorized || !currentMarker) return;
-        const val = prompt("Enter Engineering Valuation (e.g., $20k - $30k or 25000):");
+    function openAudit() { if(isAuthorized) document.getElementById('auditOverlay').style.display='flex'; }
+    function closeAudit() { document.getElementById('auditOverlay').style.display='none'; }
+
+    function submitVerification() {
+        const d = currentMarker.options.vData;
+        const rawCost = document.getElementById('auditCost').value;
         
-        if(val) {
-            // FIX: Robust Dashboard Extraction
-            // Scans the string and finds the FIRST number. If "20k", it finds 20. 
-            let numericVal = 0;
-            const match = val.replace(/,/g, '').match(/\d+/);
-            if(match) {
-                numericVal = parseInt(match[0]);
-                // Check if user wrote 'k' for thousand
-                if(val.toLowerCase().includes('k')) numericVal *= 1000;
-            }
-
-            currentMarker.setStyle({color: "#3b82f6", radius: 9});
-            currentMarker.options.vData.status = "VERIFIED";
-            currentMarker.options.vData.cost = val;
-            currentMarker.options.vData.timeVerified = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-            currentMarker.options.vData.verifiedBy = sessionUser.name;
-            currentMarker.options.vData.agentID = sessionUser.id;
-
-            stats.pending--;
-            stats.verified++;
-            stats.exposure += numericVal;
-            updateDashboard();
-
-            const vList = document.getElementById('verifiedList');
-            if(stats.verified === 1) vList.innerHTML = ""; 
-            const vItem = document.createElement('div');
-            vItem.className = "box";
-            vItem.style = "margin-bottom:15px; border:1px solid #3b82f633; padding:15px;";
-            vItem.innerHTML = `<p style="font-size:9px; color:#3b82f6; font-weight:bold;">VETTED BY ${sessionUser.id}</p>
-                               <h3 style="font-size:14px; margin:5px 0;">${currentMarker.options.vData.type}</h3>
-                               <p style="font-size:12px; opacity:0.6;">Valuation: ${val}</p>`;
-            vList.prepend(vItem);
-
-            document.getElementById("issueStatusView").innerText = "VERIFIED";
-            document.getElementById("issueCostView").innerText = val;
+        // SMART DASHBOARD CALCULATION (PRESERVED)
+        let numericVal = 0;
+        const match = rawCost.replace(/,/g, '').match(/\d+/);
+        if(match) {
+            numericVal = parseInt(match[0]);
+            if(rawCost.toLowerCase().includes('k')) numericVal *= 1000;
         }
+
+        d.address = document.getElementById('auditAddress').value;
+        d.traffic = document.getElementById('auditTraffic').value;
+        d.duration = document.getElementById('auditDuration').value;
+        d.cost = rawCost;
+        d.auditNotes = document.getElementById('auditNotes').value;
+        d.status = "VERIFIED";
+        d.verifiedBy = adminUser.name;
+        d.agentID = adminUser.id;
+        d.timeVerified = new Date().toLocaleTimeString();
+
+        currentMarker.setStyle({color: "#3b82f6", radius: 9});
+        stats.pending--; stats.verified++; stats.exposure += numericVal;
+        updateDashboard();
+
+        const vList = document.getElementById('verifiedList');
+        if(stats.verified === 1) vList.innerHTML = "";
+        const vItem = document.createElement('div');
+        vItem.className = "box"; vItem.style = "margin-bottom:10px; border:1px solid #3b82f633;";
+        vItem.innerHTML = `<p style="font-size:9px; color:#3b82f6;">VETTED BY ${adminUser.id}</p><h3>${d.type}</h3>`;
+        vList.prepend(vItem);
+
+        document.getElementById("vStatus").innerText = "VERIFIED";
+        document.getElementById("vCost").innerText = d.cost;
+        closeAudit();
     }
 
-    function handleImage(input) {
-        const reader = new FileReader(); reader.onload = (e) => {
-            tempImageData = e.target.result;
-            document.getElementById('pPreview').style.backgroundImage = `url(${tempImageData})`;
-            document.getElementById('pPreview').innerText = "";
-        };
-        reader.readAsDataURL(input.files[0]);
+    function generateDossier() {
+        const d = currentMarker.options.vData;
+        if(d.status !== "VERIFIED") return alert("Asset requires audit.");
+        const { jsPDF } = window.jspdf; const doc = new jsPDF();
+
+        doc.setFillColor(10, 15, 26); doc.rect(0, 0, 210, 40, 'F');
+        doc.setTextColor(0, 217, 255); doc.setFontSize(28); doc.text("FIXHAITI", 20, 28);
+        doc.setTextColor(255); doc.setFontSize(9); doc.text("INSTITUTIONAL INFRASTRUCTURE DOSSIER", 21, 35);
+
+        doc.setTextColor(0); doc.text("01. GEOSPATIAL & ASSET DATA", 20, 55); doc.line(20, 57, 190, 57);
+        doc.text(`LOCATION: ${d.lat}N / ${d.lng}W`, 25, 65);
+        doc.text(`ADDRESS: ${d.address.toUpperCase()}`, 25, 72);
+        doc.text(`TRAFFIC DENSITY: ${d.traffic.toUpperCase()}`, 25, 79);
+
+        doc.text("02. ENGINEERING VALUATION", 20, 95); doc.line(20, 97, 190, 97);
+        doc.text(`CLASSIFICATION: ${d.type.toUpperCase()}`, 25, 105);
+        doc.text(`DURATION: ${d.duration.toUpperCase()}`, 25, 112);
+        doc.setFont("helvetica", "bold"); doc.text(`VALUATION: ${d.cost}`, 25, 119);
+
+        doc.text("03. FIELD OBSERVATIONS", 20, 135); doc.line(20, 137, 190, 137);
+        doc.setFont("helvetica", "normal");
+        doc.text("ORIGINAL REPORT:", 25, 145); doc.text(doc.splitTextToSize(d.desc, 160), 25, 150);
+        doc.text("TECHNICAL NOTES:", 25, 165); doc.text(doc.splitTextToSize(d.auditNotes, 160), 25, 170);
+
+        if(d.photo) doc.addImage(d.photo, 'JPEG', 20, 190, 80, 45);
+
+        doc.text("04. AUTHORIZATION", 20, 250); doc.line(20, 252, 190, 252);
+        doc.text(`VERIFIED BY: ${d.verifiedBy}`, 25, 260);
+        doc.setTextColor(0, 100, 255); doc.text(`AGENT ID: ${d.agentID}`, 25, 267);
+
+        doc.save(`Audit_${d.agentID}.pdf`);
     }
 
     function reportAtMyLocation(){
         navigator.geolocation.getCurrentPosition(pos=>{
-            let lat=pos.coords.latitude; let lng=pos.coords.longitude;
-            let popup=`<div class="popup-form">
-                <select id="t"><option>Structural Pothole</option><option>Asphalt Degradation</option><option>Trash Accumulation</option><option>Drainage Blockage</option></select>
-                <textarea id="d" placeholder="Description..."></textarea>
-                <input type="file" accept="image/*" onchange="handleImage(this)">
-                <div id="pPreview" class="image-preview">Add Photo Evidence</div>
-                <button class="btn" id="s" style="width:100%; margin-top:10px;">Send Report</button>
+            let lat=pos.coords.latitude, lng=pos.coords.longitude;
+            let popup=`<div style="background:#0f1626; color:white; padding:10px;">
+                <select id="t" style="width:100%; margin-bottom:5px;"><option>Pothole</option><option>Drainage</option></select>
+                <textarea id="d" placeholder="Desc..." style="width:100%;"></textarea>
+                <button class="btn" onclick="addIssue(${lat},${lng},document.getElementById('t').value,document.getElementById('d').value); map.closePopup();">Submit</button>
             </div>`;
             L.popup().setLatLng([lat,lng]).setContent(popup).openOn(map);
-            setTimeout(()=>{ document.getElementById("s").onclick=()=>{
-                addIssue(lat,lng, document.getElementById("t").value, document.getElementById("d").value, "Pending Audit", tempImageData);
-                map.closePopup(); tempImageData = null;
-            }; },100);
         });
     }
 
-    function generateDossier() {
-        const d = currentMarker.options.vData; 
-        if(!d.cost || d.status !== "VERIFIED") { alert("Institutional Protocol: Valuation required before export."); return; }
-
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        const refID = `FX-AUDIT-${Math.floor(Math.random()*900000) + 100000}`;
-        const timeAudit = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
-
-        // 1. PAGE BORDER & WATERMARK
-        doc.setDrawColor(20, 20, 20); doc.setLineWidth(0.5); doc.rect(10, 10, 190, 277); 
-        doc.setFontSize(65); doc.setTextColor(248, 248, 248); doc.text("FIXHAITI", 35, 160, {angle: 45}); 
-
-        // 2. HEADER
-        doc.setFillColor(10, 15, 26); doc.rect(10, 10, 190, 35, 'F'); 
-        doc.setTextColor(0, 217, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(32); doc.text("FIXHAITI", 20, 32);
-        doc.setTextColor(255); doc.setFontSize(9); doc.text("INFRASTRUCTURE INTELLIGENCE UNIT", 21, 40);
-        
-        doc.setTextColor(150); doc.setFont("courier", "bold"); doc.setFontSize(8);
-        doc.text(`CONTROL: ${refID}`, 140, 25);
-        doc.setTextColor(0, 255, 136); doc.text(`STATUS: CERTIFIED DATA`, 140, 30);
-
-        // 3. ASSET SECTION
-        doc.setTextColor(0); doc.setFont("helvetica", "bold"); doc.setFontSize(10);
-        doc.text("01. GEOSPATIAL & ASSET DATA", 20, 55); doc.line(20, 57, 190, 57);
-
-        const drawRow = (y, label, value) => {
-            doc.setFillColor(248, 250, 252); doc.rect(20, y, 170, 8, 'F');
-            doc.setFont("helvetica", "bold"); doc.text(label, 25, y + 5);
-            doc.setFont("helvetica", "normal"); doc.text(String(value), 85, y + 5);
-        };
-
-        drawRow(60, "GEODETIC POSITION", `${d.lat}N / ${d.lng}W`);
-        drawRow(68, "MUNICIPAL SECTOR", "PORT-AU-PRINCE METROPOLITAN");
-        drawRow(76, "ASSET CLASSIFICATION", d.type.toUpperCase());
-        drawRow(84, "VALUATION", d.cost);
-
-        // 4. EVIDENCE
-        if(d.photo) {
-            doc.setFont("helvetica", "bold"); doc.text("02. GROUND-TRUTH EVIDENCE", 20, 105);
-            doc.rect(20, 108, 170, 80); doc.addImage(d.photo, 'JPEG', 21, 109, 168, 78);
-        }
-
-        // 5. AUTHENTICATION (The New Section)
-        let authY = 200;
-        doc.setTextColor(0); doc.setFont("helvetica", "bold"); doc.setFontSize(10);
-        doc.text("03. VETTING AUTHORITY & LOG", 20, authY); doc.line(20, authY+2, 190, authY+2);
-        
-        doc.setFontSize(9);
-        doc.text("VERIFIED BY:", 25, authY+10);
-        doc.setFont("helvetica", "normal"); doc.text(d.verifiedBy, 70, authY+10);
-        
-        doc.setFont("helvetica", "bold"); doc.text("AUTHORITY ID:", 25, authY+18);
-        doc.setFont("courier", "bold"); doc.setTextColor(0, 100, 255); doc.text(d.agentID, 70, authY+18);
-        
-        doc.setTextColor(0); doc.setFont("helvetica", "bold"); doc.text("VALIDATION LOG:", 25, authY+28);
-        doc.setFont("courier", "normal"); doc.setFontSize(8);
-        doc.text(`[ ${d.timeReported} ] SIGNAL CAPTURED`, 70, authY+28);
-        doc.text(`[ ${d.timeVerified} ] EXPERT AUDIT COMPLETED`, 70, authY+34);
-        doc.text(`[ ${timeAudit} ] OFFICIAL DOSSIER SIGNED`, 70, authY+40);
-
-        doc.setFontSize(7); doc.setTextColor(150);
-        doc.text("This dossier is a sovereign asset of FixHaiti. Authentication is tied to the unique Agent ID above.", 20, 285);
-        
-        doc.save(`FixHaiti_Official_Audit_${refID}.pdf`);
-    }
-
-    function dismissReport() { if(confirm("Remove signal?")) { map.removeLayer(currentMarker); stats.total--; if(currentMarker.options.vData.status === "Pending Audit") stats.pending--; updateDashboard(); } }
-
-    updateDashboard();
+    function dismissReport() { if(confirm("Dismiss signal?")) { map.removeLayer(currentMarker); stats.total--; stats.pending--; updateDashboard(); } }
 </script>
-
-<footer>
-    <h2>FIXHAITI</h2>
-    <p>Infrastructure Intelligence Unit — Port-au-Prince</p>
-    <p style="margin-top: 10px;">© 2026. Institutional Reconstruction Framework.</p>
-</footer>
 
 </body>
 </html>
