@@ -22,64 +22,18 @@
         nav a {color:white; margin-left:25px; text-decoration:none; font-size:12px; opacity:0.6; text-transform: uppercase; font-weight: 700;}
 
         /* --- THE REPORTING POPUP --- */
-        .popup-form { 
-            background: #0f1626; 
-            padding: 25px; 
-            border-radius: 8px; 
-            width: 320px; 
-            color: white; 
-            border: 1px solid #00d9ff33; 
-        }
-        .popup-form select, .popup-form textarea, .popup-form input { 
-            width: 100%; 
-            margin: 10px 0; 
-            padding: 14px; 
-            border-radius: 4px; 
-            background: #0a0f1a; 
-            color: white; 
-            border: 1px solid #1e293b; 
-            font-size: 12px; 
-        }
-        .image-preview { 
-            width: 100%; 
-            height: 120px; 
-            background: #000; 
-            margin-top: 10px; 
-            border: 1px dashed #334155; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 10px; 
-            color: #64748b; 
-            background-size: cover; 
-            background-position: center;
-        }
+        .popup-form { background: #0f1626; padding: 25px; border-radius: 8px; width: 320px; color: white; border: 1px solid #00d9ff33; }
+        .popup-form select, .popup-form textarea, .popup-form input { width: 100%; margin: 10px 0; padding: 14px; border-radius: 4px; background: #0a0f1a; color: white; border: 1px solid #1e293b; font-size: 12px; }
+        .image-preview { width: 100%; height: 120px; background: #000; margin-top: 10px; border: 1px dashed #334155; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #64748b; background-size: cover; background-position: center; }
 
         /* --- THE AUDIT TABLET --- */
-        #auditOverlay {
-            display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
-            background:rgba(5,7,10,0.96); z-index:20000; align-items:center; justify-content:center;
-            backdrop-filter: blur(15px);
-        }
-        .audit-sheet {
-            background:#0f1626; width:90%; max-width:750px; padding:45px; 
-            border: 1px solid #3b82f6; border-radius:12px;
-        }
+        #auditOverlay { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(5,7,10,0.96); z-index:20000; align-items:center; justify-content:center; backdrop-filter: blur(15px); }
+        .audit-sheet { background:#0f1626; width:90%; max-width:750px; padding:45px; border: 1px solid #3b82f6; border-radius:12px; max-height: 90vh; overflow-y: auto; }
         .audit-grid { display:grid; grid-template-columns: 1fr 1fr; gap:25px; margin-top: 25px;}
         .audit-field label { display:block; font-size:10px; color:#64748b; text-transform:uppercase; margin-bottom:8px; font-weight: 800;}
-        .audit-field input, .audit-field select, .audit-field textarea {
-            width:100%; background:#0a0f1a; border:1px solid #1e293b; padding:15px; color:white; border-radius:4px; font-size:13px;
-        }
+        .audit-field input, .audit-field select, .audit-field textarea { width:100%; background:#0a0f1a; border:1px solid #1e293b; padding:15px; color:white; border-radius:4px; font-size:13px; }
 
-        .machinery-checklist {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-            margin-top: 15px;
-            background: #0a0f1a;
-            padding: 15px;
-            border: 1px solid #1e293b;
-        }
+        .machinery-checklist { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; background: #0a0f1a; padding: 15px; border: 1px solid #1e293b; }
         .machinery-item { font-size: 10px; color: #94a3b8; display: flex; align-items: center; gap: 8px; text-transform: uppercase; cursor: pointer;}
         .machinery-item input { accent-color: #00d9ff; width: 14px; height: 14px; }
 
@@ -97,10 +51,7 @@
 
         #mapBox { width:100%; max-width: 1200px; height:550px; margin:auto; border:1px solid #1e293b; border-radius:8px; z-index:1;}
         
-        .issue-panel {
-            width:100%; max-width:1200px; margin:40px auto; padding:40px;
-            background:#0f1626; border:1px solid #1e293b; border-radius:8px; text-align:left;
-        }
+        .issue-panel { width:100%; max-width:1200px; margin:40px auto; padding:40px; background:#0f1626; border:1px solid #1e293b; border-radius:8px; text-align:left; }
         .issue-panel p {margin:14px 0; font-size:14px; color: #94a3b8; border-bottom: 1px solid #1e293b; padding-bottom: 10px;}
         .issue-panel span {color: white; font-weight: 600; float: right;}
 
@@ -127,52 +78,74 @@
 
 <div id="auditOverlay">
     <div class="audit-sheet">
-        <h2 style="font-size:11px; color:#00d9ff; letter-spacing:3px; text-transform:uppercase; border-bottom:1px solid #1e293b; padding-bottom:15px;">Institutional Verification Matrix</h2>
-        <div class="audit-grid">
-            <div class="audit-field">
-                <label>Verified Street Address</label>
-                <input type="text" id="auditAddress" placeholder="e.g. Avenue Jean-Paul II">
+        <h2 id="auditTitle" style="font-size:11px; color:#00d9ff; letter-spacing:3px; text-transform:uppercase; border-bottom:1px solid #1e293b; padding-bottom:15px;">Institutional Verification Matrix</h2>
+        
+        <div id="baseAuditFields">
+            <div class="audit-grid">
+                <div class="audit-field">
+                    <label>Verified Street Address</label>
+                    <input type="text" id="auditAddress" placeholder="e.g. Avenue Jean-Paul II">
+                </div>
+                <div class="audit-field">
+                    <label>Traffic Density</label>
+                    <select id="auditTraffic">
+                        <option>Low (Residential Sector)</option>
+                        <option>Moderate (Commercial Zone)</option>
+                        <option>High (Main Arterial Road)</option>
+                        <option>Critical (Transit Corridor)</option>
+                    </select>
+                </div>
+                <div class="audit-field">
+                    <label>Project Duration Estimate</label>
+                    <input type="text" id="auditDuration" placeholder="e.g. 21 Working Days">
+                </div>
+                <div class="audit-field">
+                    <label>Engineering Valuation (USD)</label>
+                    <input type="text" id="auditCost" placeholder="e.g. $45,000">
+                </div>
             </div>
-            <div class="audit-field">
-                <label>Traffic Density</label>
-                <select id="auditTraffic">
-                    <option>Low (Residential Sector)</option>
-                    <option>Moderate (Commercial Zone)</option>
-                    <option>High (Main Arterial Road)</option>
-                    <option>Critical (Transit Corridor)</option>
-                </select>
+
+            <div class="audit-field" style="margin-top:20px;">
+                <label>Required Logistics & Heavy Machinery</label>
+                <div class="machinery-checklist" id="machineryList">
+                    <label class="machinery-item"><input type="checkbox" value="Excavator"> Excavator</label>
+                    <label class="machinery-item"><input type="checkbox" value="Asphalt Paver"> Asphalt Paver</label>
+                    <label class="machinery-item"><input type="checkbox" value="Steam Roller"> Steam Roller</label>
+                    <label class="machinery-item"><input type="checkbox" value="Dump Truck"> Dump Truck</label>
+                    <label class="machinery-item"><input type="checkbox" value="Cement Mixer"> Cement Mixer</label>
+                    <label class="machinery-item"><input type="checkbox" value="Backhoe Loader"> Backhoe Loader</label>
+                    <label class="machinery-item"><input type="checkbox" value="Drainage Pipes"> Drainage Pipes</label>
+                    <label class="machinery-item"><input type="checkbox" value="Bitumen Sprayer"> Bitumen Sprayer</label>
+                    <label class="machinery-item"><input type="checkbox" value="Surveying Tools"> Surveying Tools</label>
+                </div>
             </div>
-            <div class="audit-field">
-                <label>Project Duration Estimate</label>
-                <input type="text" id="auditDuration" placeholder="e.g. 21 Working Days">
-            </div>
-            <div class="audit-field">
-                <label>Engineering Valuation (USD)</label>
-                <input type="text" id="auditCost" placeholder="e.g. $45,000">
+
+            <div class="audit-field" style="margin-top:25px;">
+                <label>Internal Audit Notes (Field Intelligence)</label>
+                <textarea id="auditNotes" rows="3" placeholder="Deep technical context for institutional dossiers..."></textarea>
             </div>
         </div>
 
-        <div class="audit-field" style="margin-top:20px;">
-            <label>Required Logistics & Heavy Machinery</label>
-            <div class="machinery-checklist" id="machineryList">
-                <label class="machinery-item"><input type="checkbox" value="Excavator"> Excavator</label>
-                <label class="machinery-item"><input type="checkbox" value="Asphalt Paver"> Asphalt Paver</label>
-                <label class="machinery-item"><input type="checkbox" value="Steam Roller"> Steam Roller</label>
-                <label class="machinery-item"><input type="checkbox" value="Dump Truck"> Dump Truck</label>
-                <label class="machinery-item"><input type="checkbox" value="Cement Mixer"> Cement Mixer</label>
-                <label class="machinery-item"><input type="checkbox" value="Backhoe Loader"> Backhoe Loader</label>
-                <label class="machinery-item"><input type="checkbox" value="Drainage Pipes"> Drainage Pipes</label>
-                <label class="machinery-item"><input type="checkbox" value="Bitumen Sprayer"> Bitumen Sprayer</label>
-                <label class="machinery-item"><input type="checkbox" value="Surveying Tools"> Surveying Tools</label>
+        <div id="resolutionSection" style="display:none; margin-top:30px; padding-top:20px; border-top: 1px double #3b82f6;">
+            <label style="font-size:10px; color:#00ff88; text-transform:uppercase; font-weight:800;">Final Resolution Certification</label>
+            <div class="audit-grid">
+                <div class="audit-field">
+                    <label>Completion Date</label>
+                    <input type="date" id="resolvedDate" style="color-scheme: dark;">
+                </div>
+                <div class="audit-field">
+                    <label>Final Contractor / Unit</label>
+                    <input type="text" id="contractorName" placeholder="e.g. Public Works Division 4">
+                </div>
+            </div>
+            <div class="audit-field" style="margin-top:15px;">
+                <label>Resolution Summary (Proof of Work)</label>
+                <textarea id="resolutionSummary" rows="2" placeholder="Summarize the repair work completed..."></textarea>
             </div>
         </div>
 
-        <div class="audit-field" style="margin-top:25px;">
-            <label>Internal Audit Notes (Field Intelligence)</label>
-            <textarea id="auditNotes" rows="3" placeholder="Deep technical context for institutional dossiers..."></textarea>
-        </div>
         <div style="display:flex; gap:15px; margin-top:30px;">
-            <button class="btn" style="flex:1; background:#00ff88; color:#000;" onclick="submitVerification()">Submit Official Audit</button>
+            <button id="submitBtn" class="btn" style="flex:1; background:#00ff88; color:#000;" onclick="submitVerification()">Submit Official Audit</button>
             <button class="btn" style="flex:1; background:transparent; border:1px solid #ef4444; color:#ef4444;" onclick="closeAudit()">Discard Session</button>
         </div>
     </div>
@@ -201,7 +174,7 @@
 <section class="stats">
     <div class="card"><h2 id="statReports">0</h2><p>Signals Reported</p></div>
     <div class="card"><h2 id="statVerified">0</h2><p>Verified Assets</p></div>
-    <div class="card"><h2>19</h2><p>Active Agents</p></div>
+    <div class="card"><h2 id="statResolved">0</h2><p>Resolved Assets</p></div>
 </section>
 
 <section id="map" style="padding:100px 40px; background:#0a0f1a; text-align:center;">
@@ -221,7 +194,7 @@
         </div>
 
         <div id="guardianActions">
-            <button class="btn" style="background:#00ff88; color:#000; width:48%;" onclick="openAudit()">Launch Audit Tablet</button>
+            <button id="mainAuditBtn" class="btn" style="background:#00ff88; color:#000; width:48%;" onclick="openAudit()">Launch Audit Tablet</button>
             <button class="btn" style="background:transparent; border:1px solid #ef4444; color:#ef4444; width:48%;" onclick="dismissReport()">Dismiss Signal</button>
             <button class="btn" style="background:#fff; color:#000; width:100%; margin-top:15px;" onclick="generateDossier()">Export Official PDF Dossier</button>
         </div>
@@ -259,27 +232,29 @@
 
     let currentMarker = null, isAuthorized = false, tempImageData = null;
     let adminUser = { name: "", id: "" };
-    let stats = { total: 0, pending: 0, verified: 0, exposure: 0 };
+    let stats = { total: 0, pending: 0, verified: 0, exposure: 0, resolved: 0 };
 
     function updateDashboard() {
         document.getElementById('statReports').innerText = stats.total;
         document.getElementById('statVerified').innerText = stats.verified;
+        document.getElementById('statResolved').innerText = stats.resolved;
         document.getElementById('dashExposure').innerText = "$" + stats.exposure.toLocaleString();
         document.getElementById('dashPending').innerText = stats.pending;
         document.getElementById('dashVerified').innerText = stats.verified;
     }
 
     function addIssue(lat, lng, type, desc, status="Pending Audit", photo) {
-        let m = L.circleMarker([lat, lng], { radius: 7, color: status==="VERIFIED"?"#3b82f6":"#ef4444", fillOpacity: 0.8, weight: 1 }).addTo(map);
+        let m = L.circleMarker([lat, lng], { radius: 7, color: "#ef4444", fillOpacity: 0.8, weight: 1 }).addTo(map);
         m.options.vData = { 
             type, desc, status, photo, cost: "Awaiting Audit",
             address: "", traffic: "", duration: "", auditNotes: "",
             machinery: [],
             lat: lat.toFixed(5), lng: lng.toFixed(5), 
             timeReported: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
-            timeVerified: null, verifiedBy: "", agentID: ""
+            timeVerified: null, timeResolved: null, verifiedBy: "", agentID: "",
+            resolvedDate: "", contractor: "", resolutionNotes: ""
         };
-        stats.total++; if(status==="Pending Audit") stats.pending++; updateDashboard();
+        stats.total++; stats.pending++; updateDashboard();
 
         m.on("click", () => {
             currentMarker = m; const d = m.options.vData;
@@ -287,6 +262,7 @@
             document.getElementById("vDesc").innerText = d.desc;
             document.getElementById("vStatus").innerText = d.status;
             document.getElementById("vCost").innerText = d.cost;
+            document.getElementById("mainAuditBtn").innerText = d.status === "VERIFIED" ? "Certify Resolution" : "Launch Audit Tablet";
             if(d.photo) { document.getElementById("photoContainer").style.display="block"; document.getElementById("displayPhoto").style.backgroundImage=`url(${d.photo})`; }
             else { document.getElementById("photoContainer").style.display="none"; }
         });
@@ -302,23 +278,116 @@
         const nameInput = document.getElementById('adminName').value.trim();
         const key = document.getElementById('gCode').value;
         if(key === "1974" && nameInput.length > 2) {
-            isAuthorized = true;
-            adminUser.name = nameInput.toUpperCase();
+            isAuthorized = true; adminUser.name = nameInput.toUpperCase();
             adminUser.id = `${nameInput.charAt(0).toUpperCase()}-AUDIT-${Math.floor(100+Math.random()*899)}`;
             document.getElementById('loginOverlay').style.display = 'none';
             document.getElementById('expertBar').style.display = 'flex';
             document.getElementById('expertBar').innerText = `ADMIN: ${adminUser.name} // ID: ${adminUser.id} // SECURE PROTOCOL ACTIVE`;
             document.getElementById('guardianActions').style.display = 'block';
-        } else { alert("Access Denied: Incorrect Identity or Sector Key."); }
+        } else { alert("Access Denied."); }
     }
 
     function openAudit() { 
-        if(isAuthorized) {
+        if(isAuthorized && currentMarker) {
+            const d = currentMarker.options.vData;
             document.getElementById('auditOverlay').style.display='flex';
-            document.querySelectorAll('#machineryList input').forEach(i => i.checked = false);
+            
+            if(d.status === "VERIFIED") {
+                document.getElementById('auditTitle').innerText = "Infrastructure Resolution Protocol";
+                document.getElementById('baseAuditFields').style.opacity = "0.5";
+                document.getElementById('resolutionSection').style.display = 'block';
+                document.getElementById('submitBtn').innerText = "Certify Repair & Resolve";
+                document.getElementById('submitBtn').style.background = "#00ff88";
+            } else {
+                document.getElementById('auditTitle').innerText = "Institutional Verification Matrix";
+                document.getElementById('baseAuditFields').style.opacity = "1";
+                document.getElementById('resolutionSection').style.display = 'none';
+                document.getElementById('submitBtn').innerText = "Submit Official Audit";
+                document.getElementById('submitBtn').style.background = "#00d9ff";
+            }
         } 
     }
     function closeAudit() { document.getElementById('auditOverlay').style.display='none'; }
+
+    function submitVerification() {
+        const d = currentMarker.options.vData;
+        
+        if (d.status !== "VERIFIED") {
+            const rawCost = document.getElementById('auditCost').value;
+            let numericVal = 0;
+            const match = rawCost.replace(/,/g, '').match(/\d+/);
+            if(match) { numericVal = parseInt(match[0]); if(rawCost.toLowerCase().includes('k')) numericVal *= 1000; }
+
+            const selectedMachinery = [];
+            document.querySelectorAll('#machineryList input:checked').forEach(i => selectedMachinery.push(i.value));
+
+            d.address = document.getElementById('auditAddress').value;
+            d.traffic = document.getElementById('auditTraffic').value;
+            d.duration = document.getElementById('auditDuration').value;
+            d.cost = rawCost;
+            d.auditNotes = document.getElementById('auditNotes').value;
+            d.machinery = selectedMachinery;
+            d.status = "VERIFIED";
+            d.verifiedBy = adminUser.name;
+            d.agentID = adminUser.id;
+            d.timeVerified = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+
+            currentMarker.setStyle({color: "#3b82f6", radius: 9});
+            stats.pending--; stats.verified++; stats.exposure += numericVal;
+            
+            const vList = document.getElementById('verifiedList');
+            if(stats.verified === 1) vList.innerHTML = '<h4 style="font-size:10px; color:#3b82f6; margin-bottom:20px; text-transform:uppercase;">Institutional Pipe</h4>';
+            const vItem = document.createElement('div');
+            vItem.className = "box"; vItem.style = "margin-bottom:12px; border:1px solid #3b82f633; padding:15px;";
+            vItem.innerHTML = `<p style="font-size:8px; color:#3b82f6; font-weight:bold;">VETTED BY ${adminUser.id}</p><h3 style="font-size:14px; margin-top:5px;">${d.type}</h3>`;
+            vList.prepend(vItem);
+        } else {
+            d.status = "RESOLVED";
+            d.resolvedDate = document.getElementById('resolvedDate').value;
+            d.contractor = document.getElementById('contractorName').value;
+            d.resolutionNotes = document.getElementById('resolutionSummary').value;
+            d.timeResolved = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            
+            currentMarker.setStyle({color: "#475569", radius: 6, fillOpacity: 0.4});
+            stats.verified--; stats.resolved++;
+        }
+
+        updateDashboard();
+        document.getElementById("vStatus").innerText = d.status;
+        document.getElementById("vCost").innerText = d.cost;
+        closeAudit();
+    }
+
+    function generateDossier() {
+        const d = currentMarker.options.vData;
+        if(d.status === "Pending Audit") return alert("Protocol: Asset must be audited before export.");
+        const { jsPDF } = window.jspdf; const doc = new jsPDF();
+
+        doc.setFillColor(10, 15, 26); doc.rect(0, 0, 210, 40, 'F');
+        doc.setTextColor(0, 217, 255); doc.setFontSize(28); doc.text("FIXHAITI", 20, 28);
+        doc.setTextColor(255); doc.setFontSize(9); doc.text("OFFICIAL INSTITUTIONAL DOSSIER // ASSET LIFECYCLE", 21, 35);
+
+        doc.setTextColor(0); doc.setFont("helvetica", "bold"); doc.text("01. GEOSPATIAL DATA", 20, 55); doc.line(20, 57, 190, 57);
+        doc.setFont("helvetica", "normal"); doc.text(`COORD: ${d.lat}N / ${d.lng}W`, 25, 65); doc.text(`ADDRESS: ${d.address.toUpperCase()}`, 25, 72);
+
+        doc.setFont("helvetica", "bold"); doc.text("02. LOGISTICS", 20, 85); doc.line(20, 87, 190, 87);
+        doc.setFont("helvetica", "normal"); doc.text(`TYPE: ${d.type.toUpperCase()}`, 25, 95); doc.text(`VALUATION: ${d.cost}`, 25, 102);
+        doc.text(`MACHINERY: ${d.machinery.join(", ") || "NONE"}`, 25, 109);
+
+        doc.setFont("helvetica", "bold"); doc.text("03. VETTING AUTHORITY", 20, 120); doc.line(20, 122, 190, 122);
+        doc.setFont("helvetica", "normal"); doc.text(`AGENT: ${d.verifiedBy} (${d.agentID})`, 25, 130);
+        doc.text(`REPORTED: ${d.timeReported}`, 25, 135); doc.text(`VERIFIED: ${d.timeVerified}`, 25, 140);
+
+        if(d.status === "RESOLVED") {
+            doc.setFont("helvetica", "bold"); doc.text("04. RESOLUTION CERTIFICATION", 20, 155); doc.line(20, 157, 190, 157);
+            doc.setFont("helvetica", "normal"); doc.text(`COMPLETED: ${d.resolvedDate}`, 25, 165);
+            doc.text(`CONTRACTOR: ${d.contractor.toUpperCase()}`, 25, 172);
+            doc.text("WORK SUMMARY:", 25, 179); doc.text(doc.splitTextToSize(d.resolutionNotes, 160), 25, 184);
+        }
+
+        if(d.photo) doc.addImage(d.photo, 'JPEG', 20, 210, 85, 48);
+        doc.save(`FixHaiti_Dossier_${d.agentID}.pdf`);
+    }
 
     function handleImage(input) {
         const reader = new FileReader(); reader.onload = (e) => {
@@ -329,93 +398,12 @@
         reader.readAsDataURL(input.files[0]);
     }
 
-    function submitVerification() {
-        const d = currentMarker.options.vData;
-        const rawCost = document.getElementById('auditCost').value;
-        
-        let numericVal = 0;
-        const match = rawCost.replace(/,/g, '').match(/\d+/);
-        if(match) {
-            numericVal = parseInt(match[0]);
-            if(rawCost.toLowerCase().includes('k')) numericVal *= 1000;
-        }
-
-        const selectedMachinery = [];
-        document.querySelectorAll('#machineryList input:checked').forEach(i => selectedMachinery.push(i.value));
-
-        d.address = document.getElementById('auditAddress').value;
-        d.traffic = document.getElementById('auditTraffic').value;
-        d.duration = document.getElementById('auditDuration').value;
-        d.cost = rawCost;
-        d.auditNotes = document.getElementById('auditNotes').value;
-        d.machinery = selectedMachinery;
-        d.status = "VERIFIED";
-        d.verifiedBy = adminUser.name;
-        d.agentID = adminUser.id;
-        d.timeVerified = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-
-        currentMarker.setStyle({color: "#3b82f6", radius: 9});
-        stats.pending--; stats.verified++; stats.exposure += numericVal;
-        updateDashboard();
-
-        const vList = document.getElementById('verifiedList');
-        if(stats.verified === 1) vList.innerHTML = '<h4 style="font-size:10px; color:#3b82f6; margin-bottom:20px; text-transform:uppercase;">Institutional Pipe</h4>';
-        const vItem = document.createElement('div');
-        vItem.className = "box"; vItem.style = "margin-bottom:12px; border:1px solid #3b82f633; padding:15px;";
-        vItem.innerHTML = `<p style="font-size:8px; color:#3b82f6; font-weight:bold;">VETTED BY ${adminUser.id}</p><h3 style="font-size:14px; margin-top:5px;">${d.type}</h3>`;
-        vList.prepend(vItem);
-
-        document.getElementById("vStatus").innerText = "VERIFIED";
-        document.getElementById("vCost").innerText = d.cost;
-        closeAudit();
-    }
-
-    function generateDossier() {
-        const d = currentMarker.options.vData;
-        if(d.status !== "VERIFIED") return alert("Protocol: Asset must be audited before dossier export.");
-        const { jsPDF } = window.jspdf; const doc = new jsPDF();
-
-        doc.setFillColor(10, 15, 26); doc.rect(0, 0, 210, 40, 'F');
-        doc.setTextColor(0, 217, 255); doc.setFontSize(28); doc.text("FIXHAITI", 20, 28);
-        doc.setTextColor(255); doc.setFontSize(9); doc.text("OFFICIAL INSTITUTIONAL DOSSIER // RECONSTRUCTION PRIORITIES", 21, 35);
-
-        doc.setTextColor(0); doc.setFont("helvetica", "bold"); doc.text("01. GEOSPATIAL & ASSET DATA", 20, 55); doc.line(20, 57, 190, 57);
-        doc.setFont("helvetica", "normal"); doc.text(`COORDINATES: ${d.lat}N / ${d.lng}W`, 25, 65);
-        doc.text(`STREET ADDRESS: ${d.address.toUpperCase()}`, 25, 72);
-        doc.text(`TRAFFIC DENSITY: ${d.traffic.toUpperCase()}`, 25, 79);
-
-        doc.setFont("helvetica", "bold"); doc.text("02. LOGISTICS & VALUATION", 20, 95); doc.line(20, 97, 190, 97);
-        doc.setFont("helvetica", "normal"); doc.text(`ASSET TYPE: ${d.type.toUpperCase()}`, 25, 105);
-        doc.text(`PROJECT DURATION: ${d.duration.toUpperCase()}`, 25, 112);
-        doc.setFont("helvetica", "bold"); doc.text(`ESTIMATED VALUATION: ${d.cost}`, 25, 119);
-        
-        doc.setFont("helvetica", "bold"); doc.text("REQUIRED MACHINERY:", 25, 127);
-        doc.setFont("helvetica", "normal");
-        const machineryText = d.machinery.length > 0 ? d.machinery.join(", ") : "NO SPECIAL MACHINERY LOGGED";
-        doc.text(doc.splitTextToSize(machineryText, 160), 25, 132);
-
-        doc.setFont("helvetica", "bold"); doc.text("03. FIELD OBSERVATIONS", 20, 145); doc.line(20, 147, 190, 147);
-        doc.setFont("helvetica", "normal"); doc.text("ORIGINAL GROUND SIGNAL:", 25, 155); doc.text(doc.splitTextToSize(d.desc, 160), 25, 160);
-        doc.text("EXPERT TECHNICAL NOTES:", 25, 175); doc.text(doc.splitTextToSize(d.auditNotes, 160), 25, 180);
-
-        if(d.photo) doc.addImage(d.photo, 'JPEG', 20, 195, 85, 48);
-
-        // RESTORED: Timestamp data in Vetting Authority section
-        doc.setFont("helvetica", "bold"); doc.text("04. VETTING AUTHORITY", 20, 255); doc.line(20, 257, 190, 257);
-        doc.setFont("helvetica", "normal"); doc.text(`VETTED BY: ${d.verifiedBy}`, 25, 263);
-        doc.text(`SIGNAL RECORDED: ${d.timeReported}`, 25, 268);
-        doc.text(`AUDIT COMPLETED: ${d.timeVerified}`, 25, 273);
-        doc.setTextColor(0, 100, 255); doc.setFont("courier", "bold"); doc.text(`AGENT ID CODE: ${d.agentID}`, 25, 278);
-
-        doc.save(`FixHaiti_Dossier_${d.agentID}.pdf`);
-    }
-
     function reportAtMyLocation(){
         navigator.geolocation.getCurrentPosition(pos=>{
             let lat=pos.coords.latitude, lng=pos.coords.longitude;
             let popup=`<div class="popup-form">
                 <h2 style="font-size:10px; color:#00d9ff; letter-spacing:2px; margin-bottom:15px; text-transform:uppercase;">New Ground Signal</h2>
-                <select id="t"><option>Structural Pothole</option><option>Drainage Blockage</option><option>Asphalt Degradation</option><option>Civilian Hazard</option></select>
+                <select id="t"><option>Structural Pothole</option><option>Drainage Blockage</option><option>Asphalt Degradation</option></select>
                 <textarea id="d" placeholder="Provide ground truth details..." rows="3"></textarea>
                 <input type="file" accept="image/*" onchange="handleImage(this)">
                 <div id="pPreview" class="image-preview">Evidence Attachment Slot</div>
@@ -425,8 +413,7 @@
         });
     }
 
-    function dismissReport() { if(confirm("Permanently dismiss this signal?")) { map.removeLayer(currentMarker); stats.total--; if(currentMarker.options.vData.status === "Pending Audit") stats.pending--; updateDashboard(); } }
+    function dismissReport() { if(confirm("Dismiss this signal?")) { map.removeLayer(currentMarker); stats.total--; if(currentMarker.options.vData.status === "Pending Audit") stats.pending--; updateDashboard(); } }
 </script>
-
 </body>
 </html>
