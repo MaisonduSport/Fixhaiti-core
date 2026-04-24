@@ -71,8 +71,9 @@
 <div id="loginOverlay">
     <div style="background:#0f1626; padding:50px; border:1px solid #1e293b; border-radius:8px; width:360px; text-align:center;">
         <h2 style="font-size:10px; letter-spacing:5px; margin-bottom:30px; color:#00d9ff; text-transform: uppercase;">Technical Access</h2>
+        <input type="text" id="adminName" placeholder="ENTER FULL NAME" style="width:100%; padding:15px; margin-bottom:10px; background:#0a0f1a; color:white; border:1px solid #1e293b; text-align:center; text-transform:uppercase;">
         <input type="password" id="gCode" placeholder="SECTOR KEY" style="width:100%; padding:15px; margin-bottom:20px; background:#0a0f1a; color:white; border:1px solid #1e293b; text-align:center;">
-        <button class="btn" style="width:100%;" onclick="validateGuardian()">Authorize</button>
+        <button class="btn" style="width:100%;" onclick="validateGuardian()">Authorize Session</button>
     </div>
 </div>
 
@@ -177,20 +178,30 @@
     let currentMarker = null; 
     let tempImageData = null;
     let stats = { total: 0, pending: 0, verified: 0, exposure: 0 };
+    
+    // --- AUTHENTICATION DATA ---
+    let sessionUser = { name: "", id: "" };
 
     function updateDashboard() {
         document.getElementById('statReports').innerText = stats.total;
         document.getElementById('statVerified').innerText = stats.verified;
-        document.getElementById('dashExposure').innerText = isNaN(stats.exposure) ? "Multiple Tiers" : "$" + stats.exposure.toLocaleString();
+        document.getElementById('dashExposure').innerText = "$" + stats.exposure.toLocaleString();
         document.getElementById('dashPending').innerText = stats.pending;
         document.getElementById('dashVerified').innerText = stats.verified;
     }
 
     function addIssue(lat,lng,type,desc,status="Pending Audit",photo,cost=0){
         let m=L.circleMarker([lat,lng],{ radius:7, color:status.includes("VERIFIED")?"#3b82f6":"#ef4444", fillOpacity: 0.8, weight: 1 }).addTo(map);
-        // Track timestamps for the validation log
-        const now = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
-        m.options.vData = { type, desc, status, photo, cost, lat: lat.toFixed(5), lng: lng.toFixed(5), timeReported: now, timeVerified: null };
+        const reportTime = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        
+        m.options.vData = { 
+            type, desc, status, photo, cost, 
+            lat: lat.toFixed(5), lng: lng.toFixed(5),
+            timeReported: reportTime,
+            timeVerified: null,
+            verifiedBy: null,
+            agentID: null
+        };
         
         stats.total++;
         if(status === "Pending Audit") stats.pending++;
@@ -199,7 +210,7 @@
         const feed = document.getElementById('signalFeed');
         const item = document.createElement('div');
         item.style = "font-size:12px; border-left:2px solid #ef4444; padding-left:15px; margin-bottom:15px; opacity:0.8;";
-        item.innerHTML = `<p><b>${type}</b></p><p style="opacity:0.5;">Signal Captured @ ${now}</p>`;
+        item.innerHTML = `<p><b>${type}</b></p><p style="opacity:0.5;">Signal Detected @ ${reportTime}</p>`;
         feed.prepend(item);
 
         m.on("click",()=>{
@@ -207,36 +218,57 @@
             document.getElementById("issueTypeView").innerText = d.type;
             document.getElementById("issueDescView").innerText = d.desc;
             document.getElementById("issueStatusView").innerText = d.status;
-            document.getElementById("issueCostView").innerText = d.cost ? (typeof d.cost === 'string' ? d.cost : "$" + d.cost.toLocaleString()) : "Awaiting Audit";
+            document.getElementById("issueCostView").innerText = d.cost || "Awaiting Audit";
             if(d.photo) { document.getElementById("photoContainer").style.display = "block"; document.getElementById("displayPhoto").style.backgroundImage = `url(${d.photo})`; }
             else { document.getElementById("photoContainer").style.display = "none"; }
         });
     }
 
     function validateGuardian() {
-        if(document.getElementById('gCode').value === "1974") {
-            isAuthorized = true; document.getElementById('loginOverlay').style.display = 'none';
+        const nameInput = document.getElementById('adminName').value.trim();
+        const codeInput = document.getElementById('gCode').value;
+
+        if(codeInput === "1974" && nameInput.length > 2) {
+            isAuthorized = true;
+            sessionUser.name = nameInput.toUpperCase();
+            // Generate unique Institutional ID based on name and random hex
+            const initials = sessionUser.name.split(" ").map(n => n[0]).join("");
+            sessionUser.id = `${initials}-AUDIT-${Math.floor(100 + Math.random() * 899)}`;
+
+            document.getElementById('loginOverlay').style.display = 'none';
             document.getElementById('expertBar').style.display = 'flex';
+            document.getElementById('expertBar').innerText = `ADMIN: ${sessionUser.name} // ID: ${sessionUser.id} // SECTOR AUTHORITY ACTIVE`;
             document.getElementById('guardianActions').style.display = 'block';
-        } else { alert("Key Denied."); }
+        } else {
+            alert("Security Protocol: Unauthorized Access. Correct Name and Sector Key Required.");
+        }
     }
 
     function verifyReport() {
         if(!isAuthorized || !currentMarker) return;
-        const val = prompt("Engineering Valuation (Accepts range like $10k-$20k or single amount):");
+        const val = prompt("Enter Engineering Valuation (e.g., $20k - $30k or 25000):");
+        
         if(val) {
+            // FIX: Robust Dashboard Extraction
+            // Scans the string and finds the FIRST number. If "20k", it finds 20. 
+            let numericVal = 0;
+            const match = val.replace(/,/g, '').match(/\d+/);
+            if(match) {
+                numericVal = parseInt(match[0]);
+                // Check if user wrote 'k' for thousand
+                if(val.toLowerCase().includes('k')) numericVal *= 1000;
+            }
+
             currentMarker.setStyle({color: "#3b82f6", radius: 9});
-            currentMarker.options.vData.status = "VERIFIED BY FIXHAITI";
+            currentMarker.options.vData.status = "VERIFIED";
             currentMarker.options.vData.cost = val;
-            currentMarker.options.vData.timeVerified = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
-            
+            currentMarker.options.vData.timeVerified = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            currentMarker.options.vData.verifiedBy = sessionUser.name;
+            currentMarker.options.vData.agentID = sessionUser.id;
+
             stats.pending--;
             stats.verified++;
-            
-            // Logic to handle dashboard summation if numeric, otherwise flag as mixed
-            const numericVal = parseInt(val.replace(/[^0-9]/g, ''));
-            if(!isNaN(numericVal)) stats.exposure += numericVal;
-            
+            stats.exposure += numericVal;
             updateDashboard();
 
             const vList = document.getElementById('verifiedList');
@@ -244,12 +276,12 @@
             const vItem = document.createElement('div');
             vItem.className = "box";
             vItem.style = "margin-bottom:15px; border:1px solid #3b82f633; padding:15px;";
-            vItem.innerHTML = `<p style="font-size:9px; color:#3b82f6; font-weight:bold;">VETTED</p>
+            vItem.innerHTML = `<p style="font-size:9px; color:#3b82f6; font-weight:bold;">VETTED BY ${sessionUser.id}</p>
                                <h3 style="font-size:14px; margin:5px 0;">${currentMarker.options.vData.type}</h3>
                                <p style="font-size:12px; opacity:0.6;">Valuation: ${val}</p>`;
             vList.prepend(vItem);
 
-            document.getElementById("issueStatusView").innerText = "VERIFIED BY FIXHAITI";
+            document.getElementById("issueStatusView").innerText = "VERIFIED";
             document.getElementById("issueCostView").innerText = val;
         }
     }
@@ -283,101 +315,69 @@
 
     function generateDossier() {
         const d = currentMarker.options.vData; 
-        if(!d.cost) { alert("Institutional Protocol: Valuation required."); return; }
+        if(!d.cost || d.status !== "VERIFIED") { alert("Institutional Protocol: Valuation required before export."); return; }
 
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         const refID = `FX-AUDIT-${Math.floor(Math.random()*900000) + 100000}`;
         const timeAudit = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
 
-        // 1. BACKGROUND & BORDER
-        doc.setDrawColor(20, 20, 20);
-        doc.setLineWidth(0.5);
-        doc.rect(10, 10, 190, 277); 
-        doc.setFontSize(65);
-        doc.setTextColor(248, 248, 248);
-        doc.text("FIXHAITI", 35, 160, {angle: 45}); 
+        // 1. PAGE BORDER & WATERMARK
+        doc.setDrawColor(20, 20, 20); doc.setLineWidth(0.5); doc.rect(10, 10, 190, 277); 
+        doc.setFontSize(65); doc.setTextColor(248, 248, 248); doc.text("FIXHAITI", 35, 160, {angle: 45}); 
 
-        // 2. BRANDED HEADER
-        doc.setFillColor(10, 15, 26);
-        doc.rect(10, 10, 190, 35, 'F'); 
+        // 2. HEADER
+        doc.setFillColor(10, 15, 26); doc.rect(10, 10, 190, 35, 'F'); 
+        doc.setTextColor(0, 217, 255); doc.setFont("helvetica", "bold"); doc.setFontSize(32); doc.text("FIXHAITI", 20, 32);
+        doc.setTextColor(255); doc.setFontSize(9); doc.text("INFRASTRUCTURE INTELLIGENCE UNIT", 21, 40);
         
-        doc.setTextColor(0, 217, 255);
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(28);
-        doc.text("FIXHAITI", 20, 30);
-        
-        doc.setTextColor(255);
-        doc.setFontSize(9);
-        doc.text("INFRASTRUCTURE INTELLIGENCE UNIT", 21, 38);
-        
-        // 3. REPOSITIONED CONTROL DATA
-        doc.setTextColor(100, 116, 139); // Muted slate color
-        doc.setFont("courier", "bold");
-        doc.setFontSize(8);
-        doc.text(`CONTROL: ${refID}`, 145, 25);
-        doc.setTextColor(0, 255, 136); // Green for status
-        doc.text(`STATUS: CERTIFIED DATA`, 145, 30);
+        doc.setTextColor(150); doc.setFont("courier", "bold"); doc.setFontSize(8);
+        doc.text(`CONTROL: ${refID}`, 140, 25);
+        doc.setTextColor(0, 255, 136); doc.text(`STATUS: CERTIFIED DATA`, 140, 30);
 
-        // 4. DATA BLOCK
-        doc.setTextColor(0);
-        doc.setFont("helvetica", "bold");
-        doc.setFontSize(10);
-        doc.text("01. GEOSPATIAL & ASSET DATA", 20, 55);
-        doc.line(20, 57, 190, 57);
+        // 3. ASSET SECTION
+        doc.setTextColor(0); doc.setFont("helvetica", "bold"); doc.setFontSize(10);
+        doc.text("01. GEOSPATIAL & ASSET DATA", 20, 55); doc.line(20, 57, 190, 57);
 
         const drawRow = (y, label, value) => {
-            doc.setFillColor(248, 250, 252);
-            doc.rect(20, y, 170, 8, 'F');
-            doc.setFont("helvetica", "bold");
-            doc.text(label, 25, y + 5);
-            doc.setFont("helvetica", "normal");
-            doc.text(String(value), 85, y + 5);
+            doc.setFillColor(248, 250, 252); doc.rect(20, y, 170, 8, 'F');
+            doc.setFont("helvetica", "bold"); doc.text(label, 25, y + 5);
+            doc.setFont("helvetica", "normal"); doc.text(String(value), 85, y + 5);
         };
 
         drawRow(60, "GEODETIC POSITION", `${d.lat}N / ${d.lng}W`);
         drawRow(68, "MUNICIPAL SECTOR", "PORT-AU-PRINCE METROPOLITAN");
         drawRow(76, "ASSET CLASSIFICATION", d.type.toUpperCase());
-        drawRow(84, "ENGINEERING ESTIMATE", d.cost);
+        drawRow(84, "VALUATION", d.cost);
 
-        // 5. STRATEGIC IMPACT
-        doc.setFont("helvetica", "bold");
-        doc.text("02. STRATEGIC IMPACT ASSESSMENT", 20, 105);
-        doc.line(20, 107, 190, 107);
-        doc.setFontSize(9);
-        doc.text("FIELD OBSERVATIONS:", 25, 115);
-        const splitDesc = doc.splitTextToSize(d.desc, 110);
-        doc.setFont("helvetica", "normal");
-        doc.text(splitDesc, 75, 115);
-
-        // 6. VISUAL EVIDENCE
+        // 4. EVIDENCE
         if(d.photo) {
-            doc.setFont("helvetica", "bold");
-            doc.text("03. GROUND-TRUTH EVIDENCE", 20, 150);
-            doc.setDrawColor(40);
-            doc.rect(20, 153, 170, 85); 
-            doc.addImage(d.photo, 'JPEG', 21, 154, 168, 83);
+            doc.setFont("helvetica", "bold"); doc.text("02. GROUND-TRUTH EVIDENCE", 20, 105);
+            doc.rect(20, 108, 170, 80); doc.addImage(d.photo, 'JPEG', 21, 109, 168, 78);
         }
 
-        // 7. UPDATED VALIDATION LOG WITH TIMESTAMPS
-        let footerY = 250;
-        doc.setTextColor(0);
+        // 5. AUTHENTICATION (The New Section)
+        let authY = 200;
+        doc.setTextColor(0); doc.setFont("helvetica", "bold"); doc.setFontSize(10);
+        doc.text("03. VETTING AUTHORITY & LOG", 20, authY); doc.line(20, authY+2, 190, authY+2);
+        
         doc.setFontSize(9);
-        doc.setFont("helvetica", "bold");
-        doc.text("TECHNICAL VALIDATION LOG:", 20, footerY);
+        doc.text("VERIFIED BY:", 25, authY+10);
+        doc.setFont("helvetica", "normal"); doc.text(d.verifiedBy, 70, authY+10);
         
-        doc.setFont("courier", "normal");
-        doc.setFontSize(8);
-        doc.text(`[ COMPLETED ${d.timeReported} ] SIGNAL RECEIVED BY SYSTEM`, 25, footerY + 8);
-        doc.text(`[ COMPLETED ${d.timeVerified} ] EXPERT GEOSPATIAL VERIFICATION`, 25, footerY + 14);
-        doc.text(`[ COMPLETED ${timeAudit} ] BUDGETARY AUDIT & EXPORT`, 25, footerY + 20);
+        doc.setFont("helvetica", "bold"); doc.text("AUTHORITY ID:", 25, authY+18);
+        doc.setFont("courier", "bold"); doc.setTextColor(0, 100, 255); doc.text(d.agentID, 70, authY+18);
+        
+        doc.setTextColor(0); doc.setFont("helvetica", "bold"); doc.text("VALIDATION LOG:", 25, authY+28);
+        doc.setFont("courier", "normal"); doc.setFontSize(8);
+        doc.text(`[ ${d.timeReported} ] SIGNAL CAPTURED`, 70, authY+28);
+        doc.text(`[ ${d.timeVerified} ] EXPERT AUDIT COMPLETED`, 70, authY+34);
+        doc.text(`[ ${timeAudit} ] OFFICIAL DOSSIER SIGNED`, 70, authY+40);
 
-        doc.setFontSize(7);
-        doc.setTextColor(150);
-        doc.setFont("helvetica", "italic");
-        doc.text("Certified technical asset of FixHaiti. Authorized for institutional resource allocation.", 20, 285);
+        doc.setFontSize(7); doc.setTextColor(150);
+        doc.text("This dossier is a sovereign asset of FixHaiti. Authentication is tied to the unique Agent ID above.", 20, 285);
         
-        doc.save(`FixHaiti_Dossier_${refID}.pdf`);
+        doc.save(`FixHaiti_Official_Audit_${refID}.pdf`);
     }
 
     function dismissReport() { if(confirm("Remove signal?")) { map.removeLayer(currentMarker); stats.total--; if(currentMarker.options.vData.status === "Pending Audit") stats.pending--; updateDashboard(); } }
