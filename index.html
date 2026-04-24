@@ -7,7 +7,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
-        /* --- CORE STYLES (RESTORED) --- */
+        /* --- CORE STYLES --- */
         * {margin:0; padding:0; box-sizing:border-box; font-family: 'Inter', Arial, sans-serif;}
         body {background:#0a0f1a; color:white; overflow-x:hidden;}
 
@@ -21,7 +21,7 @@
         .logo {font-size:24px; font-weight:900; color:#00d9ff; letter-spacing:2px; text-transform: uppercase;}
         nav a {color:white; margin-left:25px; text-decoration:none; font-size:12px; opacity:0.6; text-transform: uppercase; font-weight: 700;}
 
-        /* --- THE REPORTING POPUP (FULLY RESTORED SIZE) --- */
+        /* --- THE REPORTING POPUP --- */
         .popup-form { 
             background: #0f1626; 
             padding: 25px; 
@@ -55,7 +55,7 @@
             background-position: center;
         }
 
-        /* --- THE AUDIT TABLET (ADMIN INTERFACE) --- */
+        /* --- THE AUDIT TABLET --- */
         #auditOverlay {
             display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
             background:rgba(5,7,10,0.96); z-index:20000; align-items:center; justify-content:center;
@@ -71,7 +71,6 @@
             width:100%; background:#0a0f1a; border:1px solid #1e293b; padding:15px; color:white; border-radius:4px; font-size:13px;
         }
 
-        /* NEW: Machinery Checklist Styling */
         .machinery-checklist {
             display: grid;
             grid-template-columns: 1fr 1fr 1fr;
@@ -316,7 +315,6 @@
     function openAudit() { 
         if(isAuthorized) {
             document.getElementById('auditOverlay').style.display='flex';
-            // Reset checklist
             document.querySelectorAll('#machineryList input').forEach(i => i.checked = false);
         } 
     }
@@ -342,7 +340,6 @@
             if(rawCost.toLowerCase().includes('k')) numericVal *= 1000;
         }
 
-        // Capture checked machinery
         const selectedMachinery = [];
         document.querySelectorAll('#machineryList input:checked').forEach(i => selectedMachinery.push(i.value));
 
@@ -392,7 +389,6 @@
         doc.text(`PROJECT DURATION: ${d.duration.toUpperCase()}`, 25, 112);
         doc.setFont("helvetica", "bold"); doc.text(`ESTIMATED VALUATION: ${d.cost}`, 25, 119);
         
-        // NEW: Export selected machinery to PDF
         doc.setFont("helvetica", "bold"); doc.text("REQUIRED MACHINERY:", 25, 127);
         doc.setFont("helvetica", "normal");
         const machineryText = d.machinery.length > 0 ? d.machinery.join(", ") : "NO SPECIAL MACHINERY LOGGED";
@@ -404,9 +400,12 @@
 
         if(d.photo) doc.addImage(d.photo, 'JPEG', 20, 195, 85, 48);
 
+        // RESTORED: Timestamp data in Vetting Authority section
         doc.setFont("helvetica", "bold"); doc.text("04. VETTING AUTHORITY", 20, 255); doc.line(20, 257, 190, 257);
-        doc.setFont("helvetica", "normal"); doc.text(`VETTED BY: ${d.verifiedBy}`, 25, 265);
-        doc.setTextColor(0, 100, 255); doc.setFont("courier", "bold"); doc.text(`AGENT ID CODE: ${d.agentID}`, 25, 272);
+        doc.setFont("helvetica", "normal"); doc.text(`VETTED BY: ${d.verifiedBy}`, 25, 263);
+        doc.text(`SIGNAL RECORDED: ${d.timeReported}`, 25, 268);
+        doc.text(`AUDIT COMPLETED: ${d.timeVerified}`, 25, 273);
+        doc.setTextColor(0, 100, 255); doc.setFont("courier", "bold"); doc.text(`AGENT ID CODE: ${d.agentID}`, 25, 278);
 
         doc.save(`FixHaiti_Dossier_${d.agentID}.pdf`);
     }
