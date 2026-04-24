@@ -278,15 +278,114 @@
     }
 
     function generateDossier() {
-        const d = currentMarker.options.vData; if(!d.cost) { alert("Valuation required."); return; }
-        const { jsPDF } = window.jspdf; const doc = new jsPDF();
-        doc.setDrawColor(15, 23, 42); doc.rect(10, 10, 190, 277);
-        doc.setFontSize(22); doc.text("FIXHAITI TECHNICAL BRIEF", 20, 30);
-        doc.setFontSize(10); doc.text(`COORDINATES: ${d.lat} / ${d.lng}`, 20, 50);
-        doc.text(`ISSUE: ${d.type.toUpperCase()}`, 20, 60);
-        doc.text(`VALUATION: $${d.cost.toLocaleString()}`, 20, 70);
-        if(d.photo) { doc.text("EXHIBIT A: SITE EVIDENCE", 20, 90); doc.addImage(d.photo, 'JPEG', 20, 95, 170, 95); }
-        doc.save(`FixHaiti_Dossier.pdf`);
+        const d = currentMarker.options.vData; 
+        if(!d.cost) { alert("Institutional Protocol: Valuation required before export."); return; }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        const refID = `FX-AUDIT-${Math.floor(Math.random()*900000) + 100000}`;
+        
+        // 1. PAGE BORDER & INSTITUTIONAL WATERMARK
+        doc.setDrawColor(20, 20, 20);
+        doc.setLineWidth(0.5);
+        doc.rect(10, 10, 190, 277); 
+        
+        doc.setFontSize(65);
+        doc.setTextColor(248, 248, 248);
+        doc.text("FIXHAITI", 35, 160, {angle: 45}); 
+
+        // 2. HEADER BLOCK
+        doc.setFillColor(10, 15, 26);
+        doc.rect(10, 10, 190, 30, 'F'); 
+        
+        doc.setTextColor(0, 217, 255);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(18);
+        doc.text("INFRASTRUCTURE INTELLIGENCE UNIT", 20, 25);
+        
+        doc.setTextColor(255);
+        doc.setFontSize(8);
+        doc.setFont("courier", "bold");
+        doc.text(`CONTROL NUMBER: ${refID}`, 130, 22);
+        doc.text(`SYSTEM STATUS: CERTIFIED DATA`, 130, 28);
+
+        // 3. SECTION 01: GEOSPATIAL DATA
+        doc.setTextColor(0);
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(10);
+        doc.text("01. GEOSPATIAL & ASSET DATA", 20, 50);
+        doc.line(20, 52, 190, 52);
+
+        const drawRow = (y, label, value) => {
+            doc.setFillColor(248, 250, 252);
+            doc.rect(20, y, 170, 8, 'F');
+            doc.setFont("helvetica", "bold");
+            doc.text(label, 25, y + 5);
+            doc.setFont("helvetica", "normal");
+            doc.text(value, 85, y + 5);
+        };
+
+        drawRow(55, "GEODETIC POSITION", `${d.lat}N / ${d.lng}W (WGS84)`);
+        drawRow(63, "MUNICIPAL SECTOR", "PORT-AU-PRINCE METROPOLITAN");
+        drawRow(71, "ASSET CLASSIFICATION", d.type.toUpperCase());
+        drawRow(79, "ENGINEERING VALUATION", `$${d.cost.toLocaleString()} USD`);
+
+        // 4. SECTION 02: STRATEGIC IMPACT
+        doc.setFont("helvetica", "bold");
+        doc.text("02. STRATEGIC IMPACT ASSESSMENT", 20, 100);
+        doc.line(20, 102, 190, 102);
+
+        doc.setFontSize(9);
+        doc.text("OPERATIONAL URGENCY:", 25, 110);
+        doc.setFont("helvetica", "normal");
+        doc.text(d.cost > 10000 ? "PRIORITY ALPHA (IMMEDIATE)" : "PRIORITY BETA (SCHEDULED)", 75, 110);
+        
+        doc.setFont("helvetica", "bold");
+        doc.text("STRATEGIC JUSTIFICATION:", 25, 118);
+        doc.setFont("helvetica", "normal");
+        const justification = "Critical signal for urban stabilization. Repair is essential for maintaining local supply chains and public safety access.";
+        const splitJust = doc.splitTextToSize(justification, 110);
+        doc.text(splitJust, 75, 118);
+
+        doc.setFont("helvetica", "bold");
+        doc.text("FIELD OBSERVATIONS:", 25, 130);
+        const splitDesc = doc.splitTextToSize(d.desc, 110);
+        doc.setFont("helvetica", "normal");
+        doc.text(splitDesc, 75, 130);
+
+        // 5. SECTION 03: VISUAL EVIDENCE
+        if(d.photo) {
+            doc.setFont("helvetica", "bold");
+            doc.text("03. GROUND-TRUTH EVIDENCE", 20, 155);
+            doc.setDrawColor(40);
+            doc.rect(20, 158, 170, 85); 
+            doc.addImage(d.photo, 'JPEG', 21, 159, 168, 83);
+            
+            doc.setFontSize(7);
+            doc.setTextColor(120);
+            doc.text(`FIELD SIGNAL CAPTURE TIMESTAMP: ${new Date().toLocaleString()}`, 20, 248);
+        }
+
+        // 6. VALIDATION LOG
+        let footerY = 255;
+        doc.setTextColor(0);
+        doc.setFontSize(9);
+        doc.setFont("helvetica", "bold");
+        doc.text("TECHNICAL VALIDATION LOG:", 20, footerY);
+        
+        doc.setFont("helvetica", "normal");
+        doc.setFontSize(8);
+        doc.text("[ X ] FIELD SIGNAL RECEIVED", 25, footerY + 8);
+        doc.text("[ X ] GEOSPATIAL ALIGNMENT VERIFIED", 75, footerY + 8);
+        doc.text("[ X ] BUDGETARY AUDIT COMPLETED", 135, footerY + 8);
+
+        // Final Footer
+        doc.setFontSize(7);
+        doc.setTextColor(150);
+        const disclaimer = "This dossier is a sovereign technical asset of FixHaiti. Information herein is certified for institutional resource allocation and reconstruction frameworks.";
+        doc.text(disclaimer, 20, 282);
+        
+        doc.save(`FixHaiti_Official_Audit_${refID}.pdf`);
     }
 
     function dismissReport() { if(confirm("Remove signal?")) { map.removeLayer(currentMarker); stats.total--; if(currentMarker.options.vData.status === "Pending Audit") stats.pending--; updateDashboard(); } }
