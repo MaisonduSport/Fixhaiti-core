@@ -254,35 +254,6 @@
     let adminUser = { name: "", id: "" };
     let stats = { total: 0, pending: 0, verified: 0, exposure: 0, resolved: 0 };
 
-    // ================= DEMO FIXHAITI REPORTS =================
-    // 1. Major pothole (urban road)
-    addIssue(
-        18.5431, -72.3380,
-        "Structural Pothole",
-        "Severe road collapse affecting main traffic flow. Water erosion suspected under asphalt layer.",
-        "Pending Audit",
-        "https://images.unsplash.com/photo-1600320254374-ce2d293c0b0d?auto=format&fit=crop&w=800&q=60"
-    );
-
-    // 2. Drainage blockage
-    addIssue(
-        18.5398, -72.3352,
-        "Drainage Blockage",
-        "Storm drain completely obstructed with debris causing localized flooding during rainfall.",
-        "Pending Audit",
-        "https://images.unsplash.com/photo-1590490360182-c33d57733427?auto=format&fit=crop&w=800&q=60"
-    );
-
-    // 3. Asphalt degradation (highway segment)
-    addIssue(
-        18.5365, -72.3320,
-        "Asphalt Degradation",
-        "Surface cracking and layered asphalt failure on high-traffic arterial road segment.",
-        "Pending Audit",
-        "https://images.unsplash.com/photo-1629904853716-f0b1c7b2b7f3?auto=format&fit=crop&w=800&q=60"
-    );
-    // ==========================================================
-
     function updateDashboard() {
         document.getElementById('statReports').innerText = stats.total;
         document.getElementById('statVerified').innerText = stats.verified;
