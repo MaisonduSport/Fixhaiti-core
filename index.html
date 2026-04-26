@@ -38,10 +38,78 @@
         .machinery-item input { accent-color: #00d9ff; width: 14px; height: 14px; }
 
         /* --- DASHBOARD & LAYOUT --- */
-        .hero { height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; position:relative; overflow:hidden;}
+        .hero { 
+            height:100vh; 
+            display:flex; 
+            align-items:center; 
+            justify-content:center; 
+            text-align:center; 
+            position:relative; 
+            overflow:hidden;
+            background: #0a0f1a;
+        }
         #roadNetwork { position:absolute; top:0; left:0; width:100%; height:100%; z-index:1; opacity: 0.4;}
-        .hero-content {position:relative; z-index:2; max-width:800px;}
-        .hero h1 {font-size:55px; margin-bottom:20px; letter-spacing:-1px;}
+        
+        .hero-content {
+            position:relative; 
+            z-index:10; 
+            max-width:900px;
+            animation: fadeIn 1.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .hero h1 {
+            font-size: 78px; 
+            font-weight: 200; 
+            letter-spacing: -4px; 
+            line-height: 0.85;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            color: #ffffff;
+        }
+        .hero p.tagline {
+            font-size: 10px; 
+            letter-spacing: 8px; 
+            text-transform: uppercase; 
+            color: #00d9ff; 
+            font-weight: 800; 
+            margin-bottom: 10px;
+        }
+
+        .hero-footer {
+            position: absolute;
+            bottom: 40px;
+            width: 100%;
+            padding: 0 80px;
+            display: flex;
+            justify-content: space-between;
+            z-index: 10;
+        }
+
+        .ticker-box {
+            text-align: left;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding-left: 20px;
+        }
+
+        .ticker-box span {
+            display: block;
+            font-size: 8px;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+        }
+
+        .ticker-box b {
+            font-size: 11px;
+            font-family: 'Inter', sans-serif;
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); filter: blur(5px); }
+            to { opacity: 1; transform: translateY(0); filter: blur(0); }
+        }
 
         .btn { padding:14px 28px; border:none; background:#00d9ff; color:black; border-radius:4px; cursor:pointer; font-weight:800; text-transform: uppercase; font-size: 11px; transition: 0.2s ease;}
         
@@ -55,7 +123,6 @@
         .issue-panel p {margin:14px 0; font-size:14px; color: #94a3b8; border-bottom: 1px solid #1e293b; padding-bottom: 10px;}
         .issue-panel span {color: white; font-weight: 600; float: right;}
 
-        /* Visual Evidence Comparison UI */
         .photo-comparison-grid { display: flex; gap: 20px; margin-top: 20px; }
         .photo-box { flex: 1; }
         .photo-box p { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; border: none; padding: 0; color: #00d9ff; }
@@ -177,9 +244,26 @@
 <section class="hero">
     <canvas id="roadNetwork"></canvas>
     <div class="hero-content">
-        <h1>Infrastructure Intelligence</h1>
-        <p>Turning verified ground-truth into sovereign reconstruction priorities.</p>
-        <button class="btn" onclick="document.getElementById('map').scrollIntoView({behavior:'smooth'})">Explore Grid</button>
+        <p class="tagline">Infrastructure Intelligence</p>
+        <h1>National<br>Grid Systems</h1>
+        <button class="btn" style="background:transparent; border: 1px solid #1e293b; color:#94a3b8; margin-top:30px; letter-spacing: 2px;" onclick="document.getElementById('map').scrollIntoView({behavior:'smooth'})">
+            Enter Command Center
+        </button>
+    </div>
+
+    <div class="hero-footer">
+        <div class="ticker-box">
+            <span>Terminal Access</span>
+            <b>ENCRYPTED // P-A-P GRID</b>
+        </div>
+        <div class="ticker-box">
+            <span>Operational Time</span>
+            <b id="liveTime">00:00:00</b>
+        </div>
+        <div class="ticker-box">
+            <span>Platform Status</span>
+            <b>V.2.06 ACTIVE</b>
+        </div>
     </div>
 </section>
 
@@ -247,6 +331,13 @@
     function animate(){ ctx.clearRect(0,0,canvas.width,canvas.height); nodes.forEach(n=>{ n.x+=n.vx; n.y+=n.vy; if(n.x<0||n.x>canvas.width)n.vx*=-1; if(n.y<0||n.y>canvas.height)n.vy*=-1; ctx.beginPath(); ctx.arc(n.x,n.y,1.5,0,Math.PI*2); ctx.fillStyle="#00d9ff"; ctx.fill(); }); requestAnimationFrame(animate); }
     animate();
 
+    function updateClock() {
+        const now = new Date();
+        document.getElementById('liveTime').innerText = now.toLocaleTimeString('en-US', { hour12: false });
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+
     const map=L.map('mapBox', {zoomControl: false}).setView([18.539, -72.336], 13);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
 
@@ -288,7 +379,6 @@
                 document.getElementById("photoContainer").style.display="block"; 
                 document.getElementById("displayPhoto").style.backgroundImage=`url(${d.photo})`;
                 
-                // Show After image if resolved
                 if(d.photoAfter) {
                     document.getElementById("afterBox").style.display = "block";
                     document.getElementById("displayPhotoAfter").style.backgroundImage=`url(${d.photoAfter})`;
@@ -382,19 +472,16 @@
             vItem.innerHTML = `<p style="font-size:8px; color:#3b82f6; font-weight:bold;">VETTED BY ${adminUser.id}</p><h3 style="font-size:14px; margin-top:5px;">${d.type}</h3>`;
             vList.prepend(vItem);
         } else {
-            // Check for After photo
             if(!tempAfterImage) return alert("Validation Error: A resolution photo is required to close this asset dossier.");
-            
             d.status = "RESOLVED";
             d.resolvedDate = document.getElementById('resolvedDate').value;
             d.contractor = document.getElementById('contractorName').value;
             d.resolutionNotes = document.getElementById('resolutionSummary').value;
             d.photoAfter = tempAfterImage;
             d.timeResolved = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-            
             currentMarker.setStyle({color: "#475569", radius: 6, fillOpacity: 0.4});
             stats.verified--; stats.resolved++;
-            tempAfterImage = null; // Reset buffer
+            tempAfterImage = null;
         }
 
         updateDashboard();
@@ -428,8 +515,6 @@
             doc.setFont("helvetica", "normal"); doc.text(`COMPLETED: ${d.resolvedDate}`, 25, 165);
             doc.text(`CONTRACTOR: ${d.contractor.toUpperCase()}`, 25, 172);
             doc.text("WORK SUMMARY:", 25, 179); doc.text(doc.splitTextToSize(d.resolutionNotes, 160), 25, 184);
-            
-            // Side-by-Side Comparison
             doc.setFont("helvetica", "bold"); doc.text("05. VISUAL PROOF (BEFORE VS AFTER)", 20, 205);
             if(d.photo) doc.addImage(d.photo, 'JPEG', 20, 210, 85, 48);
             if(d.photoAfter) doc.addImage(d.photoAfter, 'JPEG', 105, 210, 85, 48);
