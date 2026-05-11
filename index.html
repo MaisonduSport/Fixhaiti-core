@@ -336,6 +336,7 @@
         document.getElementById('liveTime').innerText = now.toLocaleTimeString('en-US', { hour12: false });
     }
     setInterval(updateClock, 1000);
+    updateClock();
 
     const map=L.map('mapBox', {zoomControl: false}).setView([18.539, -72.336], 13);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png').addTo(map);
@@ -364,7 +365,7 @@
             timeVerified: null, timeResolved: null, verifiedBy: "", agentID: "",
             resolvedDate: "", contractor: "", resolutionNotes: ""
         };
-        stats.total++; stats.pending++; 
+        stats.total++; stats.pending++; updateDashboard();
 
         m.on("click", () => {
             currentMarker = m; const d = m.options.vData;
@@ -394,35 +395,6 @@
         feed.prepend(item);
     }
 
-    // --- DEMO INITIALIZATION PROTOCOL ---
-    function initDemo() {
-        // 1. PENDING SIGNAL (Red)
-        addIssue(18.542, -72.333, "Structural Pothole", "Major depression on primary transit lane. High risk of vehicle axle damage.", "Pending Audit", null);
-
-        // 2. CONFIRMED/VERIFIED ASSET (Blue)
-        addIssue(18.535, -72.345, "Drainage Blockage", "Secondary canal overflow causing asphalt erosion. GEMS Category 4.", "VERIFIED", null);
-        const vLayer = map._layers[Object.keys(map._layers)[Object.keys(map._layers).length - 1]];
-        if(vLayer.options.vData) {
-            vLayer.setStyle({color: "#3b82f6", radius: 9});
-            vLayer.options.vData.status = "VERIFIED";
-            vLayer.options.vData.cost = "$12,400";
-            vLayer.options.vData.address = "Delmas 33 Intersection";
-            stats.pending--; stats.verified++; stats.exposure += 12400;
-        }
-
-        // 3. RESOLVED ASSET (Slate)
-        addIssue(18.548, -72.320, "Asphalt Degradation", "Surface delamination covering 40sqm. Repaired using high-grade bitumen.", "RESOLVED", null);
-        const rLayer = map._layers[Object.keys(map._layers)[Object.keys(map._layers).length - 1]];
-        if(rLayer.options.vData) {
-            rLayer.setStyle({color: "#475569", radius: 6, fillOpacity: 0.4});
-            rLayer.options.vData.status = "RESOLVED";
-            rLayer.options.vData.cost = "$5,200";
-            rLayer.options.vData.address = "Avenue Martin Luther King";
-            stats.pending--; stats.resolved++; stats.exposure += 5200;
-        }
-        updateDashboard();
-    }
-
     function validateGuardian() {
         const nameInput = document.getElementById('adminName').value.trim();
         const key = document.getElementById('gCode').value;
@@ -449,6 +421,7 @@
         if(isAuthorized && currentMarker) {
             const d = currentMarker.options.vData;
             document.getElementById('auditOverlay').style.display='flex';
+            
             if(d.status === "VERIFIED") {
                 document.getElementById('auditTitle').innerText = "Infrastructure Resolution Protocol";
                 document.getElementById('baseAuditFields').style.opacity = "0.5";
@@ -468,25 +441,52 @@
 
     function submitVerification() {
         const d = currentMarker.options.vData;
+        
         if (d.status !== "VERIFIED") {
             const rawCost = document.getElementById('auditCost').value;
             let numericVal = 0;
             const match = rawCost.replace(/,/g, '').match(/\d+/);
             if(match) { numericVal = parseInt(match[0]); if(rawCost.toLowerCase().includes('k')) numericVal *= 1000; }
+
+            const selectedMachinery = [];
+            document.querySelectorAll('#machineryList input:checked').forEach(i => selectedMachinery.push(i.value));
+
             d.address = document.getElementById('auditAddress').value;
+            d.traffic = document.getElementById('auditTraffic').value;
+            d.duration = document.getElementById('auditDuration').value;
             d.cost = rawCost;
+            d.auditNotes = document.getElementById('auditNotes').value;
+            d.machinery = selectedMachinery;
             d.status = "VERIFIED";
+            d.verifiedBy = adminUser.name;
+            d.agentID = adminUser.id;
+            d.timeVerified = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+
             currentMarker.setStyle({color: "#3b82f6", radius: 9});
             stats.pending--; stats.verified++; stats.exposure += numericVal;
+            
+            const vList = document.getElementById('verifiedList');
+            if(stats.verified === 1) vList.innerHTML = '<h4 style="font-size:10px; color:#3b82f6; margin-bottom:20px; text-transform:uppercase;">Institutional Pipe</h4>';
+            const vItem = document.createElement('div');
+            vItem.className = "box"; vItem.style = "margin-bottom:12px; border:1px solid #3b82f633; padding:15px;";
+            vItem.innerHTML = `<p style="font-size:8px; color:#3b82f6; font-weight:bold;">VETTED BY ${adminUser.id}</p><h3 style="font-size:14px; margin-top:5px;">${d.type}</h3>`;
+            vList.prepend(vItem);
         } else {
-            if(!tempAfterImage) return alert("Validation Error: A resolution photo is required.");
+            if(!tempAfterImage) return alert("Validation Error: A resolution photo is required to close this asset dossier.");
             d.status = "RESOLVED";
+            d.resolvedDate = document.getElementById('resolvedDate').value;
+            d.contractor = document.getElementById('contractorName').value;
+            d.resolutionNotes = document.getElementById('resolutionSummary').value;
             d.photoAfter = tempAfterImage;
+            d.timeResolved = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
             currentMarker.setStyle({color: "#475569", radius: 6, fillOpacity: 0.4});
             stats.verified--; stats.resolved++;
+            tempAfterImage = null;
         }
+
         updateDashboard();
         document.getElementById("vStatus").innerText = d.status;
+        document.getElementById("vCost").innerText = d.cost;
         closeAudit();
     }
 
@@ -494,37 +494,63 @@
         const d = currentMarker.options.vData;
         if(d.status === "Pending Audit") return alert("Protocol: Asset must be audited before export.");
         const { jsPDF } = window.jspdf; const doc = new jsPDF();
+
         doc.setFillColor(10, 15, 26); doc.rect(0, 0, 210, 40, 'F');
         doc.setTextColor(0, 217, 255); doc.setFontSize(28); doc.text("FIXHAITI", 20, 28);
-        doc.save(`FixHaiti_Dossier_${d.lat}.pdf`);
+        doc.setTextColor(255); doc.setFontSize(9); doc.text("OFFICIAL INSTITUTIONAL DOSSIER // ASSET LIFECYCLE", 21, 35);
+
+        doc.setTextColor(0); doc.setFont("helvetica", "bold"); doc.text("01. GEOSPATIAL DATA", 20, 55); doc.line(20, 57, 190, 57);
+        doc.setFont("helvetica", "normal"); doc.text(`COORD: ${d.lat}N / ${d.lng}W`, 25, 65); doc.text(`ADDRESS: ${d.address.toUpperCase()}`, 25, 72);
+
+        doc.setFont("helvetica", "bold"); doc.text("02. LOGISTICS", 20, 85); doc.line(20, 87, 190, 87);
+        doc.setFont("helvetica", "normal"); doc.text(`TYPE: ${d.type.toUpperCase()}`, 25, 95); doc.text(`VALUATION: ${d.cost}`, 25, 102);
+        doc.text(`MACHINERY: ${d.machinery.join(", ") || "NONE"}`, 25, 109);
+
+        doc.setFont("helvetica", "bold"); doc.text("03. VETTING AUTHORITY", 20, 120); doc.line(20, 122, 190, 122);
+        doc.setFont("helvetica", "normal"); doc.text(`AGENT: ${d.verifiedBy} (${d.agentID})`, 25, 130);
+        doc.text(`REPORTED: ${d.timeReported}`, 25, 135); doc.text(`VERIFIED: ${d.timeVerified}`, 25, 140);
+
+        if(d.status === "RESOLVED") {
+            doc.setFont("helvetica", "bold"); doc.text("04. RESOLUTION CERTIFICATION", 20, 155); doc.line(20, 157, 190, 157);
+            doc.setFont("helvetica", "normal"); doc.text(`COMPLETED: ${d.resolvedDate}`, 25, 165);
+            doc.text(`CONTRACTOR: ${d.contractor.toUpperCase()}`, 25, 172);
+            doc.text("WORK SUMMARY:", 25, 179); doc.text(doc.splitTextToSize(d.resolutionNotes, 160), 25, 184);
+            doc.setFont("helvetica", "bold"); doc.text("05. VISUAL PROOF (BEFORE VS AFTER)", 20, 205);
+            if(d.photo) doc.addImage(d.photo, 'JPEG', 20, 210, 85, 48);
+            if(d.photoAfter) doc.addImage(d.photoAfter, 'JPEG', 105, 210, 85, 48);
+        } else {
+            if(d.photo) doc.addImage(d.photo, 'JPEG', 20, 210, 85, 48);
+        }
+
+        doc.save(`FixHaiti_Dossier_${d.agentID}.pdf`);
+    }
+
+    function handleImage(input) {
+        const reader = new FileReader(); reader.onload = (e) => {
+            tempImageData = e.target.result;
+            const prev = document.getElementById('pPreview');
+            prev.style.backgroundImage = `url(${tempImageData})`; prev.innerText = "";
+        };
+        reader.readAsDataURL(input.files[0]);
     }
 
     function reportAtMyLocation(){
         navigator.geolocation.getCurrentPosition(pos=>{
             let lat=pos.coords.latitude, lng=pos.coords.longitude;
             let popup=`<div class="popup-form">
-                <select id="t"><option>Structural Pothole</option><option>Drainage Blockage</option></select>
+                <h2 style="font-size:10px; color:#00d9ff; letter-spacing:2px; margin-bottom:15px; text-transform:uppercase;">New Ground Signal</h2>
+                <select id="t"><option>Structural Pothole</option><option>Drainage Blockage</option><option>Asphalt Degradation</option></select>
                 <textarea id="d" placeholder="Provide ground truth details..." rows="3"></textarea>
                 <input type="file" accept="image/*" onchange="handleImage(this)">
                 <div id="pPreview" class="image-preview">Evidence Attachment Slot</div>
-                <button class="btn" style="width:100%;" onclick="addIssue(${lat},${lng},document.getElementById('t').value,document.getElementById('d').value,'Pending Audit',tempImageData); map.closePopup();">Broadcast Signal</button>
+                <button class="btn" style="width:100%; margin-top:15px;" onclick="addIssue(${lat},${lng},document.getElementById('t').value,document.getElementById('d').value,'Pending Audit',tempImageData); map.closePopup(); tempImageData=null;">Broadcast Signal</button>
             </div>`;
             L.popup().setLatLng([lat,lng]).setContent(popup).openOn(map);
         });
     }
 
-    function handleImage(input) {
-        const reader = new FileReader(); reader.onload = (e) => {
-            tempImageData = e.target.result;
-            document.getElementById('pPreview').style.backgroundImage = `url(${tempImageData})`;
-            document.getElementById('pPreview').innerText = "";
-        };
-        reader.readAsDataURL(input.files[0]);
-    }
-
-    function dismissReport() { if(confirm("Dismiss this signal?")) { map.removeLayer(currentMarker); stats.total--; updateDashboard(); } }
-
-    window.onload = () => { initDemo(); updateClock(); };
+    function dismissReport() { if(confirm("Dismiss this signal?")) { map.removeLayer(currentMarker); stats.total--; if(currentMarker.options.vData.status === "Pending Audit") stats.pending--; updateDashboard(); } }
 </script>
 </body>
 </html>
+       
